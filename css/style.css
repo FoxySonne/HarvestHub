@@ -3,8 +3,9 @@
 @import url("layout.css");
 @import url("forms.css");
 @import url("buttons.css");
-@import url("components.css?v=20260703-13");
-@import url("season-resources.css?v=20260703-9");
+@import url("components.css?v=20260704-1");
+@import url("season-resources.css?v=20260704-1");
 @import url("utilities.css?v=20260703-2");
 @import url("mobile.css");
+@import url("ipk.css?v=20260704-1");
 @import url("desktop.css?v=20260703-1");
