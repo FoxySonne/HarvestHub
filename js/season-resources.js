@@ -106,6 +106,37 @@ function createLevelSelect(className, defaultValue) {
   return select;
 }
 
+function syncBuildingRow(row) {
+  if (!row) return;
+
+  const checkbox = row.querySelector(".season-building-enabled");
+  const currentSelect = row.querySelector(".season-building-current");
+  const targetSelect = row.querySelector(".season-building-target");
+
+  if (!checkbox || !currentSelect || !targetSelect) return;
+
+  const currentLevel = Number(currentSelect.value) || 0;
+  let targetLevel = Number(targetSelect.value) || 0;
+
+  Array.from(targetSelect.options).forEach(option => {
+    const optionLevel = Number(option.value) || 0;
+    option.disabled = optionLevel > 0 && optionLevel < currentLevel;
+  });
+
+  if (currentLevel > 0 && targetLevel < currentLevel) {
+    targetLevel = currentLevel;
+    targetSelect.value = String(currentLevel);
+  }
+
+  if (currentLevel > 0 || targetLevel > 0) {
+    checkbox.checked = true;
+  }
+}
+
+function syncAllBuildingRows() {
+  document.querySelectorAll(".season-building-row").forEach(row => syncBuildingRow(row));
+}
+
 function renderBuildingRows() {
   const container = document.getElementById("seasonBuildingList");
   if (!container) return;
@@ -146,6 +177,7 @@ function renderBuildingRows() {
     levels.append(currentWrap, targetWrap);
     row.append(checkLabel, levels);
     container.appendChild(row);
+    syncBuildingRow(row);
   });
 }
 
@@ -339,6 +371,9 @@ function updateProduction() {
 }
 
 function handleCalculatorInput(target) {
+  const buildingRow = target?.closest?.(".season-building-row");
+  if (buildingRow) syncBuildingRow(buildingRow);
+
   if (isRaidNeedInput(target)) {
     isRaidNeedManual = true;
   }
@@ -393,6 +428,7 @@ function setDefaults() {
 
 function updateAll(target = null) {
   normalizeDiscountCans();
+  syncAllBuildingRows();
 
   if (shouldSyncMainBuildingLevel(target)) {
     syncMainBuildingLevel();
