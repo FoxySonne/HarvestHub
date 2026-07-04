@@ -1,6 +1,85 @@
 import { database } from "../data/database.js";
 
+const TURBO_WEEK_STATE_PREFIX = "harvesthub_turbo_vs_week_state:local";
+
 let isSyncingControls = false;
+let isDaySelectedManually = false;
+let currentDayId = "";
+
+function getTurboWeekStateKey() {
+  return TURBO_WEEK_STATE_PREFIX;
+}
+
+function readTurboWeekState() {
+  try {
+    return JSON.parse(localStorage.getItem(getTurboWeekStateKey()) || "{}");
+  } catch (error) {
+    console.warn("Не удалось прочитать недельные данные Турбо/VS", error);
+    return {};
+  }
+}
+
+function writeTurboWeekState(state) {
+  localStorage.setItem(getTurboWeekStateKey(), JSON.stringify(state));
+}
+
+function getRowActionId(row) {
+  return row?.querySelector("[data-action-id]")?.dataset.actionId ||
+    row?.querySelector("[data-level-action-id]")?.dataset.levelActionId ||
+    "";
+}
+
+function getRowState(row) {
+  const quantityControl = row.querySelector("input[data-action-id], select[data-action-id]");
+  const levelSelect = row.querySelector(".action-level-select");
+
+  return {
+    value: quantityControl?.value || "0",
+    level: levelSelect?.value || null
+  };
+}
+
+function setRowState(row, state) {
+  const quantityControl = row.querySelector("input[data-action-id], select[data-action-id]");
+  const levelSelect = row.querySelector(".action-level-select");
+
+  if (quantityControl) quantityControl.value = String(state?.value ?? "0");
+  if (levelSelect && state?.level != null) levelSelect.value = String(state.level);
+}
+
+function saveCurrentDayState() {
+  if (!currentDayId) return;
+
+  const state = readTurboWeekState();
+  state[currentDayId] = { turtle: {}, vs: {} };
+
+  document.querySelectorAll(".action-row").forEach(row => {
+    const actionId = getRowActionId(row);
+    const eventType = row.querySelector("[data-event-type]")?.dataset.eventType;
+
+    if (!actionId || !eventType) return;
+
+    state[currentDayId][eventType][actionId] = getRowState(row);
+  });
+
+  writeTurboWeekState(state);
+}
+
+function restoreDayState(dayId) {
+  const state = readTurboWeekState();
+  const dayState = state[dayId];
+
+  if (!dayState) return;
+
+  document.querySelectorAll(".action-row").forEach(row => {
+    const actionId = getRowActionId(row);
+    const eventType = row.querySelector("[data-event-type]")?.dataset.eventType;
+
+    if (!actionId || !eventType) return;
+
+    setRowState(row, dayState[eventType]?.[actionId]);
+  });
+}
 
 function resolveDayList(list = []) {
   return list.flatMap(item => {
@@ -87,6 +166,7 @@ function syncActionControls(actionId, sourceControl) {
 
 function handleControlChange(actionId, sourceControl) {
   syncActionControls(actionId, sourceControl);
+  saveCurrentDayState();
   updateTotals();
 }
 
@@ -113,6 +193,7 @@ function createActionRow(action, eventType) {
     const levelSelect = document.createElement("select");
     levelSelect.className = "action-level-select";
     levelSelect.dataset.levelActionId = action.id;
+    levelSelect.dataset.noPersist = "true";
 
     action.options.forEach(optionData => {
       const option = document.createElement("option");
@@ -129,6 +210,7 @@ function createActionRow(action, eventType) {
     quantityInput.dataset.actionId = action.id;
     quantityInput.dataset.eventType = eventType;
     quantityInput.dataset.hasLevel = "true";
+    quantityInput.dataset.noPersist = "true";
 
     levelSelect.addEventListener("change", () => handleControlChange(action.id, levelSelect));
     quantityInput.addEventListener("input", () => handleControlChange(action.id, quantityInput));
@@ -156,6 +238,7 @@ function createActionRow(action, eventType) {
 
     quantitySelect.dataset.actionId = action.id;
     quantitySelect.dataset.eventType = eventType;
+    quantitySelect.dataset.noPersist = "true";
     quantitySelect.addEventListener("change", () => handleControlChange(action.id, quantitySelect));
 
     controls.appendChild(quantitySelect);
@@ -169,6 +252,7 @@ function createActionRow(action, eventType) {
   input.value = "0";
   input.dataset.actionId = action.id;
   input.dataset.eventType = eventType;
+  input.dataset.noPersist = "true";
   input.addEventListener("input", () => handleControlChange(action.id, input));
 
   controls.appendChild(input);
@@ -184,6 +268,13 @@ function getPoints(actionId, eventType, level = null) {
   if (points == null) return 0;
   if (typeof points === "object") return Number(points[level]) || 0;
   return Number(points) || 0;
+}
+
+function calculateSavedItemTotal(actionId, eventType, itemState = {}) {
+  const value = Number(itemState.value) || 0;
+  const points = getPoints(actionId, eventType, itemState.level ?? null);
+
+  return value * points;
 }
 
 function updateTotals() {
@@ -215,6 +306,29 @@ function updateTotals() {
   if (vsTotalElement) vsTotalElement.textContent = vsTotal.toLocaleString("ru-RU");
 }
 
+function calculateWeeklyTotals() {
+  saveCurrentDayState();
+
+  const state = readTurboWeekState();
+  let turtleTotal = 0;
+  let vsTotal = 0;
+
+  database.dayOrder.forEach(dayId => {
+    const dayState = state[dayId];
+    if (!dayState) return;
+
+    Object.entries(dayState.turtle || {}).forEach(([actionId, itemState]) => {
+      turtleTotal += calculateSavedItemTotal(actionId, "turtle", itemState);
+    });
+
+    Object.entries(dayState.vs || {}).forEach(([actionId, itemState]) => {
+      vsTotal += calculateSavedItemTotal(actionId, "vs", itemState);
+    });
+  });
+
+  return { turtleTotal, vsTotal };
+}
+
 function renderList(container, items, eventType) {
   items.forEach(item => {
     if (typeof item !== "string") {
@@ -229,8 +343,12 @@ function renderList(container, items, eventType) {
 }
 
 function renderDay(dayId) {
+  saveCurrentDayState();
+
   const day = database.days[dayId];
   if (!day) return;
+
+  currentDayId = dayId;
 
   const turtleList = document.getElementById("turtleList");
   const vsList = document.getElementById("vsList");
@@ -245,6 +363,7 @@ function renderDay(dayId) {
 
   renderList(turtleList, turtleItems, "turtle");
   renderList(vsList, vsItems, "vs");
+  restoreDayState(dayId);
   updateTotals();
 }
 
@@ -252,6 +371,7 @@ export function init() {
   const daySelector = document.getElementById("daySelector");
   if (!daySelector) return;
 
+  currentDayId = "";
   daySelector.innerHTML = "";
 
   database.dayOrder.forEach(dayId => {
@@ -264,6 +384,29 @@ export function init() {
     daySelector.appendChild(option);
   });
 
-  daySelector.addEventListener("change", () => renderDay(daySelector.value));
+  const currentUtcDayId = typeof window.getHarvestHubUtcDayId === "function"
+    ? window.getHarvestHubUtcDayId()
+    : database.dayOrder[0];
+
+  daySelector.value = database.days[currentUtcDayId] ? currentUtcDayId : database.dayOrder[0];
+
+  daySelector.addEventListener("change", () => {
+    isDaySelectedManually = true;
+    renderDay(daySelector.value);
+  });
+
+  window.addEventListener("harvesthub:utc-day-change", event => {
+    if (isDaySelectedManually) return;
+
+    const dayId = event.detail?.dayId;
+
+    if (!dayId || !database.days[dayId]) return;
+
+    daySelector.value = dayId;
+    renderDay(dayId);
+  });
+
   renderDay(daySelector.value);
 }
+
+window.calculateTurboVsWeeklyTotals = calculateWeeklyTotals;
