@@ -1,5 +1,6 @@
 @media (max-width:1199px){
 .container{display:block;width:100%;min-height:100vh}.topbar{display:flex}.main{width:100%;max-width:100%;padding:16px;overflow-x:hidden}.left{position:fixed;top:0;left:-260px;width:240px;height:100vh}.left.active{left:0}.right{display:flex;flex-direction:column;gap:16px;padding:0 16px 16px;max-width:100%;overflow-x:hidden}
 .adaptive-grid,.grid,.grid-2,.grid-3,.grid-4{grid-template-columns:1fr;gap:16px}.flex,.flex-between{flex-direction:column;align-items:stretch}.desktop-fixed-right{order:-1}.turbo-content{display:flex;flex-direction:column;gap:16px}.results{order:-1}
+.action-row,.action-row-with-level{display:grid;grid-template-columns:1fr;gap:8px}.action-row label{min-width:0;overflow-wrap:anywhere}.action-controls{width:100%;min-width:0}.action-row input,.action-row select{width:100%;max-width:100%;min-width:0}.action-row-with-level .action-controls{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}.action-row-with-level .action-level-select,.action-row-with-level .action-quantity-input{width:100%;max-width:100%;min-width:0}
 .button,button,input[type=submit],input[type=button]{width:100%;min-width:100%}.input-small,.input-medium,.input-large{max-width:100%}
 }
