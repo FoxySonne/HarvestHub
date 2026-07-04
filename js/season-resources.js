@@ -2,7 +2,11 @@ import { seasonDatabase } from "../data/season-database.js";
 import { seasonBuildingsDatabase } from "../data/season-buildings-database.js";
 
 const MAX_DISCOUNT_CANS = 50;
-const numberFormat = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 1 });
+let isRaidNeedManual = false;
+
+const numberFormat = new Intl.NumberFormat("ru-RU", {
+  maximumFractionDigits: 1
+});
 
 function num(id) {
   const element = document.getElementById(id);
@@ -47,6 +51,19 @@ function syncLinkedRaidInputs(target) {
   syncValue(target.id, linkedId);
 }
 
+function isRaidNeedInput(target) {
+  return target?.id === "raidNeedPrimary" || target?.id === "raidNeedSecondary";
+}
+
+function isBuildingNeedSource(target) {
+  if (!target) return true;
+
+  return target.id === "buildingOwnedPrimary" ||
+    target.id === "buildingOwnedSecondary" ||
+    target.id === "buildingEfficiencyLevel" ||
+    Boolean(target.closest?.(".season-building-row"));
+}
+
 function shouldSyncMainBuildingLevel(target) {
   if (!target) return true;
   return Boolean(target.closest?.('.season-building-row[data-building-id="main"]'));
@@ -69,7 +86,9 @@ function fillSelect(id, list, defaultValue = null) {
     select.appendChild(option);
   });
 
-  if (defaultValue !== null) select.value = String(defaultValue);
+  if (defaultValue !== null) {
+    select.value = String(defaultValue);
+  }
 }
 
 function createLevelSelect(className, defaultValue) {
@@ -166,9 +185,18 @@ function sumRequirementsForBuilding(type, currentLevel, targetLevel) {
   return { secondary, primary };
 }
 
+function getEngineeringReduction() {
+  const level = Math.min(3, Math.max(0, num("buildingEfficiencyLevel")));
+  return level / 100;
+}
+
+function applyEngineeringReduction(value) {
+  return Math.ceil(value * (1 - getEngineeringReduction()));
+}
+
 function updateBuildingNeeds() {
-  let secondary = 0;
-  let primary = 0;
+  let secondaryTotal = 0;
+  let primaryTotal = 0;
 
   document.querySelectorAll(".season-building-row").forEach(row => {
     const enabled = row.querySelector(".season-building-enabled")?.checked;
@@ -179,19 +207,25 @@ function updateBuildingNeeds() {
     if (targetLevel <= currentLevel) return;
 
     const requirement = sumRequirementsForBuilding(row.dataset.buildingType, currentLevel, targetLevel);
-    secondary += requirement.secondary;
-    primary += requirement.primary;
+    secondaryTotal += requirement.secondary;
+    primaryTotal += requirement.primary;
   });
 
-  setValue("raidNeedPrimary", primary);
-  setValue("raidNeedSecondary", secondary);
+  const secondaryAfterEfficiency = applyEngineeringReduction(secondaryTotal);
+  const primaryAfterEfficiency = applyEngineeringReduction(primaryTotal);
+  const secondary = Math.max(0, secondaryAfterEfficiency - num("buildingOwnedSecondary"));
+  const primary = Math.max(0, primaryAfterEfficiency - num("buildingOwnedPrimary"));
+
   setValue("productionNeedPrimary", primary);
   setValue("productionNeedSecondary", secondary);
 
+  if (!isRaidNeedManual) {
+    setValue("raidNeedPrimary", primary);
+    setValue("raidNeedSecondary", secondary);
+  }
+
   setText("buildingNeedPrimary", primary);
   setText("buildingNeedSecondary", secondary);
-  setText("raidNeedPrimaryText", primary);
-  setText("raidNeedSecondaryText", secondary);
   setText("productionNeedPrimaryText", primary);
   setText("productionNeedSecondaryText", secondary);
 }
@@ -217,7 +251,6 @@ function calculateAvailableEnergy() {
   const discountCansAvailable = Math.min(MAX_DISCOUNT_CANS, num("raidDiscountCans"));
   const existingCans = num("raidCans");
   const existingEnergy = num("raidEnergy");
-
   const discountCansBought = Math.min(discountCansAvailable, Math.floor(diamonds / seasonDatabase.energy.discountCanCost));
   const diamondsAfterDiscount = diamonds - discountCansBought * seasonDatabase.energy.discountCanCost;
   const regularCansBought = Math.floor(diamondsAfterDiscount / seasonDatabase.energy.regularCanCost);
@@ -305,24 +338,35 @@ function updateProduction() {
   setText("productionNeedHours", needHours);
 }
 
+function handleCalculatorInput(target) {
+  if (isRaidNeedInput(target)) {
+    isRaidNeedManual = true;
+  }
+
+  if (isBuildingNeedSource(target)) {
+    isRaidNeedManual = false;
+  }
+
+  syncLinkedRaidInputs(target);
+  updateAll(target);
+}
+
 function bindCalculatorInputs() {
   const inputs = document.querySelectorAll(".season-page input, .season-page select");
 
   inputs.forEach(input => {
-    input.addEventListener("input", event => {
-      syncLinkedRaidInputs(event.target);
-      updateAll(event.target);
-    });
-
-    input.addEventListener("change", event => {
-      syncLinkedRaidInputs(event.target);
-      updateAll(event.target);
-    });
+    input.addEventListener("input", event => handleCalculatorInput(event.target));
+    input.addEventListener("change", event => handleCalculatorInput(event.target));
   });
 }
 
 function setDefaults() {
   const defaults = {
+    buildingEfficiencyLevel: 0,
+    buildingOwnedSecondary: 0,
+    buildingOwnedPrimary: 0,
+    raidNeedPrimary: 0,
+    raidNeedSecondary: 0,
     alphaNeedLevel: 10,
     alphaFarmLevel: 10,
     infectedNeedLevel: 30,
@@ -360,6 +404,8 @@ function updateAll(target = null) {
 }
 
 export function init() {
+  isRaidNeedManual = false;
+
   fillSelect("alphaNeedLevel", seasonDatabase.alphaDrops);
   fillSelect("alphaFarmLevel", seasonDatabase.alphaDrops);
   fillSelect("infectedNeedLevel", seasonDatabase.infectedDrops);
