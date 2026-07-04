@@ -1,4 +1,4 @@
-const SITE_ASSET_VERSION = "20260704-4";
+const SITE_ASSET_VERSION = "20260704-5";
 const QUICK_LINKS_STORAGE_KEY = "harvesthub_page_visits";
 const PAGE_FORM_STATE_PREFIX = "harvesthub_page_form_state:local:";
 const MAX_QUICK_LINKS = 5;
@@ -185,10 +185,7 @@ function renderQuickLinks(currentPage = localStorage.getItem("currentPage") || "
     }
 
     container.innerHTML = pages.map(page => `
-        <a href="#" class="quick-link-item" data-page-path="${page.path}">
-            <span>${page.title}</span>
-            <small>${page.group}</small>
-        </a>
+        <a href="#" class="quick-link-item" data-page-path="${page.path}">${page.title}</a>
     `).join("");
 
     container.querySelectorAll(".quick-link-item").forEach(link => {
