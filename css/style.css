@@ -3,10 +3,10 @@
 @import url("layout.css");
 @import url("forms.css");
 @import url("buttons.css");
-@import url("components.css?v=20260704-2");
-@import url("home.css?v=20260705-1");
-@import url("season-resources.css?v=20260704-3");
-@import url("utilities.css?v=20260704-3");
-@import url("mobile.css?v=20260704-3");
-@import url("ipk.css?v=20260704-1");
-@import url("desktop.css?v=20260704-2");
+@import url("components.css");
+@import url("home.css");
+@import url("season-resources.css");
+@import url("utilities.css");
+@import url("mobile.css");
+@import url("ipk.css");
+@import url("desktop.css");
