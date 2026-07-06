@@ -1,4 +1,4 @@
-const SITE_ASSET_VERSION = "20260704-6";
+const SITE_ASSET_VERSION = "20260706-1";
 const QUICK_LINKS_STORAGE_KEY = "harvesthub_page_visits";
 const PAGE_FORM_STATE_PREFIX = "harvesthub_page_form_state:local:";
 const MAX_QUICK_LINKS = 5;
@@ -8,363 +8,41 @@ let currentUtcDayId = "";
 let utcClockTimerId = null;
 
 const UTC_DAY_IDS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
-const UTC_DAY_NAMES = {
-    mon: "понедельник",
-    tue: "вторник",
-    wed: "среда",
-    thu: "четверг",
-    fri: "пятница",
-    sat: "суббота",
-    sun: "воскресенье"
-};
+const UTC_DAY_NAMES = {mon:"понедельник",tue:"вторник",wed:"среда",thu:"четверг",fri:"пятница",sat:"суббота",sun:"воскресенье"};
 
 const pagesDatabase = [
     { title: "Главная", path: "home.html", group: "Основное" },
     { title: "Калькулятор", path: "calculator.html", group: "Основное" },
     { title: "Игра по-крупному", path: "calculator/ipk.html", group: "Калькуляторы" },
     { title: "Турбочерепашка & VS", path: "calculator/turbo-vs.html", group: "Калькуляторы" },
-    { title: "Сезонные ресурсы", path: "calculator/season-resources.html", group: "Калькуляторы" }
+    { title: "Сезонные ресурсы", path: "calculator/season-resources.html", group: "Калькуляторы" },
+    { title: "Обучение войск", path: "calculator/troop-training.html", group: "Калькуляторы" }
 ];
 
-function padTimePart(value) {
-    return String(value).padStart(2, "0");
-}
-
-function getHarvestHubUtcTime(date = new Date()) {
-    const dayId = UTC_DAY_IDS[date.getUTCDay()];
-    const year = date.getUTCFullYear();
-    const month = date.getUTCMonth() + 1;
-    const day = date.getUTCDate();
-    const hours = date.getUTCHours();
-    const minutes = date.getUTCMinutes();
-    const seconds = date.getUTCSeconds();
-
-    return {
-        date,
-        timestamp: date.getTime(),
-        iso: date.toISOString(),
-        year,
-        month,
-        day,
-        hours,
-        minutes,
-        seconds,
-        dayIndex: date.getUTCDay(),
-        dayId,
-        dayName: UTC_DAY_NAMES[dayId],
-        dateKey: `${year}-${padTimePart(month)}-${padTimePart(day)}`,
-        timeKey: `${padTimePart(hours)}:${padTimePart(minutes)}:${padTimePart(seconds)}`
-    };
-}
-
-function getHarvestHubUtcDayId(date = new Date()) {
-    return getHarvestHubUtcTime(date).dayId;
-}
-
-function applyHarvestHubUtcTime() {
-    const time = getHarvestHubUtcTime();
-    const previousDayId = currentUtcDayId;
-
-    currentUtcDayId = time.dayId;
-
-    document.documentElement.dataset.utcDate = time.dateKey;
-    document.documentElement.dataset.utcTime = time.timeKey;
-    document.documentElement.dataset.utcDay = time.dayId;
-
-    if (document.body) {
-        document.body.dataset.utcDate = time.dateKey;
-        document.body.dataset.utcTime = time.timeKey;
-        document.body.dataset.utcDay = time.dayId;
-    }
-
-    window.harvestHubUtcTime = time;
-
-    window.dispatchEvent(new CustomEvent("harvesthub:utc-time-change", {
-        detail: time
-    }));
-
-    if (previousDayId && previousDayId !== time.dayId) {
-        window.dispatchEvent(new CustomEvent("harvesthub:utc-day-change", {
-            detail: time
-        }));
-    }
-
-    return time;
-}
-
-function startHarvestHubUtcClock() {
-    applyHarvestHubUtcTime();
-
-    if (utcClockTimerId) return;
-
-    utcClockTimerId = window.setInterval(applyHarvestHubUtcTime, 30000);
-}
-
-function readJsonStorage(key, fallback = {}) {
-    try {
-        return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback));
-    } catch (e) {
-        console.warn(`Не удалось прочитать данные из localStorage: ${key}`, e);
-        return fallback;
-    }
-}
-
-function writeJsonStorage(key, value) {
-    try {
-        localStorage.setItem(key, JSON.stringify(value));
-    } catch (e) {
-        console.warn(`Не удалось сохранить данные в localStorage: ${key}`, e);
-    }
-}
-
-function getPageFormStateKey(pageName) {
-    return `${PAGE_FORM_STATE_PREFIX}${pageName}`;
-}
-
-function getPersistableFields(container) {
-    if (!container) return [];
-
-    return Array.from(container.querySelectorAll("input, select, textarea"))
-        .filter(field => {
-            const type = (field.type || "").toLowerCase();
-
-            if (field.dataset.noPersist === "true") return false;
-
-            return !["button", "submit", "reset", "hidden", "file"].includes(type);
-        });
-}
-
-function getFieldKey(field, index) {
-    const buildingRow = field.closest?.(".season-building-row");
-
-    if (buildingRow?.dataset?.buildingId) {
-        if (field.classList.contains("season-building-enabled")) return `building:${buildingRow.dataset.buildingId}:enabled`;
-        if (field.classList.contains("season-building-current")) return `building:${buildingRow.dataset.buildingId}:current`;
-        if (field.classList.contains("season-building-target")) return `building:${buildingRow.dataset.buildingId}:target`;
-    }
-
-    if (field.id) return `id:${field.id}`;
-    if (field.name) return `name:${field.name}`;
-
-    return `field:${field.tagName.toLowerCase()}:${field.type || "value"}:${index}`;
-}
-
-function getFieldValue(field) {
-    const type = (field.type || "").toLowerCase();
-    if (type === "checkbox" || type === "radio") return field.checked;
-    return field.value;
-}
-
-function setFieldValue(field, value) {
-    const type = (field.type || "").toLowerCase();
-
-    if (type === "checkbox" || type === "radio") {
-        field.checked = Boolean(value);
-        return;
-    }
-
-    field.value = String(value ?? "");
-}
-
-function savePageFormState(pageName = currentLoadedPage) {
-    if (!pageName) return;
-
-    const container = document.getElementById("page-content");
-    const fields = getPersistableFields(container);
-
-    if (fields.length === 0) return;
-
-    const state = {};
-
-    fields.forEach((field, index) => {
-        state[getFieldKey(field, index)] = getFieldValue(field);
-    });
-
-    writeJsonStorage(getPageFormStateKey(pageName), state);
-}
-
-function restorePageFormState(pageName) {
-    const container = document.getElementById("page-content");
-    const fields = getPersistableFields(container);
-    const state = readJsonStorage(getPageFormStateKey(pageName), null);
-
-    if (!state || typeof state !== "object") return;
-
-    fields.forEach((field, index) => {
-        const key = getFieldKey(field, index);
-
-        if (!Object.prototype.hasOwnProperty.call(state, key)) return;
-
-        setFieldValue(field, state[key]);
-        field.dispatchEvent(new Event("input", { bubbles: true }));
-        field.dispatchEvent(new Event("change", { bubbles: true }));
-    });
-}
-
-function bindPageFormPersistence(pageName) {
-    const container = document.getElementById("page-content");
-    const fields = getPersistableFields(container);
-
-    fields.forEach(field => {
-        if (field.dataset.formPersistenceBound === pageName) return;
-
-        field.dataset.formPersistenceBound = pageName;
-        field.addEventListener("input", () => savePageFormState(pageName));
-        field.addEventListener("change", () => savePageFormState(pageName));
-    });
-}
-
-function readPageVisits() {
-    return readJsonStorage(QUICK_LINKS_STORAGE_KEY, {});
-}
-
-function savePageVisits(visits) {
-    writeJsonStorage(QUICK_LINKS_STORAGE_KEY, visits);
-}
-
-function getPageByPath(pagePath) {
-    return pagesDatabase.find(page => page.path === pagePath);
-}
-
-function trackPageVisit(pageName) {
-    if (!getPageByPath(pageName)) return;
-
-    const visits = readPageVisits();
-    visits[pageName] = (Number(visits[pageName]) || 0) + 1;
-    savePageVisits(visits);
-}
-
-function getDefaultQuickLinks() {
-    return [
-        "calculator/ipk.html",
-        "calculator/turbo-vs.html",
-        "calculator/season-resources.html",
-        "calculator.html",
-        "home.html"
-    ].map(getPageByPath).filter(Boolean);
-}
-
-function getPopularPages(currentPage = "") {
-    const visits = readPageVisits();
-
-    const popularPages = pagesDatabase
-        .map(page => ({ ...page, visits: Number(visits[page.path]) || 0 }))
-        .filter(page => page.visits > 0 && page.path !== currentPage)
-        .sort((a, b) => {
-            if (b.visits !== a.visits) return b.visits - a.visits;
-            return a.title.localeCompare(b.title, "ru");
-        });
-
-    if (popularPages.length > 0) return popularPages.slice(0, MAX_QUICK_LINKS);
-
-    return getDefaultQuickLinks()
-        .filter(page => page.path !== currentPage)
-        .slice(0, MAX_QUICK_LINKS);
-}
-
-function renderQuickLinks(currentPage = localStorage.getItem("currentPage") || "") {
-    const container = document.getElementById("quickLinks");
-
-    if (!container) return;
-
-    const pages = getPopularPages(currentPage);
-
-    if (pages.length === 0) {
-        container.innerHTML = `<p class="quick-links-empty">Пока нет статистики переходов</p>`;
-        return;
-    }
-
-    container.innerHTML = pages.map(page => `
-        <a href="#" class="quick-link-item" data-page-path="${page.path}">${page.title}</a>
-    `).join("");
-
-    container.querySelectorAll(".quick-link-item").forEach(link => {
-        link.addEventListener("click", event => {
-            event.preventDefault();
-            const pagePath = link.dataset.pagePath;
-            if (pagePath) loadPage(pagePath);
-        });
-    });
-}
-
-function getGlobalInitName(fileName) {
-    return fileName
-        .split("-")
-        .map((part, index) => index === 0 ? part : part.charAt(0).toUpperCase() + part.slice(1))
-        .join("") + "Init";
-}
-
-function withCacheBust(filePath) {
-    const separator = filePath.includes("?") ? "&" : "?";
-    return `${filePath}${separator}v=${SITE_ASSET_VERSION}-${Date.now()}`;
-}
-
-async function loadBlock(containerId, filePath) {
-    const container = document.getElementById(containerId);
-
-    if (!container) return false;
-
-    const response = await fetch(withCacheBust(filePath), { cache: "no-store" });
-
-    if (!response.ok) {
-        console.warn(`Не удалось загрузить ${filePath}:`, response.status);
-        return false;
-    }
-
-    container.innerHTML = await response.text();
-
-    const fileName = filePath.split("/").pop().replace(".html", "");
-
-    try {
-        const module = await import(`./${fileName}.js?v=${SITE_ASSET_VERSION}-${Date.now()}`);
-
-        if (typeof module.init === "function") {
-            module.init();
-        } else {
-            const globalInitName = getGlobalInitName(fileName);
-            if (typeof window[globalInitName] === "function") window[globalInitName]();
-        }
-    } catch (e) {
-        console.warn(`JS-модуль для страницы ${fileName} не был запущен:`, e);
-
-        const globalInitName = getGlobalInitName(fileName);
-        if (typeof window[globalInitName] === "function") window[globalInitName]();
-    }
-
-    if (containerId === "rightbar-container") renderQuickLinks();
-
-    return true;
-}
-
-async function loadPage(pageName) {
-    savePageFormState(currentLoadedPage);
-
-    const isLoaded = await loadBlock("page-content", "pages/" + pageName);
-
-    if (!isLoaded) return;
-
-    currentLoadedPage = pageName;
-    localStorage.setItem("currentPage", pageName);
-
-    restorePageFormState(pageName);
-    bindPageFormPersistence(pageName);
-    savePageFormState(pageName);
-    trackPageVisit(pageName);
-    renderQuickLinks(pageName);
-
-    if (window.innerWidth < 900 && typeof closeMenu === "function") closeMenu();
-}
-
-window.addEventListener("beforeunload", () => {
-    savePageFormState(currentLoadedPage || localStorage.getItem("currentPage") || "");
-});
-
-startHarvestHubUtcClock();
-
-window.loadPage = loadPage;
-window.loadBlock = loadBlock;
-window.renderQuickLinks = renderQuickLinks;
-window.savePageFormState = savePageFormState;
-window.getHarvestHubUtcTime = getHarvestHubUtcTime;
-window.getHarvestHubUtcDayId = getHarvestHubUtcDayId;
-window.applyHarvestHubUtcTime = applyHarvestHubUtcTime;
+function padTimePart(value){return String(value).padStart(2,"0")}
+function getHarvestHubUtcTime(date=new Date()){const dayId=UTC_DAY_IDS[date.getUTCDay()];const year=date.getUTCFullYear();const month=date.getUTCMonth()+1;const day=date.getUTCDate();const hours=date.getUTCHours();const minutes=date.getUTCMinutes();const seconds=date.getUTCSeconds();return{date,timestamp:date.getTime(),iso:date.toISOString(),year,month,day,hours,minutes,seconds,dayIndex:date.getUTCDay(),dayId,dayName:UTC_DAY_NAMES[dayId],dateKey:`${year}-${padTimePart(month)}-${padTimePart(day)}`,timeKey:`${padTimePart(hours)}:${padTimePart(minutes)}:${padTimePart(seconds)}`}}
+function getHarvestHubUtcDayId(date=new Date()){return getHarvestHubUtcTime(date).dayId}
+function applyHarvestHubUtcTime(){const time=getHarvestHubUtcTime();const previousDayId=currentUtcDayId;currentUtcDayId=time.dayId;document.documentElement.dataset.utcDate=time.dateKey;document.documentElement.dataset.utcTime=time.timeKey;document.documentElement.dataset.utcDay=time.dayId;if(document.body){document.body.dataset.utcDate=time.dateKey;document.body.dataset.utcTime=time.timeKey;document.body.dataset.utcDay=time.dayId}window.harvestHubUtcTime=time;window.dispatchEvent(new CustomEvent("harvesthub:utc-time-change",{detail:time}));if(previousDayId&&previousDayId!==time.dayId){window.dispatchEvent(new CustomEvent("harvesthub:utc-day-change",{detail:time}))}return time}
+function startHarvestHubUtcClock(){applyHarvestHubUtcTime();if(utcClockTimerId)return;utcClockTimerId=window.setInterval(applyHarvestHubUtcTime,30000)}
+function readJsonStorage(key,fallback={}){try{return JSON.parse(localStorage.getItem(key)||JSON.stringify(fallback))}catch(e){console.warn(`Не удалось прочитать данные из localStorage: ${key}`,e);return fallback}}
+function writeJsonStorage(key,value){try{localStorage.setItem(key,JSON.stringify(value))}catch(e){console.warn(`Не удалось сохранить данные в localStorage: ${key}`,e)}}
+function getPageFormStateKey(pageName){return `${PAGE_FORM_STATE_PREFIX}${pageName}`}
+function getPersistableFields(container){if(!container)return[];return Array.from(container.querySelectorAll("input, select, textarea")).filter(field=>{const type=(field.type||"").toLowerCase();if(field.dataset.noPersist==="true")return false;return !["button","submit","reset","hidden","file"].includes(type)})}
+function getFieldKey(field,index){const buildingRow=field.closest?.(".season-building-row");if(buildingRow?.dataset?.buildingId){if(field.classList.contains("season-building-enabled"))return`building:${buildingRow.dataset.buildingId}:enabled`;if(field.classList.contains("season-building-current"))return`building:${buildingRow.dataset.buildingId}:current`;if(field.classList.contains("season-building-target"))return`building:${buildingRow.dataset.buildingId}:target`}if(field.id)return`id:${field.id}`;if(field.name)return`name:${field.name}`;return`field:${field.tagName.toLowerCase()}:${field.type||"value"}:${index}`}
+function getFieldValue(field){const type=(field.type||"").toLowerCase();return type==="checkbox"||type==="radio"?field.checked:field.value}
+function setFieldValue(field,value){const type=(field.type||"").toLowerCase();if(type==="checkbox"||type==="radio"){field.checked=Boolean(value);return}field.value=String(value??"")}
+function savePageFormState(pageName=currentLoadedPage){if(!pageName)return;const container=document.getElementById("page-content");const fields=getPersistableFields(container);if(fields.length===0)return;const state={};fields.forEach((field,index)=>{state[getFieldKey(field,index)]=getFieldValue(field)});writeJsonStorage(getPageFormStateKey(pageName),state)}
+function restorePageFormState(pageName){const container=document.getElementById("page-content");const fields=getPersistableFields(container);const state=readJsonStorage(getPageFormStateKey(pageName),null);if(!state||typeof state!=="object")return;fields.forEach((field,index)=>{const key=getFieldKey(field,index);if(!Object.prototype.hasOwnProperty.call(state,key))return;setFieldValue(field,state[key]);field.dispatchEvent(new Event("input",{bubbles:true}));field.dispatchEvent(new Event("change",{bubbles:true}))})}
+function bindPageFormPersistence(pageName){const container=document.getElementById("page-content");const fields=getPersistableFields(container);fields.forEach(field=>{if(field.dataset.formPersistenceBound===pageName)return;field.dataset.formPersistenceBound=pageName;field.addEventListener("input",()=>savePageFormState(pageName));field.addEventListener("change",()=>savePageFormState(pageName))})}
+function readPageVisits(){return readJsonStorage(QUICK_LINKS_STORAGE_KEY,{})}
+function savePageVisits(visits){writeJsonStorage(QUICK_LINKS_STORAGE_KEY,visits)}
+function getPageByPath(pagePath){return pagesDatabase.find(page=>page.path===pagePath)}
+function trackPageVisit(pageName){if(!getPageByPath(pageName))return;const visits=readPageVisits();visits[pageName]=(Number(visits[pageName])||0)+1;savePageVisits(visits)}
+function getDefaultQuickLinks(){return["calculator/ipk.html","calculator/turbo-vs.html","calculator/season-resources.html","calculator/troop-training.html","calculator.html","home.html"].map(getPageByPath).filter(Boolean)}
+function getPopularPages(currentPage=""){const visits=readPageVisits();const popularPages=pagesDatabase.map(page=>({...page,visits:Number(visits[page.path])||0})).filter(page=>page.visits>0&&page.path!==currentPage).sort((a,b)=>b.visits!==a.visits?b.visits-a.visits:a.title.localeCompare(b.title,"ru"));if(popularPages.length>0)return popularPages.slice(0,MAX_QUICK_LINKS);return getDefaultQuickLinks().filter(page=>page.path!==currentPage).slice(0,MAX_QUICK_LINKS)}
+function renderQuickLinks(currentPage=localStorage.getItem("currentPage")||""){const container=document.getElementById("quickLinks");if(!container)return;const pages=getPopularPages(currentPage);if(pages.length===0){container.innerHTML=`<p class="quick-links-empty">Пока нет статистики переходов</p>`;return}container.innerHTML=pages.map(page=>`<a href="#" class="quick-link-item" data-page-path="${page.path}">${page.title}</a>`).join("");container.querySelectorAll(".quick-link-item").forEach(link=>{link.addEventListener("click",event=>{event.preventDefault();const pagePath=link.dataset.pagePath;if(pagePath)loadPage(pagePath)})})}
+function getGlobalInitName(fileName){return fileName.split("-").map((part,index)=>index===0?part:part.charAt(0).toUpperCase()+part.slice(1)).join("")+"Init"}
+function withCacheBust(filePath){const separator=filePath.includes("?")?"&":"?";return`${filePath}${separator}v=${SITE_ASSET_VERSION}-${Date.now()}`}
+async function loadBlock(containerId,filePath){const container=document.getElementById(containerId);if(!container)return false;const response=await fetch(withCacheBust(filePath),{cache:"no-store"});if(!response.ok){console.warn(`Не удалось загрузить ${filePath}:`,response.status);return false}container.innerHTML=await response.text();const fileName=filePath.split("/").pop().replace(".html","");try{const module=await import(`./${fileName}.js?v=${SITE_ASSET_VERSION}-${Date.now()}`);if(typeof module.init==="function"){module.init()}else{const globalInitName=getGlobalInitName(fileName);if(typeof window[globalInitName]==="function")window[globalInitName]()}}catch(e){console.warn(`JS-модуль для страницы ${fileName} не был запущен:`,e);const globalInitName=getGlobalInitName(fileName);if(typeof window[globalInitName]==="function")window[globalInitName]()}if(containerId==="rightbar-container")renderQuickLinks();return true}
+async function loadPage(pageName){savePageFormState(currentLoadedPage);const isLoaded=await loadBlock("page-content","pages/"+pageName);if(!isLoaded)return;currentLoadedPage=pageName;localStorage.setItem("currentPage",pageName);restorePageFormState(pageName);bindPageFormPersistence(pageName);savePageFormState(pageName);trackPageVisit(pageName);renderQuickLinks(pageName);if(window.innerWidth<900&&typeof closeMenu==="function")closeMenu()}
+window.addEventListener("beforeunload",()=>{savePageFormState(currentLoadedPage||localStorage.getItem("currentPage")||"")});startHarvestHubUtcClock();window.loadPage=loadPage;window.loadBlock=loadBlock;window.renderQuickLinks=renderQuickLinks;window.savePageFormState=savePageFormState;window.getHarvestHubUtcTime=getHarvestHubUtcTime;window.getHarvestHubUtcDayId=getHarvestHubUtcDayId;window.applyHarvestHubUtcTime=applyHarvestHubUtcTime;
