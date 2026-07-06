@@ -1,0 +1,11 @@
+/* COLLAPSIBLE CARDS */
+.collapsible-card-header{align-items:center;cursor:default}
+.collapsible-card-toggle,.ipk-card-toggle,.ipk-collapse-button{position:relative!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;width:28px!important;height:28px!important;min-width:28px!important;max-width:28px!important;min-height:28px!important;max-height:28px!important;padding:0!important;margin:0!important;border:1px solid var(--border)!important;border-radius:50%!important;background:var(--panel)!important;color:var(--text-soft)!important;font-size:0!important;line-height:0!important;text-align:center!important;cursor:pointer!important;transition:var(--transition)!important;box-shadow:none!important;appearance:none!important;overflow:hidden!important}
+.collapsible-card-toggle::before,.ipk-card-toggle::before,.ipk-collapse-button::before{content:"";position:absolute;left:50%;top:50%;width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:translate(-50%,-62%) rotate(45deg);transform-origin:center;box-sizing:border-box}
+.collapsible-card.is-collapsed .collapsible-card-toggle::before,.ipk-card.is-collapsed .ipk-card-toggle::before,.ipk-collapse-button[aria-expanded="false"]::before,.ipk-collapse-button.is-collapsed::before{transform:translate(-62%,-50%) rotate(-45deg)}
+.collapsible-card-toggle:hover,.ipk-card-toggle:hover,.ipk-collapse-button:hover{color:var(--accent)!important;border-color:var(--button)!important;background:rgba(112,220,86,.1)!important}
+.collapsible-card.is-collapsed>:not(.collapsible-card-header){display:none!important}
+.collapsible-card.is-collapsed .collapsible-card-header{margin-bottom:0}
+.collapsible-card.is-collapsed{padding-bottom:20px}
+.ipk-card-toggle,.collapsible-card-toggle{flex:0 0 28px!important}.ipk-collapse-button{flex:0 0 28px!important}.ipk-mobile-categories .ipk-collapse-button,.ipk-desktop-categories .ipk-collapse-button{margin-left:auto!important}
+@media (max-width:899px){.collapsible-card-toggle,.ipk-card-toggle,.ipk-collapse-button{width:26px!important;height:26px!important;min-width:26px!important;max-width:26px!important;min-height:26px!important;max-height:26px!important}.collapsible-card-toggle::before,.ipk-card-toggle::before,.ipk-collapse-button::before{width:6px;height:6px}}
