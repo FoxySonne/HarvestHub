@@ -5,7 +5,7 @@ const RESOURCE_CONFIG = [
   { key: "fuel", label: "Топливо", availableId: "troopAvailableFuel" }
 ];
 
-const LEVELS = [1,2,3,4,5,6,7,8,9,10];
+const LEVELS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const TRANSFER_STORAGE_KEY = "harvesthub_troop_training_transfer";
 const TURBO_WEEK_STATE_PREFIX = "harvesthub_turbo_vs_week_state:";
 
@@ -21,38 +21,581 @@ const TROOP_COST_PRESETS = {
   }
 };
 
-function el(id){return document.getElementById(id)}
-function getAdvancedMode(){return document.body.classList.contains("advanced-mode")}
-function getTransferScope(){return "local"}
-function getTurboWeekStateKey(){return `${TURBO_WEEK_STATE_PREFIX}${getTransferScope()}`}
-function readJson(key,fallback){try{return JSON.parse(localStorage.getItem(key)||JSON.stringify(fallback))}catch{return fallback}}
-function writeJson(key,value){localStorage.setItem(key,JSON.stringify(value))}
-function parseNumber(value){const text=String(value||"").trim().replace(/\s+/g,"").replace(/,/g,".");const match=text.match(/^(\d+(?:\.\d+)?)([кkmм])?$/i);if(!match){const fallback=Number(text);return Number.isFinite(fallback)&&fallback>0?fallback:0}const base=Number(match[1]);const suffix=(match[2]||"").toLowerCase();const mult=suffix==="к"||suffix==="k"?1000:suffix==="м"||suffix==="m"?1000000:1;return base*mult}
-function formatNumber(value){return Math.max(0,Math.floor(Number(value)||0)).toLocaleString("ru-RU")}
-function formatResource(value){const n=Math.max(0,Math.ceil(Number(value)||0));return n>=1000000?`${(n/1000000).toLocaleString("ru-RU",{maximumFractionDigits:1})} М`:formatNumber(n)}
-function getTimeDigits(value){return String(value||"").replace(/\D/g,"")}
-function clampTimePart(value){return Math.min(Math.max(Number(value)||0,0),59)}
-function formatClock({hours,minutes,seconds}){return `${String(hours).padStart(2,"0")}:${String(minutes).padStart(2,"0")}:${String(seconds).padStart(2,"0")}`}
-function normalizeClockParts(digits){const padded=digits.padStart(6,"0");return {hours:Math.max(Number(padded.slice(0,-4))||0,0),minutes:clampTimePart(padded.slice(-4,-2)),seconds:clampTimePart(padded.slice(-2))}}
-function formatAvailableTimeInput(value){const digits=getTimeDigits(value);if(!digits)return "";if(digits.length<=3)return `${Number(digits)||0}д 00:00:00`;if(digits.length<=6)return `00д ${formatClock(normalizeClockParts(digits))}`;return `${Number(digits.slice(0,-6))||0}д ${formatClock(normalizeClockParts(digits.slice(-6)))}`}
-function formatStageTimeInput(value){const digits=getTimeDigits(value);return digits?formatClock(normalizeClockParts(digits.slice(-6))):""}
-function parseTimeToSeconds(value,allowDays=false){const text=String(value||"").trim().toLowerCase();if(!text)return 0;const digits=getTimeDigits(text);if(digits&&!text.includes(":"))return parseTimeToSeconds(allowDays?formatAvailableTimeInput(digits):formatStageTimeInput(digits),allowDays);let days=0;let timeText=text;const dayMatch=text.match(/^(\d+)\s*д\.?\s*(.*)$/);if(allowDays&&dayMatch){days=Number(dayMatch[1])||0;timeText=dayMatch[2]||"00:00:00"}const parts=timeText.split(":").map(part=>Number(part)||0);while(parts.length<3)parts.unshift(0);const [h,m,s]=parts.slice(-3);return days*86400+Math.max(h,0)*3600+clampTimePart(m)*60+clampTimePart(s)}
-function formatDuration(totalSeconds,{showDays=true}={}){const v=Math.max(0,Math.ceil(Number(totalSeconds)||0));const days=Math.floor(v/86400);const hours=Math.floor((v%86400)/3600);const minutes=Math.floor((v%3600)/60);const seconds=v%60;const time=`${String(hours).padStart(2,"0")}:${String(minutes).padStart(2,"0")}:${String(seconds).padStart(2,"0")}`;return showDays&&days>0?`${days}д ${time}`:time}
-function roundTroops(value){return Math.max(0,Math.floor((Number(value)||0)/1000)*1000)}
-function parseAvailableResource(inputId){const input=el(inputId);const value=parseNumber(input?.value);const unit=document.querySelector(`[data-unit-for="${inputId}"] .is-active`)?.dataset.unit||"raw";return unit==="m"?value*1000000:value}
-function fillLevelSelect(select,defaultLevel){if(!select)return;select.innerHTML="";LEVELS.forEach(level=>{const option=document.createElement("option");option.value=String(level);option.textContent=`${level} ур.`;select.appendChild(option)});select.value=String(defaultLevel)}
-function getStagePreset(stage,level){return stage===1?TROOP_COST_PRESETS.training[level]:TROOP_COST_PRESETS.upgrade[level]}
-function applyStagePreset(stage){const level=Number(el(`troopStage${stage}Level`)?.value)||0;const preset=getStagePreset(stage,level);if(!preset)return;[["Food",preset.food],["Wood",preset.wood],["Metal",preset.metal],["Fuel",preset.fuel],["Time",preset.time]].forEach(([suffix,value])=>{const field=el(`troopStage${stage}${suffix}`);if(field)field.value=String(value)})}
-function isStageEnabled(stage){const checkbox=el(`troopStage${stage}Enabled`);return checkbox?checkbox.checked:true}
-function syncStageEnabledState(stage){const card=document.querySelector(`.troop-stage-card[data-stage="${stage}"]`);if(card)card.classList.toggle("is-disabled",!isStageEnabled(stage))}
-function createStageFields(card){const stage=Number(card.dataset.stage);const container=card.querySelector(".troop-stage-grid");if(!container)return;container.innerHTML=`<label class="troop-field"><span>Уровень войск</span><select id="troopStage${stage}Level"></select></label><label class="troop-field"><span>Еда на 1000</span><input id="troopStage${stage}Food" type="text" inputmode="decimal" autocomplete="off"></label><label class="troop-field"><span>Дерево на 1000</span><input id="troopStage${stage}Wood" type="text" inputmode="decimal" autocomplete="off"></label><label class="troop-field"><span>Металл на 1000</span><input id="troopStage${stage}Metal" type="text" inputmode="decimal" autocomplete="off"></label><label class="troop-field"><span>Топливо на 1000</span><input id="troopStage${stage}Fuel" type="text" inputmode="decimal" autocomplete="off"></label><label class="troop-field"><span>Время на 1000</span><input id="troopStage${stage}Time" type="text" placeholder="00:00:00" inputmode="numeric" autocomplete="off" data-time-format="stage"></label>`;fillLevelSelect(el(`troopStage${stage}Level`),stage===1?8:stage===2?9:10);applyStagePreset(stage);syncStageEnabledState(stage)}
-function getAvailableData(){const resources={};RESOURCE_CONFIG.forEach(resource=>resources[resource.key]=parseAvailableResource(resource.availableId));return {resources,time:parseTimeToSeconds(el("troopAvailableTime")?.value,true),garrisonCapacity:parseNumber(el("troopGarrisonCapacity")?.value),desired:parseNumber(el("troopDesiredAmount")?.value),currentAmount:parseNumber(el("troopCurrentAmount")?.value)}}
-function getStageData(card){const stage=Number(card.dataset.stage);const costs={food:parseNumber(el(`troopStage${stage}Food`)?.value),wood:parseNumber(el(`troopStage${stage}Wood`)?.value),metal:parseNumber(el(`troopStage${stage}Metal`)?.value),fuel:parseNumber(el(`troopStage${stage}Fuel`)?.value)};const time=parseTimeToSeconds(el(`troopStage${stage}Time`)?.value,false);const level=el(`troopStage${stage}Level`)?.value||"";const hasCost=Object.values(costs).some(v=>v>0)||time>0;return {stage,title:stage===1?"Обучение":"Улучшение",level,costs,time,isActive:isStageEnabled(stage)&&(stage===1||hasCost)}}
-function getActiveStages(){const advanced=getAdvancedMode();return Array.from(document.querySelectorAll(".troop-stage-card")).filter(card=>advanced||Number(card.dataset.stage)===1).map(getStageData).filter(stage=>stage.isActive)}
-function getCostForTroops(stages,troops){const mult=troops/1000;const resources={food:0,wood:0,metal:0,fuel:0};let time=0;stages.forEach(stage=>{RESOURCE_CONFIG.forEach(r=>resources[r.key]+=stage.costs[r.key]*mult);time+=stage.time*mult});return {resources,time}}
-function getMaxTroopsByAvailable(stages,available){if(stages.length===0)return 0;const per=getCostForTroops(stages,1000);const limits=[];RESOURCE_CONFIG.forEach(r=>{if(per.resources[r.key]>0)limits.push((available.resources[r.key]/per.resources[r.key])*1000)});if(per.time>0)limits.push((available.time/per.time)*1000);if(available.garrisonCapacity>0)limits.push(Math.max(available.garrisonCapacity-available.currentAmount,0));return roundTroops(Math.min(...limits.filter(Number.isFinite)))}
-function renderResourceList(container,resources){if(!container)return;container.innerHTML=RESOURCE_CONFIG.map(r=>`<div><span>${r.label}</span><strong>${formatResource(resources[r.key]||0)}</strong></div>`).join("")}
-function calculate(){const stages=getActiveStages();const available=getAvailableData();const desired=roundTroops(available.desired);const possible=desired>0?desired:getMaxTroopsByAvailable(stages,available);const cost=getCostForTroops(stages,possible);const remainders={};const shortages={};RESOURCE_CONFIG.forEach(r=>{remainders[r.key]=Math.max(0,available.resources[r.key]-cost.resources[r.key]);shortages[r.key]=Math.max(0,cost.resources[r.key]-available.resources[r.key])});if(el("troopPossibleTotal"))el("troopPossibleTotal").textContent=formatNumber(possible);if(el("troopStageResults"))el("troopStageResults").innerHTML=stages.map(stage=>`<div><span>${stage.title} ${stage.level} ур.</span><strong>${formatNumber(possible)} / ${formatDuration(cost.time,{showDays:true})}</strong></div>`).join("");renderResourceList(el("troopRemainders"),remainders);renderResourceList(el("troopShortages"),shortages);if(el("troopExtraTitle"))el("troopExtraTitle").textContent=`Еще можно обучить: ${formatNumber(getMaxTroopsByAvailable(stages,{...available,resources:remainders}))} войск`;return {troops:possible,stages:stages.map(stage=>({level:stage.level,troops:possible}))}}
-function saveTurboVsTransfer(target,payload){if(target!=="turtle"&&target!=="vs")return false;const rows=payload.stages.filter(stage=>Number(stage.level)>0&&Number(stage.troops)>0).map(stage=>({level:String(stage.level),value:String(stage.troops)}));if(!rows.length)return false;const dayId=target==="turtle"?"mon":"fri";const eventType=target==="turtle"?"turtle":"vs";const state=readJson(getTurboWeekStateKey(),{});state[dayId]=state[dayId]||{turtle:{},vs:{}};state[dayId][eventType]=state[dayId][eventType]||{};state[dayId][eventType].troop_upgrade={value:String(Math.max(...rows.map(r=>Number(r.value)||0))),level:rows[rows.length-1].level,rows};writeJson(getTurboWeekStateKey(),state);return true}
-function bind(){document.querySelectorAll(".troop-stage-card").forEach(createStageFields);fillLevelSelect(el("troopCurrentLevel"),8);document.querySelectorAll(".troop-page input,.troop-page select").forEach(field=>{field.addEventListener("input",()=>{if(field.dataset.timeFormat==="stage")field.value=formatStageTimeInput(field.value);calculate()});field.addEventListener("change",()=>{const stage=field.closest(".troop-stage-card")?.dataset.stage;if(field.id?.includes("Level")&&stage)applyStagePreset(Number(stage));if(stage)syncStageEnabledState(Number(stage));calculate()})});document.querySelectorAll(".troop-unit-toggle button").forEach(button=>button.addEventListener("click",()=>{const wrap=button.closest(".troop-unit-toggle");wrap.querySelectorAll("button").forEach(item=>item.classList.remove("is-active"));button.classList.add("is-active");calculate()}));document.querySelectorAll("[data-transfer-target]").forEach(button=>button.addEventListener("click",()=>{const payload=calculate();const target=button.dataset.transferTarget;const ok=target==="ipk"?false:saveTurboVsTransfer(target,payload);if(target==="ipk")localStorage.setItem(TRANSFER_STORAGE_KEY,JSON.stringify(payload));const status=el("troopTransferStatus");if(status)status.textContent=ok||target==="ipk"?"Данные подготовлены для переноса":"Нет данных для переноса"}));calculate()}
-export function init(){bind()}
+function getElement(id) {
+  return document.getElementById(id);
+}
+
+function getAdvancedMode() {
+  return typeof window.getAdvancedMode === "function" ? window.getAdvancedMode() : document.body.classList.contains("advanced-mode");
+}
+
+function getTransferScope() {
+  const profile = typeof window.getActiveProfile === "function" ? window.getActiveProfile() : null;
+  return profile?.id ? `profile:${profile.id}` : "local";
+}
+
+function getTurboWeekStateKey() {
+  return `${TURBO_WEEK_STATE_PREFIX}${getTransferScope()}`;
+}
+
+function readTurboWeekState() {
+  try {
+    return JSON.parse(localStorage.getItem(getTurboWeekStateKey()) || "{}");
+  } catch (error) {
+    console.warn("Не удалось прочитать данные Турбочерепашки/VS", error);
+    return {};
+  }
+}
+
+function writeTurboWeekState(state) {
+  localStorage.setItem(getTurboWeekStateKey(), JSON.stringify(state));
+}
+
+function saveTurboVsTransfer(target, payload) {
+  if (target !== "turtle" && target !== "vs") return false;
+
+  const rows = Array.isArray(payload.stages)
+    ? payload.stages
+      .filter(stage => Number(stage.level) > 0 && Number(stage.troops) > 0)
+      .map(stage => ({ level: String(stage.level), value: String(Number(stage.troops) || 0) }))
+    : [];
+
+  if (!rows.length) return false;
+
+  const dayId = target === "turtle" ? "mon" : "fri";
+  const eventType = target === "turtle" ? "turtle" : "vs";
+  const state = readTurboWeekState();
+
+  Object.keys(state).forEach(savedDayId => {
+    if (state[savedDayId]?.[eventType]?.troop_upgrade) {
+      delete state[savedDayId][eventType].troop_upgrade;
+    }
+  });
+
+  state[dayId] = state[dayId] || { turtle: {}, vs: {} };
+  state[dayId][eventType] = state[dayId][eventType] || {};
+  state[dayId][eventType].troop_upgrade = {
+    value: String(Math.max(...rows.map(row => Number(row.value) || 0))),
+    level: rows[rows.length - 1].level,
+    rows
+  };
+
+  writeTurboWeekState(state);
+  return true;
+}
+
+function parseNumber(value) {
+  const text = String(value || "").trim().replace(/\s+/g, "").replace(/,/g, ".");
+  const match = text.match(/^(\d+(?:\.\d+)?)([кkmм])?$/i);
+
+  if (!match) {
+    const fallback = Number(text);
+    return Number.isFinite(fallback) && fallback > 0 ? fallback : 0;
+  }
+
+  const base = Number(match[1]);
+  const suffix = (match[2] || "").toLowerCase();
+  const multiplier = suffix === "к" || suffix === "k" ? 1000 : suffix === "м" || suffix === "m" ? 1000000 : 1;
+  const number = base * multiplier;
+
+  return Number.isFinite(number) && number > 0 ? number : 0;
+}
+
+function parseAvailableResource(inputId) {
+  const input = getElement(inputId);
+  const value = parseNumber(input?.value);
+  const activeUnit = document.querySelector(`[data-unit-for="${inputId}"] .is-active`)?.dataset.unit || "raw";
+
+  return activeUnit === "m" ? value * 1000000 : value;
+}
+
+function getTimeDigits(value) {
+  return String(value || "").replace(/\D/g, "");
+}
+
+function clampTimePart(value) {
+  return Math.min(Math.max(Number(value) || 0, 0), 59);
+}
+
+function normalizeClockParts(digits) {
+  const padded = digits.padStart(6, "0");
+  return {
+    hours: Math.max(Number(padded.slice(0, -4)) || 0, 0),
+    minutes: clampTimePart(padded.slice(-4, -2)),
+    seconds: clampTimePart(padded.slice(-2))
+  };
+}
+
+function formatClockParts({ hours, minutes, seconds }) {
+  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+}
+
+function formatClockDigits(digits) {
+  return formatClockParts(normalizeClockParts(digits));
+}
+
+function formatAvailableTimeInput(value) {
+  const digits = getTimeDigits(value);
+  if (!digits) return "";
+  if (digits.length <= 3) return `${Number(digits) || 0}д 00:00:00`;
+  if (digits.length <= 6) return `00д ${formatClockDigits(digits)}`;
+  return `${Number(digits.slice(0, -6)) || 0}д ${formatClockDigits(digits.slice(-6))}`;
+}
+
+function formatStageTimeInput(value) {
+  const digits = getTimeDigits(value);
+  if (!digits) return "";
+  return formatClockDigits(digits.slice(-6));
+}
+
+function parseTimeToSeconds(value, allowDays = false) {
+  const text = String(value || "").trim().toLowerCase();
+  if (!text) return 0;
+
+  const digits = getTimeDigits(text);
+  if (digits && !text.includes(":")) {
+    return parseTimeToSeconds(allowDays ? formatAvailableTimeInput(digits) : formatStageTimeInput(digits), allowDays);
+  }
+
+  let days = 0;
+  let timeText = text;
+  const dayMatch = text.match(/^(\d+)\s*д\.?\s*(.*)$/);
+
+  if (allowDays && dayMatch) {
+    days = Number(dayMatch[1]) || 0;
+    timeText = dayMatch[2] || "00:00:00";
+  }
+
+  const parts = timeText.split(":").map(part => Number(part) || 0);
+  while (parts.length < 3) parts.unshift(0);
+
+  const [rawHours, rawMinutes, rawSeconds] = parts.slice(-3);
+  return days * 86400 + Math.max(rawHours, 0) * 3600 + clampTimePart(rawMinutes) * 60 + clampTimePart(rawSeconds);
+}
+
+function formatNumber(value) {
+  return Math.max(0, Math.floor(Number(value) || 0)).toLocaleString("ru-RU");
+}
+
+function formatResource(value) {
+  const number = Math.max(0, Math.ceil(Number(value) || 0));
+  if (number >= 1000000) {
+    return `${(number / 1000000).toLocaleString("ru-RU", { maximumFractionDigits: 1 })} М`;
+  }
+  return formatNumber(number);
+}
+
+function formatDuration(totalSeconds, { showDays = true } = {}) {
+  const secondsValue = Math.max(0, Math.ceil(Number(totalSeconds) || 0));
+  const days = Math.floor(secondsValue / 86400);
+  const hours = Math.floor((secondsValue % 86400) / 3600);
+  const minutes = Math.floor((secondsValue % 3600) / 60);
+  const seconds = secondsValue % 60;
+  const time = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  return showDays && days > 0 ? `${days}д ${time}` : time;
+}
+
+function roundTroops(value) {
+  return Math.max(0, Math.floor((Number(value) || 0) / 1000) * 1000);
+}
+
+function fillLevelSelect(select, defaultLevel) {
+  if (!select) return;
+  select.innerHTML = "";
+  LEVELS.forEach(level => {
+    const option = document.createElement("option");
+    option.value = String(level);
+    option.textContent = `${level} ур.`;
+    select.appendChild(option);
+  });
+  select.value = String(defaultLevel);
+}
+
+function getStagePreset(stage, level) {
+  return stage === 1 ? TROOP_COST_PRESETS.training[level] : TROOP_COST_PRESETS.upgrade[level];
+}
+
+function applyStagePreset(stage) {
+  const level = Number(getElement(`troopStage${stage}Level`)?.value) || 0;
+  const preset = getStagePreset(stage, level);
+  if (!preset) return;
+
+  const fieldValues = { Food: preset.food, Wood: preset.wood, Metal: preset.metal, Fuel: preset.fuel, Time: preset.time };
+  Object.entries(fieldValues).forEach(([suffix, value]) => {
+    const field = getElement(`troopStage${stage}${suffix}`);
+    if (field) field.value = String(value);
+  });
+}
+
+function isStageEnabled(stage) {
+  const checkbox = getElement(`troopStage${stage}Enabled`);
+  return checkbox ? checkbox.checked : true;
+}
+
+function syncStageEnabledState(stage) {
+  const card = document.querySelector(`.troop-stage-card[data-stage="${stage}"]`);
+  if (!card) return;
+  card.classList.toggle("is-disabled", !isStageEnabled(stage));
+}
+
+function createStageFields(stageCard) {
+  const stage = Number(stageCard.dataset.stage);
+  const container = stageCard.querySelector(".troop-stage-grid");
+  if (!container) return;
+
+  container.innerHTML = `
+    <label class="troop-field"><span>Уровень войск</span><select id="troopStage${stage}Level"></select></label>
+    <label class="troop-field"><span>Еда на 1000</span><input id="troopStage${stage}Food" type="text" inputmode="decimal" autocomplete="off"></label>
+    <label class="troop-field"><span>Дерево на 1000</span><input id="troopStage${stage}Wood" type="text" inputmode="decimal" autocomplete="off"></label>
+    <label class="troop-field"><span>Металл на 1000</span><input id="troopStage${stage}Metal" type="text" inputmode="decimal" autocomplete="off"></label>
+    <label class="troop-field"><span>Топливо на 1000</span><input id="troopStage${stage}Fuel" type="text" inputmode="decimal" autocomplete="off"></label>
+    <label class="troop-field"><span>Время на 1000</span><input id="troopStage${stage}Time" type="text" placeholder="00:00:00" inputmode="numeric" autocomplete="off" data-time-format="stage"></label>
+  `;
+
+  fillLevelSelect(getElement(`troopStage${stage}Level`), stage === 1 ? 8 : stage === 2 ? 9 : 10);
+  applyStagePreset(stage);
+  syncStageEnabledState(stage);
+}
+
+function getAvailableData() {
+  const resources = {};
+  RESOURCE_CONFIG.forEach(resource => {
+    resources[resource.key] = parseAvailableResource(resource.availableId);
+  });
+
+  return {
+    resources,
+    time: parseTimeToSeconds(getElement("troopAvailableTime")?.value, true),
+    garrisonCapacity: parseNumber(getElement("troopGarrisonCapacity")?.value),
+    desired: parseNumber(getElement("troopDesiredAmount")?.value),
+    currentAmount: parseNumber(getElement("troopCurrentAmount")?.value),
+    currentLevel: getElement("troopCurrentLevel")?.value || ""
+  };
+}
+
+function getStageData(stageCard) {
+  const stage = Number(stageCard.dataset.stage);
+  const costs = {
+    food: parseNumber(getElement(`troopStage${stage}Food`)?.value),
+    wood: parseNumber(getElement(`troopStage${stage}Wood`)?.value),
+    metal: parseNumber(getElement(`troopStage${stage}Metal`)?.value),
+    fuel: parseNumber(getElement(`troopStage${stage}Fuel`)?.value)
+  };
+  const time = parseTimeToSeconds(getElement(`troopStage${stage}Time`)?.value, false);
+  const level = getElement(`troopStage${stage}Level`)?.value || "";
+  const enabled = isStageEnabled(stage);
+  const hasCost = Object.values(costs).some(value => value > 0) || time > 0;
+
+  return {
+    stage,
+    type: stage === 1 ? "training" : "upgrade",
+    level,
+    title: stage === 1 ? "Обучение" : "Улучшение",
+    costs,
+    time,
+    isActive: enabled && (stage === 1 || hasCost)
+  };
+}
+
+function getActiveStages() {
+  const isAdvanced = getAdvancedMode();
+  return Array.from(document.querySelectorAll(".troop-stage-card"))
+    .filter(card => isAdvanced || Number(card.dataset.stage) === 1)
+    .map(getStageData)
+    .filter(stage => stage.isActive);
+}
+
+function getCostForTroops(stages, troops) {
+  const multiplier = troops / 1000;
+  const resources = { food: 0, wood: 0, metal: 0, fuel: 0 };
+  let time = 0;
+
+  stages.forEach(stage => {
+    RESOURCE_CONFIG.forEach(resource => {
+      resources[resource.key] += stage.costs[resource.key] * multiplier;
+    });
+    time += stage.time * multiplier;
+  });
+
+  return { resources, time };
+}
+
+function getMaxTroopsByAvailable(stages, available) {
+  if (stages.length === 0) return 0;
+  const perThousand = getCostForTroops(stages, 1000);
+  const limits = [];
+
+  RESOURCE_CONFIG.forEach(resource => {
+    const cost = perThousand.resources[resource.key];
+    if (cost > 0) limits.push((available.resources[resource.key] / cost) * 1000);
+  });
+
+  if (perThousand.time > 0) limits.push((available.time / perThousand.time) * 1000);
+
+  const freeGarrison = Math.max(available.garrisonCapacity - available.currentAmount, 0);
+  if (available.garrisonCapacity > 0) limits.push(freeGarrison);
+
+  if (limits.length === 0) return 0;
+  return roundTroops(Math.min(...limits));
+}
+
+function buildCalculation() {
+  const available = getAvailableData();
+  const stages = getActiveStages();
+  const maxTroops = getMaxTroopsByAvailable(stages, available);
+  const desired = available.desired;
+  const possibleTroops = desired > 0 ? Math.min(desired, maxTroops) : maxTroops;
+  const targetTroops = desired > 0 ? desired : possibleTroops;
+  const required = getCostForTroops(stages, targetTroops);
+  const spent = getCostForTroops(stages, possibleTroops);
+  const remainders = { resources: {}, time: Math.max(available.time - spent.time, 0) };
+  const missing = { resources: {}, time: Math.max(required.time - available.time, 0), garrison: 0 };
+  const freeGarrison = Math.max(available.garrisonCapacity - available.currentAmount, 0);
+
+  RESOURCE_CONFIG.forEach(resource => {
+    const key = resource.key;
+    remainders.resources[key] = Math.max(available.resources[key] - spent.resources[key], 0);
+    missing.resources[key] = Math.max(required.resources[key] - available.resources[key], 0);
+  });
+
+  if (available.garrisonCapacity > 0) {
+    missing.garrison = Math.max(targetTroops - freeGarrison, 0);
+  }
+
+  return {
+    available,
+    stages,
+    possibleTroops: roundTroops(possibleTroops),
+    targetTroops: roundTroops(targetTroops),
+    required,
+    spent,
+    remainders,
+    missing,
+    desiredMode: desired > 0
+  };
+}
+
+function calculateExtraTraining(calculation) {
+  const stages = calculation.stages;
+  const perThousand = getCostForTroops(stages, 1000);
+  const capacities = [];
+
+  RESOURCE_CONFIG.forEach(resource => {
+    const cost = perThousand.resources[resource.key];
+    if (cost > 0) capacities.push((calculation.remainders.resources[resource.key] / cost) * 1000);
+  });
+
+  if (perThousand.time > 0) capacities.push((calculation.remainders.time / perThousand.time) * 1000);
+
+  const freeGarrison = Math.max(calculation.available.garrisonCapacity - calculation.available.currentAmount - calculation.possibleTroops, 0);
+  const rawExtra = capacities.length > 0 ? Math.max(...capacities) : 0;
+  const extraTroops = roundTroops(rawExtra);
+  const extraRequired = getCostForTroops(stages, extraTroops);
+  const shortages = { resources: {}, time: 0, garrison: 0 };
+
+  RESOURCE_CONFIG.forEach(resource => {
+    const key = resource.key;
+    shortages.resources[key] = Math.max(extraRequired.resources[key] - calculation.remainders.resources[key], 0);
+  });
+
+  shortages.time = Math.max(extraRequired.time - calculation.remainders.time, 0);
+  shortages.garrison = Math.max(extraTroops - freeGarrison, 0);
+
+  return { extraTroops, shortages };
+}
+
+function renderResourceList(container, items) {
+  if (!container) return;
+  container.innerHTML = items.map(item => `
+    <div>
+      <span>${item.label}</span>
+      <strong>${item.value}</strong>
+    </div>
+  `).join("");
+}
+
+function renderResults() {
+  const calculation = buildCalculation();
+  const possibleElement = getElement("troopPossibleTotal");
+  const stageResults = getElement("troopStageResults");
+  const extra = calculateExtraTraining(calculation);
+
+  if (possibleElement) possibleElement.textContent = formatNumber(calculation.possibleTroops);
+
+  if (stageResults) {
+    stageResults.innerHTML = calculation.stages.map(stage => `
+      <div>
+        <span>${stage.level || stage.stage} уровень</span>
+        <strong>${formatNumber(calculation.possibleTroops)}</strong>
+      </div>
+    `).join("");
+  }
+
+  renderResourceList(getElement("troopRemainders"), [
+    { label: "Еда", value: formatResource(calculation.remainders.resources.food) },
+    { label: "Дерево", value: formatResource(calculation.remainders.resources.wood) },
+    { label: "Металл", value: formatResource(calculation.remainders.resources.metal) },
+    { label: "Топливо", value: formatResource(calculation.remainders.resources.fuel) },
+    { label: "Время / ускорения", value: formatDuration(calculation.remainders.time) }
+  ]);
+
+  const extraTitle = getElement("troopExtraTitle");
+  if (extraTitle) extraTitle.textContent = `Еще можно обучить: ${formatNumber(extra.extraTroops)} войск`;
+
+  renderResourceList(getElement("troopShortages"), [
+    { label: "Еды", value: formatResource(extra.shortages.resources.food) },
+    { label: "Дерева", value: formatResource(extra.shortages.resources.wood) },
+    { label: "Металла", value: formatResource(extra.shortages.resources.metal) },
+    { label: "Топлива", value: formatResource(extra.shortages.resources.fuel) },
+    { label: "Ускорений", value: formatDuration(extra.shortages.time, { showDays: false }) },
+    { label: "Вместимости гарнизона", value: formatNumber(extra.shortages.garrison) }
+  ]);
+
+  return calculation;
+}
+
+function bindUnitToggles() {
+  document.querySelectorAll(".troop-unit-toggle button").forEach(button => {
+    button.addEventListener("click", () => {
+      const group = button.closest(".troop-unit-toggle");
+      group.querySelectorAll("button").forEach(item => item.classList.toggle("is-active", item === button));
+      renderResults();
+      if (typeof window.savePageFormState === "function") window.savePageFormState();
+    });
+  });
+}
+
+function bindTimeFormatting() {
+  document.querySelectorAll("#troopAvailableTime, [data-time-format='stage']").forEach(input => {
+    input.addEventListener("blur", () => {
+      input.value = input.id === "troopAvailableTime" ? formatAvailableTimeInput(input.value) : formatStageTimeInput(input.value);
+      renderResults();
+      if (typeof window.savePageFormState === "function") window.savePageFormState();
+    });
+  });
+}
+
+function bindStagePresets() {
+  document.querySelectorAll(".troop-stage-card").forEach(card => {
+    const stage = Number(card.dataset.stage);
+    const select = getElement(`troopStage${stage}Level`);
+    if (!select) return;
+
+    select.addEventListener("change", () => {
+      applyStagePreset(stage);
+      renderResults();
+      if (typeof window.savePageFormState === "function") window.savePageFormState();
+    });
+  });
+}
+
+function bindStageEnabled() {
+  document.querySelectorAll("[data-stage-enabled]").forEach(checkbox => {
+    checkbox.addEventListener("change", () => {
+      const stage = Number(checkbox.dataset.stageEnabled);
+      syncStageEnabledState(stage);
+      renderResults();
+      if (typeof window.savePageFormState === "function") window.savePageFormState();
+    });
+  });
+}
+
+function bindInputs() {
+  document.querySelectorAll(".troop-page input, .troop-page select").forEach(field => {
+    field.addEventListener("input", renderResults);
+    field.addEventListener("change", renderResults);
+  });
+}
+
+function getTransferTargets(target) {
+  return {
+    turtle: target === "turtle",
+    vs: target === "vs",
+    ipk: target === "ipk"
+  };
+}
+
+function getPreferredDay(target) {
+  if (target === "turtle") return "mon";
+  if (target === "vs") return "fri";
+  return "";
+}
+
+function getTransferTargetName(target) {
+  if (target === "turtle") return "Турбочерепашки";
+  if (target === "vs") return "VS";
+  if (target === "ipk") return "ИПК";
+  return "выбранного калькулятора";
+}
+
+function getTransferStatusHtml(target, calculation, directSaveResult) {
+  const troops = formatNumber(calculation.possibleTroops);
+  const stages = calculation.stages.map(stage => `${stage.level || stage.stage} ур. — ${troops}`).join("<br>");
+
+  if (target === "turtle") {
+    return `<strong>Данные сохранены для Турбочерепашки.</strong><br>Записано в день: понедельник.<br>Действие: Улучшение войск.<br>Уровень и количество:<br>${stages || "нет активных этапов"}<br>Статус прямой записи: ${directSaveResult ? "успешно" : "не выполнено"}.<br>При открытии калькулятора Турбочерепашки данные дополнительно проверятся и подставятся повторно, если это нужно.`;
+  }
+
+  if (target === "vs") {
+    return `<strong>Данные сохранены для VS.</strong><br>Записано в день: пятница.<br>Действие: Улучшение войск.<br>Уровень и количество:<br>${stages || "нет активных этапов"}<br>Статус прямой записи: ${directSaveResult ? "успешно" : "не выполнено"}.<br>При открытии калькулятора Турбочерепашки & VS данные дополнительно проверятся и подставятся повторно, если это нужно.`;
+  }
+
+  if (target === "ipk") {
+    return `<strong>Данные сохранены для ИПК.</strong><br>Раздел: Улучшение войск.<br>Уровень и количество:<br>${stages || "нет активных этапов"}<br>Открой страницу ИПК — данные будут подставлены в строки обучения войск по соответствующим уровням.<br>Старые значения по уровням войск будут перезаписаны.`;
+  }
+
+  return `Данные сохранены для ${getTransferTargetName(target)}.`;
+}
+
+function bindTransferButtons() {
+  document.querySelectorAll("[data-transfer-target]").forEach(button => {
+    button.addEventListener("click", () => {
+      const calculation = renderResults();
+      const target = button.dataset.transferTarget;
+      const payload = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        target,
+        targets: getTransferTargets(target),
+        preferredDay: getPreferredDay(target),
+        troops: calculation.possibleTroops,
+        stages: calculation.stages.map(stage => ({ stage: stage.stage, type: stage.type, level: stage.level, troops: calculation.possibleTroops })),
+        createdAt: new Date().toISOString()
+      };
+
+      localStorage.setItem(TRANSFER_STORAGE_KEY, JSON.stringify(payload));
+      const directSaveResult = saveTurboVsTransfer(target, payload);
+      const status = getElement("troopTransferStatus");
+      if (status) status.innerHTML = getTransferStatusHtml(target, calculation, directSaveResult);
+    });
+  });
+}
+
+function syncAdvancedMode() {
+  const advanced = getAdvancedMode();
+  document.querySelectorAll(".troop-stage-card[data-stage='2'], .troop-stage-card[data-stage='3']").forEach(card => {
+    card.hidden = !advanced;
+  });
+
+  document.querySelectorAll(".troop-stage-card").forEach(card => syncStageEnabledState(Number(card.dataset.stage)));
+  renderResults();
+}
+
+function initStages() {
+  document.querySelectorAll(".troop-stage-card").forEach(createStageFields);
+  fillLevelSelect(getElement("troopCurrentLevel"), 8);
+}
+
+export function init() {
+  initStages();
+  bindUnitToggles();
+  bindTimeFormatting();
+  bindStagePresets();
+  bindStageEnabled();
+  bindInputs();
+  bindTransferButtons();
+  syncAdvancedMode();
+
+  window.addEventListener("harvesthub:advanced-mode-change", syncAdvancedMode);
+
+  if (typeof window.bindCollapsibleCards === "function") window.bindCollapsibleCards();
+}
