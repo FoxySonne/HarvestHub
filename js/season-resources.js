@@ -82,7 +82,7 @@ function fillSelect(id, list, defaultValue = null) {
   list.forEach(item => {
     const option = document.createElement("option");
     option.value = item.level;
-    option.textContent = `${item.level} уровень`;
+    option.textContent = item.label || `${item.level} уровень`;
     select.appendChild(option);
   });
 
@@ -104,6 +104,40 @@ function createLevelSelect(className, defaultValue) {
 
   select.value = String(defaultValue);
   return select;
+}
+
+function getBuildingCurrentLevel(buildingId) {
+  const row = document.querySelector(`.season-building-row[data-building-id="${buildingId}"]`);
+  return Number(row?.querySelector(".season-building-current")?.value) || 0;
+}
+
+function getBuildingProductionByCurrentLevel(buildingId) {
+  return getByLevel(seasonDatabase.productionByBuildingLevel, getBuildingCurrentLevel(buildingId));
+}
+
+function getFactoryProductionFromBuildingRows() {
+  const requiredRows = [
+    "secondary_factory_1",
+    "secondary_factory_2",
+    "primary_factory_1",
+    "primary_factory_2"
+  ];
+
+  const hasBuildingRows = requiredRows.every(buildingId =>
+    document.querySelector(`.season-building-row[data-building-id="${buildingId}"]`)
+  );
+
+  if (!hasBuildingRows) return null;
+
+  const secondaryFactory1 = getBuildingProductionByCurrentLevel("secondary_factory_1");
+  const secondaryFactory2 = getBuildingProductionByCurrentLevel("secondary_factory_2");
+  const primaryFactory1 = getBuildingProductionByCurrentLevel("primary_factory_1");
+  const primaryFactory2 = getBuildingProductionByCurrentLevel("primary_factory_2");
+
+  return {
+    secondary: (Number(secondaryFactory1?.secondary) || 0) + (Number(secondaryFactory2?.secondary) || 0),
+    primary: (Number(primaryFactory1?.primary) || 0) + (Number(primaryFactory2?.primary) || 0)
+  };
 }
 
 function syncBuildingRow(row) {
@@ -218,8 +252,8 @@ function sumRequirementsForBuilding(type, currentLevel, targetLevel) {
 }
 
 function getEngineeringReduction() {
-  const level = Math.min(3, Math.max(0, num("buildingEfficiencyLevel")));
-  return level / 100;
+  const item = getByLevel(seasonDatabase.seasonalBuildingBuildReduction, num("buildingEfficiencyLevel"));
+  return Number(item?.reduction) || 0;
 }
 
 function applyEngineeringReduction(value) {
@@ -336,9 +370,11 @@ function getBonus(list, level) {
 }
 
 function calculateProductionPerHour() {
-  const base = getByLevel(seasonDatabase.productionByBuildingLevel, num("productionBuildingLevel"));
+  const factoryProduction = getFactoryProductionFromBuildingRows();
+  const base = factoryProduction || getByLevel(seasonDatabase.productionByBuildingLevel, num("productionBuildingLevel"));
   const labBonus = getBonus(seasonDatabase.labProductionBonus, num("productionLabLevel"));
   const seasonBonus = getBonus(seasonDatabase.seasonalBuildingProductionBonus, num("productionSeasonLevel"));
+  const oceanBonus = getBonus(seasonDatabase.oceanAbundanceProductionBonus, num("productionOceanAbundance"));
   const village = num("productionVillage") === 2 ? seasonDatabase.territoryBuffs.villageProduction : 0;
   const factory = num("productionVillage") === 2 ? seasonDatabase.territoryBuffs.factoryProduction : 0;
   const megapolis = num("productionMegapolis") === 2 ? seasonDatabase.territoryBuffs.megapolisProduction : 0;
@@ -346,8 +382,8 @@ function calculateProductionPerHour() {
   const premiumPass = num("productionPremiumPass") || 1;
   const weeklyPass = num("productionWeeklyPass") || 1;
 
-  const secondaryPerHour = base.secondary * (1 + labBonus + seasonBonus + village + megapolis + bull) * premiumPass;
-  const primaryPerHour = base.primary * (1 + labBonus + seasonBonus + factory + megapolis + bull) * weeklyPass;
+  const secondaryPerHour = base.secondary * (1 + labBonus + seasonBonus + oceanBonus + village + megapolis + bull) * premiumPass;
+  const primaryPerHour = base.primary * (1 + labBonus + seasonBonus + oceanBonus + factory + megapolis + bull) * weeklyPass;
 
   return { secondaryPerHour, primaryPerHour };
 }
@@ -417,7 +453,8 @@ function setDefaults() {
     productionWeeklyPass: 1,
     productionVillage: 1,
     productionMegapolis: 1,
-    productionBull: 1
+    productionBull: 1,
+    productionOceanAbundance: 0
   };
 
   Object.entries(defaults).forEach(([id, value]) => {
@@ -449,6 +486,7 @@ export function init() {
   fillSelect("productionBuildingLevel", seasonDatabase.productionByBuildingLevel);
   fillSelect("productionLabLevel", seasonDatabase.labProductionBonus);
   fillSelect("productionSeasonLevel", seasonDatabase.seasonalBuildingProductionBonus);
+  fillSelect("buildingEfficiencyLevel", seasonDatabase.seasonalBuildingBuildReduction);
 
   renderBuildingRows();
   setDefaults();
