@@ -1,0 +1,14 @@
+@import url("../forms.css");
+
+@media (max-width: 899px) {
+  input[type=text],
+  input[type=number],
+  input[type=password],
+  input[type=email],
+  input[type=search],
+  input[type=date],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
