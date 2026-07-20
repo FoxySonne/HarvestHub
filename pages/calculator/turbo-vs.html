@@ -20,21 +20,6 @@
       <div id="turtleList" class="action-list"></div>
     </section>
 
-    <section class="card turbo-card turtle-goal-card" data-turbo-panel="turtle" data-no-collapse="true">
-      <div class="card-header">
-        <h3>Расчёт до нужной суммы</h3>
-      </div>
-
-      <label class="turtle-goal-field">
-        <span>Сколько очков нужно за день</span>
-        <input id="turtleGoalPoints" type="text" inputmode="decimal" placeholder="Например: 15M или 15000000" autocomplete="off">
-      </label>
-
-      <div id="turtleGoalResults" class="turtle-goal-results">
-        <p class="turtle-goal-empty">Введите нужную сумму очков.</p>
-      </div>
-    </section>
-
     <section class="card turbo-card" data-turbo-panel="vs">
       <div class="card-header">
         <h3>Дуэль союза</h3>
@@ -56,6 +41,19 @@
       <div class="result-block">
         <h4>Всего VS Дуэль союза:</h4>
         <div id="vsTotal">0</div>
+      </div>
+
+      <div class="turtle-goal-box" data-no-collapse="true">
+        <h4>Сколько нужно сделать</h4>
+
+        <label class="turtle-goal-field">
+          <span>Цель Черепашки за день</span>
+          <input id="turtleGoalPoints" type="text" inputmode="decimal" placeholder="15M или 15000000" autocomplete="off">
+        </label>
+
+        <div id="turtleGoalResults" class="turtle-goal-results">
+          <p class="turtle-goal-empty">Введите нужную сумму очков.</p>
+        </div>
       </div>
     </section>
 
