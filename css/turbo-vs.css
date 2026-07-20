@@ -124,12 +124,6 @@
   min-width: 0;
 }
 
-.action-row-with-need:not(.action-row-with-level):not(.action-row-multi-level) .action-controls::before {
-  content: "";
-  display: block;
-  min-width: 0;
-}
-
 .action-row-multi-level {
   align-items: start;
 }
@@ -153,6 +147,32 @@
   width: 244px;
   gap: 8px;
   min-width: 0;
+}
+
+.action-level-spacer,
+.action-level-static {
+  min-width: 0;
+  width: 100%;
+}
+
+.action-level-spacer {
+  visibility: hidden;
+}
+
+.action-level-static {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 5px 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-small);
+  background: var(--input-bg, rgba(0,0,0,.16));
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.15;
+  text-align: center;
+  overflow-wrap: anywhere;
 }
 
 .action-multi-line select,
