@@ -56,10 +56,6 @@ function getActionById(actionId) {
   return database.action.find(action => action.id === actionId);
 }
 
-function getCategoryName(categoryId) {
-  return database.category.find(category => category.id === categoryId)?.name || "Прочее";
-}
-
 function resolveDayList(list = []) {
   return list.flatMap(item => {
     if (typeof item === "string") return item;
@@ -201,6 +197,47 @@ function restoreDayState(dayId) {
   });
 }
 
+function getGoalTarget(eventType) {
+  const input = document.getElementById(eventType === "turtle" ? "turtleGoalPoints" : "vsGoalPoints");
+  return parseTargetPoints(input?.value);
+}
+
+function getGoalMissing(eventType) {
+  return Math.max(getGoalTarget(eventType) - (currentTotals[eventType] || 0), 0);
+}
+
+function createNeedOutput(actionId, eventType) {
+  const output = document.createElement("div");
+  output.className = "action-need-output";
+  output.dataset.actionId = actionId;
+  output.dataset.eventType = eventType;
+  output.dataset.noPersist = "true";
+  output.innerHTML = `<span>нужно</span><strong>0</strong>`;
+  return output;
+}
+
+function updateNeedOutputs() {
+  ["turtle", "vs"].forEach(eventType => {
+    const missing = getGoalMissing(eventType);
+    const missingElement = document.getElementById(eventType === "turtle" ? "turtleGoalMissing" : "vsGoalMissing");
+    if (missingElement) missingElement.textContent = formatNumber(missing);
+  });
+
+  document.querySelectorAll(".action-need-output").forEach(output => {
+    const eventType = output.dataset.eventType;
+    const actionId = output.dataset.actionId;
+    const line = output.closest(".action-multi-line");
+    const row = output.closest(".action-row");
+    const level = line?.querySelector("select")?.value || row?.querySelector(".action-level-select")?.value || null;
+    const points = getPoints(actionId, eventType, level);
+    const target = getGoalTarget(eventType);
+    const missing = getGoalMissing(eventType);
+    const value = target > 0 && missing > 0 && points > 0 ? Math.ceil(missing / points) : 0;
+    const strong = output.querySelector("strong");
+    if (strong) strong.textContent = formatNumber(value);
+  });
+}
+
 function createTextRow(text) {
   const row = document.createElement("div");
   row.className = "action-row action-row-text";
@@ -268,9 +305,10 @@ function createTroopMultiControls(action, eventType) {
     line.className = "action-multi-line";
     const levelSelect = createLevelSelect(action, eventType, defaultLevel);
     const quantityInput = createNumberInput(action, eventType);
+    const needOutput = createNeedOutput(action.id, eventType);
     quantityInput.className = "action-quantity-input";
     quantityInput.dataset.hasLevel = "true";
-    line.append(levelSelect, quantityInput);
+    line.append(levelSelect, quantityInput, needOutput);
     controls.appendChild(line);
   });
 
@@ -279,7 +317,7 @@ function createTroopMultiControls(action, eventType) {
 
 function createActionRow(action, eventType) {
   const row = document.createElement("div");
-  row.className = "action-row";
+  row.className = "action-row action-row-with-need";
   row.dataset.actionId = action.id;
   row.dataset.eventType = eventType;
 
@@ -301,9 +339,9 @@ function createActionRow(action, eventType) {
       const quantityInput = createNumberInput(action, eventType);
       quantityInput.className = "action-quantity-input";
       quantityInput.dataset.hasLevel = "true";
-      controls.append(levelSelect, quantityInput);
+      controls.append(levelSelect, quantityInput, createNeedOutput(action.id, eventType));
     } else {
-      controls.appendChild(action.quantityOptions ? createQuantitySelect(action, eventType) : createNumberInput(action, eventType));
+      controls.append(action.quantityOptions ? createQuantitySelect(action, eventType) : createNumberInput(action, eventType), createNeedOutput(action.id, eventType));
     }
   }
 
@@ -363,7 +401,7 @@ function updateTotals() {
 
   if (document.getElementById("turtleTotal")) document.getElementById("turtleTotal").textContent = formatNumber(turtleTotal);
   if (document.getElementById("vsTotal")) document.getElementById("vsTotal").textContent = formatNumber(vsTotal);
-  renderGoalCalculators();
+  updateNeedOutputs();
 }
 
 function handleControlChange(actionId, sourceControl) {
@@ -386,113 +424,13 @@ function renderEventList(container, list, eventType) {
   });
 }
 
-function getGoalVariants(action, eventType) {
-  const points = action.points?.[eventType];
-  if (points == null) return [];
-
-  if (typeof points === "object") {
-    return action.options
-      .map(option => ({
-        id: `${eventType}:${action.id}:${option.value}`,
-        name: `${action.name} — ${option.label}`,
-        category: getCategoryName(action.categoryId),
-        points: Number(points[option.value]) || 0
-      }))
-      .filter(item => item.points > 0);
-  }
-
-  const simplePoints = Number(points) || 0;
-  if (simplePoints <= 0) return [];
-
-  return [{
-    id: `${eventType}:${action.id}`,
-    name: action.name,
-    category: getCategoryName(action.categoryId),
-    points: simplePoints
-  }];
-}
-
-function getCurrentGoalItems(eventType) {
-  const day = database.days[currentDayId];
-  if (!day) return [];
-
-  const seen = new Set();
-  return sortDayItems(resolveDayList(day[eventType] || []))
-    .filter(item => typeof item === "string")
-    .flatMap(actionId => {
-      const action = getActionById(actionId);
-      if (!action) return [];
-      return getGoalVariants(action, eventType);
-    })
-    .filter(item => {
-      if (seen.has(item.id)) return false;
-      seen.add(item.id);
-      return true;
-    });
-}
-
-function renderGoalCalculator(eventType) {
-  const isTurtle = eventType === "turtle";
-  const input = document.getElementById(isTurtle ? "turtleGoalPoints" : "vsGoalPoints");
-  const container = document.getElementById(isTurtle ? "turtleGoalResults" : "vsGoalResults");
-  const missingElement = document.getElementById(isTurtle ? "turtleGoalMissing" : "vsGoalMissing");
-  if (!input || !container || !missingElement) return;
-
-  const target = parseTargetPoints(input.value);
-  const current = currentTotals[eventType] || 0;
-  const missing = Math.max(target - current, 0);
-  missingElement.textContent = formatNumber(missing);
-
-  if (target <= 0) {
-    container.innerHTML = `<p class="turbo-goal-empty">Введите цель ${isTurtle ? "Черепашки" : "VS"}.</p>`;
-    return;
-  }
-
-  if (missing <= 0) {
-    container.innerHTML = `<p class="turbo-goal-empty">Цель уже набрана.</p>`;
-    return;
-  }
-
-  const items = getCurrentGoalItems(eventType);
-  if (!items.length) {
-    container.innerHTML = `<p class="turbo-goal-empty">Для выбранного дня нет действий с очками.</p>`;
-    return;
-  }
-
-  container.innerHTML = `
-    <div class="turbo-goal-list">
-      ${items.map(item => `
-        <div class="turbo-goal-row">
-          <div class="turbo-goal-name">
-            <strong>${item.name}</strong>
-            <span>${item.category}</span>
-          </div>
-          <div class="turbo-goal-points">
-            <span>за 1 раз</span>
-            <strong>${formatNumber(item.points)}</strong>
-          </div>
-          <div class="turbo-goal-count">
-            <span>нужно ещё</span>
-            <strong>${formatNumber(Math.ceil(missing / item.points))}</strong>
-          </div>
-        </div>
-      `).join("")}
-    </div>
-  `;
-}
-
-function renderGoalCalculators() {
-  renderGoalCalculator("turtle");
-  renderGoalCalculator("vs");
-}
-
 function bindGoalInputs() {
   ["turtleGoalPoints", "vsGoalPoints"].forEach(id => {
     const input = document.getElementById(id);
     if (!input || input.dataset.goalBound === "true") return;
     input.dataset.goalBound = "true";
-    input.addEventListener("input", renderGoalCalculators);
-    input.addEventListener("change", renderGoalCalculators);
+    input.addEventListener("input", updateNeedOutputs);
+    input.addEventListener("change", updateNeedOutputs);
   });
 }
 
@@ -542,7 +480,7 @@ export function init() {
   fillDaySelector();
   selectCurrentUtcDay();
   bindGoalInputs();
-  renderGoalCalculators();
+  updateNeedOutputs();
 
   window.addEventListener("harvesthub:utc-day-change", () => {
     if (selectedManually) return;
