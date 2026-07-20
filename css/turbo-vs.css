@@ -31,47 +31,111 @@
   text-align: center;
 }
 
-.turtle-goal-box {
+.turbo-goal-layout {
   display: grid;
-  gap: 12px;
-  margin-top: 18px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
+  grid-template-columns: minmax(260px, .75fr) minmax(320px, 1.25fr);
+  gap: 16px;
+  grid-column: 1 / -1;
+  min-width: 0;
 }
 
-.turtle-goal-box h4 {
+.turbo-goal-card {
+  min-width: 0;
+}
+
+.turbo-goal-input-card,
+.turbo-goal-output-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.turbo-goal-input-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.turbo-goal-field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.turbo-goal-field span {
+  color: var(--text-soft);
+  font-size: 14px;
+}
+
+.turbo-goal-field input {
+  width: 100%;
+}
+
+.turbo-goal-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.turbo-goal-stats div {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: rgba(255,255,255,.02);
+}
+
+.turbo-goal-stats span,
+.turbo-goal-empty,
+.turbo-goal-row span {
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.turbo-goal-stats strong {
+  color: var(--accent);
+  font-size: 20px;
+}
+
+.turbo-goal-results-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  min-width: 0;
+}
+
+.turbo-goal-result-panel {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.turbo-goal-result-panel h4 {
   margin: 0;
 }
 
-.turtle-goal-field {
+.turbo-goal-results {
+  display: grid;
+  gap: 10px;
+  max-height: 430px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.turbo-goal-empty {
+  margin: 0;
+}
+
+.turbo-goal-list {
   display: grid;
   gap: 8px;
 }
 
-.turtle-goal-field span {
-  color: var(--text-soft);
-  font-size: 13px;
-}
-
-.turtle-goal-field input {
-  width: 100%;
-}
-
-.turtle-goal-results {
+.turbo-goal-row {
   display: grid;
-  gap: 10px;
-}
-
-.turtle-goal-empty {
-  margin: 0;
-  color: var(--text-soft);
-  font-size: 13px;
-}
-
-.turtle-goal-summary {
-  display: flex;
+  grid-template-columns: minmax(0, 1.4fr) minmax(82px, .65fr) minmax(82px, .65fr);
   align-items: center;
-  justify-content: space-between;
   gap: 10px;
   padding: 10px 12px;
   border: 1px solid var(--border);
@@ -79,56 +143,24 @@
   background: rgba(255,255,255,.02);
 }
 
-.turtle-goal-summary span,
-.turtle-goal-row span {
-  color: var(--text-soft);
-  font-size: 12px;
-}
-
-.turtle-goal-summary strong,
-.turtle-goal-row strong {
-  color: var(--text);
-}
-
-.turtle-goal-list {
-  display: grid;
-  gap: 7px;
-  max-height: 360px;
-  overflow: auto;
-  padding-right: 2px;
-}
-
-.turtle-goal-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 7px;
-  padding: 9px 10px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-small);
-  background: rgba(255,255,255,.02);
-}
-
-.turtle-goal-name,
-.turtle-goal-points,
-.turtle-goal-count {
+.turbo-goal-name,
+.turbo-goal-points,
+.turbo-goal-count {
   display: grid;
   gap: 3px;
   min-width: 0;
 }
 
-.turtle-goal-name strong {
+.turbo-goal-name strong {
   overflow-wrap: anywhere;
 }
 
-.turtle-goal-points,
-.turtle-goal-count {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
+.turbo-goal-points,
+.turbo-goal-count {
+  text-align: right;
 }
 
-.turtle-goal-count strong {
+.turbo-goal-count strong {
   color: var(--accent);
   font-size: 17px;
 }
@@ -192,9 +224,23 @@
     padding-top: 0;
   }
 
-  .turtle-goal-list {
-    max-height: none;
-    overflow: visible;
-    padding-right: 0;
+  .turbo-goal-layout,
+  .turbo-goal-input-grid,
+  .turbo-goal-stats,
+  .turbo-goal-results-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .turbo-goal-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .turbo-goal-points,
+  .turbo-goal-count {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    text-align: left;
   }
 }
