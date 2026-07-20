@@ -17,10 +17,8 @@
         <h3>Цели и итоги</h3>
       </div>
 
-      <section class="turbo-summary-section" data-turbo-summary-section>
-        <button type="button" class="turbo-summary-toggle" aria-expanded="true">
-          <span>Цель на день</span>
-        </button>
+      <details class="turbo-summary-section" open>
+        <summary class="turbo-summary-toggle">Цель на день</summary>
 
         <div class="turbo-summary-body">
           <div class="turbo-goal-input-grid">
@@ -46,12 +44,10 @@
             </div>
           </div>
         </div>
-      </section>
+      </details>
 
-      <section class="turbo-summary-section" data-turbo-summary-section>
-        <button type="button" class="turbo-summary-toggle" aria-expanded="true">
-          <span>Итоги</span>
-        </button>
+      <details class="turbo-summary-section" open>
+        <summary class="turbo-summary-toggle">Итоги</summary>
 
         <div class="turbo-summary-body">
           <div class="result-block">
@@ -64,7 +60,7 @@
             <div id="vsTotal">0</div>
           </div>
         </div>
-      </section>
+      </details>
     </section>
 
     <section class="card turbo-card" data-turbo-panel="turtle">
