@@ -31,10 +31,16 @@
   text-align: center;
 }
 
-.turtle-goal-card {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.turtle-goal-box {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.turtle-goal-box h4 {
+  margin: 0;
 }
 
 .turtle-goal-field {
@@ -44,7 +50,7 @@
 
 .turtle-goal-field span {
   color: var(--text-soft);
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .turtle-goal-field input {
@@ -53,30 +59,30 @@
 
 .turtle-goal-results {
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
 .turtle-goal-empty {
   margin: 0;
   color: var(--text-soft);
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .turtle-goal-summary {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 12px 14px;
+  gap: 10px;
+  padding: 10px 12px;
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--panel-soft, rgba(255,255,255,.03));
+  border-radius: var(--radius-small);
+  background: rgba(255,255,255,.02);
 }
 
 .turtle-goal-summary span,
 .turtle-goal-row span {
   color: var(--text-soft);
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .turtle-goal-summary strong,
@@ -86,15 +92,17 @@
 
 .turtle-goal-list {
   display: grid;
-  gap: 8px;
+  gap: 7px;
+  max-height: 360px;
+  overflow: auto;
+  padding-right: 2px;
 }
 
 .turtle-goal-row {
   display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(100px, .7fr) minmax(100px, .7fr);
-  align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 7px;
+  padding: 9px 10px;
   border: 1px solid var(--border);
   border-radius: var(--radius-small);
   background: rgba(255,255,255,.02);
@@ -114,12 +122,15 @@
 
 .turtle-goal-points,
 .turtle-goal-count {
-  text-align: right;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .turtle-goal-count strong {
   color: var(--accent);
-  font-size: 18px;
+  font-size: 17px;
 }
 
 @media (max-width: 899px) {
@@ -181,20 +192,9 @@
     padding-top: 0;
   }
 
-  .turtle-goal-card {
-    display: flex !important;
-  }
-
-  .turtle-goal-row {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-
-  .turtle-goal-points,
-  .turtle-goal-count {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    text-align: left;
+  .turtle-goal-list {
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
   }
 }
