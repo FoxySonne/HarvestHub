@@ -31,6 +31,97 @@
   text-align: center;
 }
 
+.turtle-goal-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.turtle-goal-field {
+  display: grid;
+  gap: 8px;
+}
+
+.turtle-goal-field span {
+  color: var(--text-soft);
+  font-size: 14px;
+}
+
+.turtle-goal-field input {
+  width: 100%;
+}
+
+.turtle-goal-results {
+  display: grid;
+  gap: 12px;
+}
+
+.turtle-goal-empty {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 14px;
+}
+
+.turtle-goal-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel-soft, rgba(255,255,255,.03));
+}
+
+.turtle-goal-summary span,
+.turtle-goal-row span {
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.turtle-goal-summary strong,
+.turtle-goal-row strong {
+  color: var(--text);
+}
+
+.turtle-goal-list {
+  display: grid;
+  gap: 8px;
+}
+
+.turtle-goal-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(100px, .7fr) minmax(100px, .7fr);
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-small);
+  background: rgba(255,255,255,.02);
+}
+
+.turtle-goal-name,
+.turtle-goal-points,
+.turtle-goal-count {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.turtle-goal-name strong {
+  overflow-wrap: anywhere;
+}
+
+.turtle-goal-points,
+.turtle-goal-count {
+  text-align: right;
+}
+
+.turtle-goal-count strong {
+  color: var(--accent);
+  font-size: 18px;
+}
+
 @media (max-width: 899px) {
   .turbo-mobile-switch {
     display: grid !important;
@@ -88,5 +179,22 @@
 
   .action-row-multi-level > label {
     padding-top: 0;
+  }
+
+  .turtle-goal-card {
+    display: flex !important;
+  }
+
+  .turtle-goal-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .turtle-goal-points,
+  .turtle-goal-count {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    text-align: left;
   }
 }
