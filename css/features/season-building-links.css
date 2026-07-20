@@ -1,0 +1,12 @@
+.season-level-auto-adjusted {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 2px rgba(112,220,86,.18) !important;
+}
+
+.season-row-auto-adjusted {
+  background: rgba(112,220,86,.06);
+}
+
+.season-production-efficiency-field {
+  order: 99;
+}
