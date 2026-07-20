@@ -305,22 +305,28 @@
     row-gap: 8px;
   }
 
+  .action-row-with-need .action-controls,
+  .action-row-multi-level .action-controls,
+  .action-row-multi-level .action-multi-controls {
+    justify-self: end;
+    justify-items: end;
+    width: 244px;
+    max-width: 100%;
+  }
+
   .action-row-with-need .action-controls {
-    justify-self: stretch;
-    width: 100%;
-    grid-template-columns: 56px minmax(72px, 1fr) 84px;
+    grid-template-columns: 62px 78px 88px;
   }
 
   .action-row-multi-level .action-controls,
   .action-row-multi-level .action-multi-controls {
-    justify-self: stretch;
-    width: 100%;
     grid-template-columns: 1fr !important;
   }
 
   .action-multi-line {
-    justify-self: stretch;
-    width: 100%;
-    grid-template-columns: 56px minmax(72px, 1fr) 84px;
+    justify-self: end;
+    width: 244px;
+    max-width: 100%;
+    grid-template-columns: 62px 78px 88px;
   }
 }
