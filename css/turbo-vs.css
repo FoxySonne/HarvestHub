@@ -104,8 +104,9 @@
 }
 
 .action-row-with-need {
-  grid-template-columns: minmax(0, 1fr) minmax(170px, 214px);
+  grid-template-columns: minmax(0, 1fr) 244px;
   align-items: center;
+  column-gap: 14px;
 }
 
 .action-row-with-need > label {
@@ -115,17 +116,18 @@
 
 .action-row-with-need .action-controls {
   display: grid;
-  grid-template-columns: minmax(74px, 1fr) 96px;
+  grid-template-columns: 62px 78px 88px;
   justify-self: end;
-  width: min(100%, 194px);
+  width: 244px;
   gap: 8px;
   align-items: stretch;
   min-width: 0;
 }
 
-.action-row-with-level.action-row-with-need .action-controls {
-  grid-template-columns: 58px minmax(62px, 1fr) 86px;
-  width: min(100%, 222px);
+.action-row-with-need:not(.action-row-with-level):not(.action-row-multi-level) .action-controls::before {
+  content: "";
+  display: block;
+  min-width: 0;
 }
 
 .action-row-multi-level {
@@ -146,9 +148,9 @@
 
 .action-multi-line {
   display: grid;
-  grid-template-columns: 58px minmax(62px, 1fr) 86px;
+  grid-template-columns: 62px 78px 88px;
   justify-self: end;
-  width: min(100%, 222px);
+  width: 244px;
   gap: 8px;
   min-width: 0;
 }
@@ -246,18 +248,15 @@
   }
 
   .action-row-with-need {
-    grid-template-columns: minmax(0, 1fr) minmax(156px, 178px);
+    grid-template-columns: minmax(0, 1fr) 214px;
+    column-gap: 10px;
   }
 
-  .action-row-with-need .action-controls {
-    grid-template-columns: minmax(66px, 1fr) 86px;
-    width: min(100%, 160px);
-  }
-
-  .action-row-with-level.action-row-with-need .action-controls,
+  .action-row-with-need .action-controls,
   .action-multi-line {
-    grid-template-columns: 52px minmax(56px, 1fr) 76px;
-    width: min(100%, 200px);
+    grid-template-columns: 54px 70px 78px;
+    width: 214px;
+    gap: 6px;
   }
 
   .action-row-multi-level {
@@ -267,5 +266,19 @@
 
   .action-row-multi-level > label {
     padding-top: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .action-row-with-need {
+    grid-template-columns: 1fr;
+    row-gap: 8px;
+  }
+
+  .action-row-with-need .action-controls,
+  .action-multi-line {
+    justify-self: stretch;
+    width: 100%;
+    grid-template-columns: 56px minmax(72px, 1fr) 84px;
   }
 }
