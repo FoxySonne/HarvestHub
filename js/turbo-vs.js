@@ -7,6 +7,7 @@ let isSyncingControls = false;
 let currentDayId = "";
 let selectedManually = false;
 let timerId = null;
+let currentTotals = { turtle: 0, vs: 0 };
 
 function getWeekStateKey() {
   return `${TURBO_WEEK_STATE_PREFIX}local`;
@@ -358,8 +359,11 @@ function updateTotals() {
     if (eventType === "vs") vsTotal += total;
   });
 
+  currentTotals = { turtle: turtleTotal, vs: vsTotal };
+
   if (document.getElementById("turtleTotal")) document.getElementById("turtleTotal").textContent = formatNumber(turtleTotal);
   if (document.getElementById("vsTotal")) document.getElementById("vsTotal").textContent = formatNumber(vsTotal);
+  renderGoalCalculators();
 }
 
 function handleControlChange(actionId, sourceControl) {
@@ -382,14 +386,14 @@ function renderEventList(container, list, eventType) {
   });
 }
 
-function getGoalVariants(action) {
-  const points = action.points?.turtle;
+function getGoalVariants(action, eventType) {
+  const points = action.points?.[eventType];
   if (points == null) return [];
 
   if (typeof points === "object") {
     return action.options
       .map(option => ({
-        id: `${action.id}:${option.value}`,
+        id: `${eventType}:${action.id}:${option.value}`,
         name: `${action.name} — ${option.label}`,
         category: getCategoryName(action.categoryId),
         points: Number(points[option.value]) || 0
@@ -401,24 +405,24 @@ function getGoalVariants(action) {
   if (simplePoints <= 0) return [];
 
   return [{
-    id: action.id,
+    id: `${eventType}:${action.id}`,
     name: action.name,
     category: getCategoryName(action.categoryId),
     points: simplePoints
   }];
 }
 
-function getCurrentTurtleGoalItems() {
+function getCurrentGoalItems(eventType) {
   const day = database.days[currentDayId];
   if (!day) return [];
 
   const seen = new Set();
-  return sortDayItems(resolveDayList(day.turtle))
+  return sortDayItems(resolveDayList(day[eventType] || []))
     .filter(item => typeof item === "string")
     .flatMap(actionId => {
       const action = getActionById(actionId);
       if (!action) return [];
-      return getGoalVariants(action);
+      return getGoalVariants(action, eventType);
     })
     .filter(item => {
       if (seen.has(item.id)) return false;
@@ -427,42 +431,49 @@ function getCurrentTurtleGoalItems() {
     });
 }
 
-function renderTurtleGoalCalculator() {
-  const input = document.getElementById("turtleGoalPoints");
-  const container = document.getElementById("turtleGoalResults");
-  if (!input || !container) return;
+function renderGoalCalculator(eventType) {
+  const isTurtle = eventType === "turtle";
+  const input = document.getElementById(isTurtle ? "turtleGoalPoints" : "vsGoalPoints");
+  const container = document.getElementById(isTurtle ? "turtleGoalResults" : "vsGoalResults");
+  const missingElement = document.getElementById(isTurtle ? "turtleGoalMissing" : "vsGoalMissing");
+  if (!input || !container || !missingElement) return;
 
   const target = parseTargetPoints(input.value);
+  const current = currentTotals[eventType] || 0;
+  const missing = Math.max(target - current, 0);
+  missingElement.textContent = formatNumber(missing);
+
   if (target <= 0) {
-    container.innerHTML = `<p class="turtle-goal-empty">Введите нужную сумму очков.</p>`;
+    container.innerHTML = `<p class="turbo-goal-empty">Введите цель ${isTurtle ? "Черепашки" : "VS"}.</p>`;
     return;
   }
 
-  const items = getCurrentTurtleGoalItems();
+  if (missing <= 0) {
+    container.innerHTML = `<p class="turbo-goal-empty">Цель уже набрана.</p>`;
+    return;
+  }
+
+  const items = getCurrentGoalItems(eventType);
   if (!items.length) {
-    container.innerHTML = `<p class="turtle-goal-empty">Для выбранного дня нет действий Черепашки с очками.</p>`;
+    container.innerHTML = `<p class="turbo-goal-empty">Для выбранного дня нет действий с очками.</p>`;
     return;
   }
 
   container.innerHTML = `
-    <div class="turtle-goal-summary">
-      <span>Цель:</span>
-      <strong>${formatNumber(target)} очков</strong>
-    </div>
-    <div class="turtle-goal-list">
+    <div class="turbo-goal-list">
       ${items.map(item => `
-        <div class="turtle-goal-row">
-          <div class="turtle-goal-name">
+        <div class="turbo-goal-row">
+          <div class="turbo-goal-name">
             <strong>${item.name}</strong>
             <span>${item.category}</span>
           </div>
-          <div class="turtle-goal-points">
+          <div class="turbo-goal-points">
             <span>за 1 раз</span>
             <strong>${formatNumber(item.points)}</strong>
           </div>
-          <div class="turtle-goal-count">
-            <span>нужно раз</span>
-            <strong>${formatNumber(Math.ceil(target / item.points))}</strong>
+          <div class="turbo-goal-count">
+            <span>нужно ещё</span>
+            <strong>${formatNumber(Math.ceil(missing / item.points))}</strong>
           </div>
         </div>
       `).join("")}
@@ -470,13 +481,19 @@ function renderTurtleGoalCalculator() {
   `;
 }
 
-function bindTurtleGoalInput() {
-  const input = document.getElementById("turtleGoalPoints");
-  if (!input || input.dataset.turtleGoalBound === "true") return;
+function renderGoalCalculators() {
+  renderGoalCalculator("turtle");
+  renderGoalCalculator("vs");
+}
 
-  input.dataset.turtleGoalBound = "true";
-  input.addEventListener("input", renderTurtleGoalCalculator);
-  input.addEventListener("change", renderTurtleGoalCalculator);
+function bindGoalInputs() {
+  ["turtleGoalPoints", "vsGoalPoints"].forEach(id => {
+    const input = document.getElementById(id);
+    if (!input || input.dataset.goalBound === "true") return;
+    input.dataset.goalBound = "true";
+    input.addEventListener("input", renderGoalCalculators);
+    input.addEventListener("change", renderGoalCalculators);
+  });
 }
 
 function renderDay(dayId) {
@@ -490,9 +507,8 @@ function renderDay(dayId) {
   renderEventList(turtleList, day.turtle, "turtle");
   renderEventList(vsList, day.vs, "vs");
   restoreDayState(dayId);
+  bindGoalInputs();
   updateTotals();
-  bindTurtleGoalInput();
-  renderTurtleGoalCalculator();
 }
 
 function fillDaySelector() {
@@ -525,7 +541,8 @@ function selectCurrentUtcDay() {
 export function init() {
   fillDaySelector();
   selectCurrentUtcDay();
-  bindTurtleGoalInput();
+  bindGoalInputs();
+  renderGoalCalculators();
 
   window.addEventListener("harvesthub:utc-day-change", () => {
     if (selectedManually) return;
