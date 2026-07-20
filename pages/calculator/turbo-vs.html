@@ -28,57 +28,33 @@
       </div>
     </section>
 
-    <section class="turbo-goal-layout" data-no-collapse="true">
-      <section class="card turbo-goal-card turbo-goal-input-card" data-no-collapse="true">
-        <div class="card-header">
-          <h3>Цель на день</h3>
+    <section class="card turbo-goal-card" data-no-collapse="true">
+      <div class="card-header">
+        <h3>Цель на день</h3>
+      </div>
+
+      <div class="turbo-goal-input-grid">
+        <label class="turbo-goal-field">
+          <span>Цель Черепашки</span>
+          <input id="turtleGoalPoints" type="text" inputmode="decimal" placeholder="15M или 15000000" autocomplete="off" data-no-persist="true">
+        </label>
+
+        <label class="turbo-goal-field">
+          <span>Цель VS</span>
+          <input id="vsGoalPoints" type="text" inputmode="decimal" placeholder="5M или 5000000" autocomplete="off" data-no-persist="true">
+        </label>
+      </div>
+
+      <div class="turbo-goal-stats">
+        <div>
+          <span>Осталось Черепашки</span>
+          <strong id="turtleGoalMissing">0</strong>
         </div>
-
-        <div class="turbo-goal-input-grid">
-          <label class="turbo-goal-field">
-            <span>Цель Черепашки</span>
-            <input id="turtleGoalPoints" type="text" inputmode="decimal" placeholder="15M или 15000000" autocomplete="off" data-no-persist="true">
-          </label>
-
-          <label class="turbo-goal-field">
-            <span>Цель VS</span>
-            <input id="vsGoalPoints" type="text" inputmode="decimal" placeholder="5M или 5000000" autocomplete="off" data-no-persist="true">
-          </label>
+        <div>
+          <span>Осталось VS</span>
+          <strong id="vsGoalMissing">0</strong>
         </div>
-
-        <div class="turbo-goal-stats">
-          <div>
-            <span>Осталось Черепашки</span>
-            <strong id="turtleGoalMissing">0</strong>
-          </div>
-          <div>
-            <span>Осталось VS</span>
-            <strong id="vsGoalMissing">0</strong>
-          </div>
-        </div>
-      </section>
-
-      <section class="card turbo-goal-card turbo-goal-output-card" data-no-collapse="true">
-        <div class="card-header">
-          <h3>Что ещё нужно сделать</h3>
-        </div>
-
-        <div class="turbo-goal-results-grid">
-          <div class="turbo-goal-result-panel">
-            <h4>Черепашка</h4>
-            <div id="turtleGoalResults" class="turbo-goal-results">
-              <p class="turbo-goal-empty">Введите цель Черепашки.</p>
-            </div>
-          </div>
-
-          <div class="turbo-goal-result-panel">
-            <h4>VS</h4>
-            <div id="vsGoalResults" class="turbo-goal-results">
-              <p class="turbo-goal-empty">Введите цель VS.</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      </div>
     </section>
 
     <section class="card turbo-card" data-turbo-panel="turtle">
