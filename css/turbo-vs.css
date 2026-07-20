@@ -104,19 +104,28 @@
 }
 
 .action-row-with-need {
-  grid-template-columns: minmax(0, 1fr) minmax(190px, 230px);
+  grid-template-columns: minmax(0, 1fr) minmax(170px, 214px);
+  align-items: center;
+}
+
+.action-row-with-need > label {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .action-row-with-need .action-controls {
   display: grid;
-  grid-template-columns: minmax(82px, 1fr) 112px;
+  grid-template-columns: minmax(74px, 1fr) 96px;
+  justify-self: end;
+  width: min(100%, 194px);
   gap: 8px;
   align-items: stretch;
   min-width: 0;
 }
 
 .action-row-with-level.action-row-with-need .action-controls {
-  grid-template-columns: minmax(74px, .8fr) minmax(82px, 1fr) 112px;
+  grid-template-columns: 58px minmax(62px, 1fr) 86px;
+  width: min(100%, 222px);
 }
 
 .action-row-multi-level {
@@ -130,12 +139,16 @@
 .action-row-multi-level .action-controls {
   display: grid;
   grid-template-columns: 1fr;
+  justify-items: end;
   gap: 8px;
+  min-width: 0;
 }
 
 .action-multi-line {
   display: grid;
-  grid-template-columns: minmax(74px, .8fr) minmax(82px, 1fr) 112px;
+  grid-template-columns: 58px minmax(62px, 1fr) 86px;
+  justify-self: end;
+  width: min(100%, 222px);
   gap: 8px;
   min-width: 0;
 }
@@ -154,8 +167,8 @@
   align-items: center;
   justify-items: center;
   min-width: 0;
-  min-height: 42px;
-  padding: 5px 8px;
+  min-height: 40px;
+  padding: 5px 6px;
   border: 1px solid rgba(112,220,86,.35);
   border-radius: var(--radius-small);
   background: rgba(112,220,86,.14);
@@ -173,7 +186,7 @@
   max-width: 100%;
   overflow-wrap: anywhere;
   color: var(--accent);
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.15;
 }
 
@@ -233,16 +246,18 @@
   }
 
   .action-row-with-need {
-    grid-template-columns: minmax(0, 1fr) minmax(164px, 190px);
+    grid-template-columns: minmax(0, 1fr) minmax(156px, 178px);
   }
 
   .action-row-with-need .action-controls {
-    grid-template-columns: minmax(72px, 1fr) 96px;
+    grid-template-columns: minmax(66px, 1fr) 86px;
+    width: min(100%, 160px);
   }
 
   .action-row-with-level.action-row-with-need .action-controls,
   .action-multi-line {
-    grid-template-columns: minmax(66px, .8fr) minmax(66px, 1fr) 96px;
+    grid-template-columns: 52px minmax(56px, 1fr) 76px;
+    width: min(100%, 200px);
   }
 
   .action-row-multi-level {
