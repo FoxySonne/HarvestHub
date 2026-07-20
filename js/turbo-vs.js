@@ -281,6 +281,19 @@ function createNumberInput(action, eventType) {
   return input;
 }
 
+function getCompactOptionLabel(action, optionData) {
+  const label = String(optionData.label || optionData.value || "").trim();
+
+  if (action.id === "infected_kill") {
+    return label
+      .replace(/^зараж[её]нн?ые\s*/i, "")
+      .replace(/^зараж[её]нный\s*/i, "")
+      .trim();
+  }
+
+  return label;
+}
+
 function createStaticLevel(value, label) {
   const level = document.createElement("div");
   level.className = "action-level-static";
@@ -312,7 +325,7 @@ function createMultiLine(action, eventType, optionData) {
   line.className = "action-multi-line";
   line.dataset.level = String(optionData.value);
 
-  const level = createStaticLevel(optionData.value, optionData.label);
+  const level = createStaticLevel(optionData.value, getCompactOptionLabel(action, optionData));
   const quantityInput = createNumberInput(action, eventType);
   const needOutput = createNeedOutput(action.id, eventType);
   quantityInput.className = "action-quantity-input";
