@@ -104,7 +104,7 @@
 }
 
 .action-row-with-need {
-  grid-template-columns: minmax(0, 1fr) 254px;
+  grid-template-columns: minmax(0, 1fr) 286px;
   align-items: center;
   column-gap: 14px;
 }
@@ -116,10 +116,10 @@
 
 .action-row-with-need .action-controls {
   display: grid;
-  grid-template-columns: 70px 84px 84px;
+  grid-template-columns: 96px 86px 86px;
   justify-self: end;
-  width: 254px;
-  gap: 8px;
+  width: 286px;
+  gap: 9px;
   align-items: stretch;
   min-width: 0;
 }
@@ -137,17 +137,17 @@
   display: grid;
   grid-template-columns: 1fr !important;
   justify-items: end;
-  width: 254px;
+  width: 286px;
   gap: 8px;
   min-width: 0;
 }
 
 .action-multi-line {
   display: grid;
-  grid-template-columns: 70px 84px 84px;
+  grid-template-columns: 96px 86px 86px;
   justify-self: end;
-  width: 254px;
-  gap: 8px;
+  width: 286px;
+  gap: 9px;
   min-width: 0;
 }
 
@@ -177,10 +177,10 @@
   overflow-wrap: anywhere;
 }
 
-.action-multi-line select,
-.action-multi-line input,
 .action-row-with-need input,
 .action-row-with-need select,
+.action-multi-line input,
+.action-multi-line select,
 .action-need-output {
   min-width: 0 !important;
   width: 100% !important;
@@ -190,8 +190,8 @@
   text-align: center !important;
 }
 
-.action-multi-line input,
 .action-row-with-need input,
+.action-multi-line input,
 .action-quantity-input,
 .action-quantity-select {
   padding-left: 0 !important;
@@ -200,10 +200,19 @@
   -moz-appearance: textfield;
 }
 
-.action-multi-line input::-webkit-outer-spin-button,
-.action-multi-line input::-webkit-inner-spin-button,
+.action-row-with-need select,
+.action-multi-line select,
+.action-level-select {
+  padding-left: 4px !important;
+  padding-right: 18px !important;
+  text-align: center !important;
+  text-align-last: center !important;
+}
+
 .action-row-with-need input::-webkit-outer-spin-button,
-.action-row-with-need input::-webkit-inner-spin-button {
+.action-row-with-need input::-webkit-inner-spin-button,
+.action-multi-line input::-webkit-outer-spin-button,
+.action-multi-line input::-webkit-inner-spin-button {
   margin: 0;
 }
 
@@ -289,15 +298,15 @@
   }
 
   .action-row-with-need {
-    grid-template-columns: minmax(0, 1fr) 230px;
+    grid-template-columns: minmax(0, 1fr) 260px;
     column-gap: 10px;
   }
 
   .action-row-with-need .action-controls,
   .action-multi-line {
-    grid-template-columns: 62px 78px 78px;
-    width: 230px;
-    gap: 6px;
+    grid-template-columns: 86px 78px 78px;
+    width: 260px;
+    gap: 9px;
   }
 
   .action-row-multi-level {
@@ -314,7 +323,7 @@
     grid-template-columns: 1fr !important;
     justify-self: end;
     justify-items: end;
-    width: 230px;
+    width: 260px;
   }
 }
 
@@ -329,12 +338,12 @@
   .action-row-multi-level .action-multi-controls {
     justify-self: end;
     justify-items: end;
-    width: 230px;
+    width: 260px;
     max-width: 100%;
   }
 
   .action-row-with-need .action-controls {
-    grid-template-columns: 62px 78px 78px;
+    grid-template-columns: 86px 78px 78px;
   }
 
   .action-row-multi-level .action-controls,
@@ -344,8 +353,8 @@
 
   .action-multi-line {
     justify-self: end;
-    width: 230px;
+    width: 260px;
     max-width: 100%;
-    grid-template-columns: 62px 78px 78px;
+    grid-template-columns: 86px 78px 78px;
   }
 }
