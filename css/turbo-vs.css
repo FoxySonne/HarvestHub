@@ -120,7 +120,7 @@
   justify-self: end;
   width: 286px;
   gap: 9px;
-  align-items: stretch;
+  align-items: center;
   min-width: 0;
 }
 
@@ -129,7 +129,7 @@
 }
 
 .action-row-multi-level > label {
-  padding-top: 10px;
+  padding-top: 9px;
 }
 
 .action-row-multi-level .action-controls,
@@ -146,6 +146,7 @@
   display: grid;
   grid-template-columns: 96px 86px 86px;
   justify-self: end;
+  align-items: center;
   width: 286px;
   gap: 9px;
   min-width: 0;
@@ -194,17 +195,22 @@
 .action-multi-line input,
 .action-quantity-input,
 .action-quantity-select {
-  padding-left: 0 !important;
-  padding-right: 0 !important;
+  display: block !important;
+  padding: 0 !important;
   text-align: center !important;
+  line-height: 40px !important;
   -moz-appearance: textfield;
 }
 
 .action-row-with-need select,
 .action-multi-line select,
 .action-level-select {
+  display: block !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
   padding-left: 4px !important;
   padding-right: 18px !important;
+  line-height: 40px !important;
   text-align: center !important;
   text-align-last: center !important;
 }
