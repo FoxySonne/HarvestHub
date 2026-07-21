@@ -114,7 +114,7 @@ function getRowEventType(row) {
 
 function getLineState(line) {
   return {
-    level: line.dataset.level || line.querySelector("select")?.value || "",
+    level: line.querySelector("select")?.value || line.dataset.level || "",
     value: line.querySelector("input")?.value || "0"
   };
 }
@@ -158,9 +158,11 @@ function setRowState(row, state = {}) {
   if (row.classList.contains("action-row-multi-level")) {
     const savedRows = getTroopRowsFromState(state);
     Array.from(row.querySelectorAll(".action-multi-line")).forEach((line, index) => {
-      const lineLevel = String(line.dataset.level || line.querySelector("select")?.value || "");
+      const levelSelect = line.querySelector("select");
+      const lineLevel = String(levelSelect?.value || line.dataset.level || "");
       const quantityInput = line.querySelector("input");
       const saved = savedRows.find(item => String(item.level) === lineLevel) || savedRows[index];
+      if (levelSelect && saved?.level != null) levelSelect.value = String(saved.level);
       if (quantityInput) quantityInput.value = String(saved?.value ?? "0");
     });
     return;
@@ -231,7 +233,7 @@ function updateNeedOutputs() {
     const actionId = output.dataset.actionId;
     const line = output.closest(".action-multi-line");
     const row = output.closest(".action-row");
-    const level = line?.dataset.level || row?.querySelector(".action-level-select")?.value || null;
+    const level = line?.querySelector("select")?.value || row?.querySelector(".action-level-select")?.value || line?.dataset.level || null;
     const points = getPoints(actionId, eventType, level);
     const target = getGoalTarget(eventType);
     const missing = getGoalMissing(eventType);
@@ -307,27 +309,44 @@ function createLevelSelect(action, eventType, defaultLevel) {
   return select;
 }
 
-function createMultiLine(action, eventType, optionData) {
+function createTroopLevelSelect(action, eventType, defaultLevel) {
+  const select = document.createElement("select");
+  select.className = "action-level-select";
+  select.dataset.levelActionId = action.id;
+  select.dataset.eventType = eventType;
+  select.dataset.noPersist = "true";
+
+  action.options
+    .filter(option => TROOP_LEVEL_DEFAULTS.includes(Number(option.value)))
+    .forEach(optionData => {
+      const option = document.createElement("option");
+      option.value = optionData.value;
+      option.textContent = optionData.label;
+      select.appendChild(option);
+    });
+
+  select.value = String(defaultLevel);
+  return select;
+}
+
+function createMultiLine(action, eventType, defaultLevel) {
   const line = document.createElement("div");
   line.className = "action-multi-line";
-  line.dataset.level = String(optionData.value);
 
-  const level = createStaticLevel(optionData.value, optionData.label);
+  const levelSelect = createTroopLevelSelect(action, eventType, defaultLevel);
   const quantityInput = createNumberInput(action, eventType);
   const needOutput = createNeedOutput(action.id, eventType);
   quantityInput.className = "action-quantity-input";
   quantityInput.dataset.hasLevel = "true";
 
-  line.append(level, quantityInput, needOutput);
+  line.append(levelSelect, quantityInput, needOutput);
   return line;
 }
 
 function createTroopUpgradeControls(action, eventType) {
   const controls = document.createElement("div");
   controls.className = "action-controls action-multi-controls";
-  action.options
-    .filter(option => TROOP_LEVEL_DEFAULTS.includes(Number(option.value)))
-    .forEach(optionData => controls.appendChild(createMultiLine(action, eventType, optionData)));
+  TROOP_LEVEL_DEFAULTS.forEach(defaultLevel => controls.appendChild(createMultiLine(action, eventType, defaultLevel)));
   return controls;
 }
 
@@ -394,7 +413,7 @@ function calculateRowTotal(row) {
   if (row.classList.contains("action-row-multi-level")) {
     return Array.from(row.querySelectorAll(".action-multi-line")).reduce((sum, line) => {
       const quantity = Number(line.querySelector("input")?.value) || 0;
-      const level = line.dataset.level || null;
+      const level = line.querySelector("select")?.value || null;
       return sum + quantity * getPoints(actionId, eventType, level);
     }, 0);
   }
