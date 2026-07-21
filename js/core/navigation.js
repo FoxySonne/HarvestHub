@@ -1,5 +1,5 @@
 (() => {
-  const SITE_ASSET_VERSION = "20260718-safe-1";
+  const SITE_ASSET_VERSION = "20260721-home-timers-1";
   const QUICK_LINKS_STORAGE_KEY = "harvesthub_page_visits";
   const MAX_QUICK_LINKS = 5;
 
@@ -13,6 +13,7 @@
   ];
 
   const pageModulePaths = {
+    home: "../home.js",
     ipk: "../calculators/ipk.js",
     "turbo-vs": "../calculators/turbo-vs.js",
     "troop-training": "../calculators/troop-training.js",
