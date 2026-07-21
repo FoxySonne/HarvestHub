@@ -124,10 +124,6 @@
   min-width: 0;
 }
 
-.action-row-with-level .action-controls {
-  grid-template-columns: 70px 84px 84px;
-}
-
 .action-row-multi-level {
   align-items: start;
 }
@@ -170,7 +166,7 @@
   align-items: center;
   justify-content: center;
   min-height: 40px;
-  padding: 5px 6px;
+  padding: 0 6px;
   border: 1px solid var(--border);
   border-radius: var(--radius-small);
   background: var(--input-bg, rgba(0,0,0,.16));
@@ -186,12 +182,29 @@
 .action-row-with-need input,
 .action-row-with-need select,
 .action-need-output {
-  min-width: 0;
-  width: 100%;
-  height: 40px;
-  min-height: 40px;
-  box-sizing: border-box;
-  text-align: center;
+  min-width: 0 !important;
+  width: 100% !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  box-sizing: border-box !important;
+  text-align: center !important;
+}
+
+.action-multi-line input,
+.action-row-with-need input,
+.action-quantity-input,
+.action-quantity-select {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  text-align: center !important;
+  -moz-appearance: textfield;
+}
+
+.action-multi-line input::-webkit-outer-spin-button,
+.action-multi-line input::-webkit-inner-spin-button,
+.action-row-with-need input::-webkit-outer-spin-button,
+.action-row-with-need input::-webkit-inner-spin-button {
+  margin: 0;
 }
 
 .action-need-output {
@@ -213,6 +226,7 @@
 
 .action-need-output strong {
   max-width: 100%;
+  margin: 0 auto;
   overflow-wrap: anywhere;
   color: var(--accent);
   font-size: 14px;
