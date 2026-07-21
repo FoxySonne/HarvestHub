@@ -316,12 +316,14 @@
   }
 
   .action-row-multi-level {
-    grid-template-columns: 1fr;
-    gap: 8px;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    align-items: start;
+    column-gap: 10px;
+    row-gap: 0;
   }
 
   .action-row-multi-level > label {
-    padding-top: 0;
+    padding-top: 9px;
   }
 
   .action-row-multi-level .action-controls,
@@ -334,7 +336,7 @@
 }
 
 @media (max-width: 560px) {
-  .action-row-with-need {
+  .action-row-with-need:not(.action-row-multi-level) {
     grid-template-columns: 1fr;
     row-gap: 8px;
   }
@@ -350,6 +352,17 @@
 
   .action-row-with-need .action-controls {
     grid-template-columns: 86px 78px 78px;
+  }
+
+  .action-row-multi-level {
+    grid-template-columns: minmax(0, 1fr) 260px;
+    align-items: start;
+    column-gap: 10px;
+    row-gap: 0;
+  }
+
+  .action-row-multi-level > label {
+    padding-top: 9px;
   }
 
   .action-row-multi-level .action-controls,
