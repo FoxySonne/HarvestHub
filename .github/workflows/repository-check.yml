@@ -1,0 +1,54 @@
+name: Repository checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repository-check-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Detect merge conflict markers
+        shell: bash
+        run: |
+          if git grep -n -I -E '^(<<<<<<<|=======|>>>>>>>)' -- . ':!.github/workflows/repository-check.yml'; then
+            echo 'Обнаружены неразрешённые маркеры конфликта Git.' >&2
+            exit 1
+          fi
+
+      - name: Validate JSON files
+        shell: bash
+        run: |
+          mapfile -d '' files < <(find . -type f -name '*.json' -not -path './.git/*' -print0)
+          if ((${#files[@]})); then
+            python -m json.tool "${files[0]}" >/dev/null
+            for file in "${files[@]:1}"; do
+              python -m json.tool "$file" >/dev/null
+            done
+          fi
+
+      - name: Validate YAML files
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          file_or_dir: .
+          config_data: |
+            extends: default
+            rules:
+              line-length: disable
+              truthy:
+                allowed-values: ['true', 'false', 'on']
+
+      - name: Check whitespace errors
+        run: git diff --check HEAD^
