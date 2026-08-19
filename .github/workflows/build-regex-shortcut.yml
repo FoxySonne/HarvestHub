@@ -1,0 +1,46 @@
+name: Build Regex Shortcut
+
+on:
+  push:
+    paths:
+      - 'tools/regex-shortcut/**'
+      - '.github/workflows/build-regex-shortcut.yml'
+  workflow_dispatch:
+
+jobs:
+  build-shortcut:
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.x'
+
+      - name: Build Cherri
+        shell: bash
+        run: |
+          set -euxo pipefail
+          git clone --depth 1 --branch v2.3.0 https://github.com/electrikmilk/cherri.git "$RUNNER_TEMP/cherri"
+          cd "$RUNNER_TEMP/cherri"
+          go build -o cherri .
+
+      - name: Build and sign Shortcut on macOS
+        shell: bash
+        run: |
+          set -euxo pipefail
+          "$RUNNER_TEMP/cherri/cherri" "$GITHUB_WORKSPACE/tools/regex-shortcut/Регулярные выражения.cherri" \
+            --output="$RUNNER_TEMP/Регулярные выражения.shortcut" \
+            --share=anyone
+          test -s "$RUNNER_TEMP/Регулярные выражения.shortcut"
+          xxd -l 4 "$RUNNER_TEMP/Регулярные выражения.shortcut"
+
+      - name: Upload signed Shortcut
+        uses: actions/upload-artifact@v4
+        with:
+          name: Регулярные-выражения-shortcut
+          path: ${{ runner.temp }}/Регулярные выражения.shortcut
+          if-no-files-found: error
+          retention-days: 7
