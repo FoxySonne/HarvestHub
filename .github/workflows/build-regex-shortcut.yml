@@ -5,6 +5,10 @@ on:
     paths:
       - 'tools/regex-shortcut/**'
       - '.github/workflows/build-regex-shortcut.yml'
+  pull_request:
+    paths:
+      - 'tools/regex-shortcut/**'
+      - '.github/workflows/build-regex-shortcut.yml'
   workflow_dispatch:
 
 jobs:
