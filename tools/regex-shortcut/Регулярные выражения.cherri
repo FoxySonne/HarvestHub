@@ -1,0 +1,554 @@
+#define name Регулярные выражения
+#define color green
+#define mac false
+
+#include 'actions/sharing'
+
+menu "Регулярные выражения" {
+    item "Массовая замена текста":
+        menu "Массовая замена текста" {
+            item "Удаляет всё после заданного начала":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^ТЕКСТ\s+.+$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = 'ТЕКСТ'
+                        setClipboard(@clip)
+                }
+            item "Оставляет всё до дефиса или тире":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^(.+?)\s*[-–—]\s*.+$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '$1'
+                        setClipboard(@clip)
+                }
+            item "Оставляет всё после двоеточия":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^.+?:\s*(.+)$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '$1'
+                        setClipboard(@clip)
+                }
+            item "Удаляет число в конце значения":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^(.+?)\s+\d+$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '$1'
+                        setClipboard(@clip)
+                }
+            item "Удаляет всё перед заданным текстом":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^.*?(ТЕКСТ.*)$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '$1'
+                        setClipboard(@clip)
+                }
+            item "Удаляет заданный текст и всё после него":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^(.*?)ТЕКСТ.*$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '$1'
+                        setClipboard(@clip)
+                }
+        }
+    item "Числа и сокращения":
+        menu "Числа и сокращения" {
+            item "Разворачивает целые миллионы":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^(\d+)М$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '$1000000'
+                        setClipboard(@clip)
+                }
+            item "Разворачивает миллионы с 1 знаком":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^(\d+)[,.](\d)М$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '$1$200000'
+                        setClipboard(@clip)
+                }
+            item "Разворачивает миллионы с 2 знаками":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^(\d+)[,.](\d{2})М$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '$1$20000'
+                        setClipboard(@clip)
+                }
+            item "Разворачивает миллионы с 3 знаками":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^(\d+)[,.](\d{3})М$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '$1$2000'
+                        setClipboard(@clip)
+                }
+            item "Разворачивает целые тысячи":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^(\d+)К$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '$1000'
+                        setClipboard(@clip)
+                }
+            item "Разворачивает тысячи с 2 знаками":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^(\d+)[,.](\d{2})К$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '$1$20'
+                        setClipboard(@clip)
+                }
+        }
+    item "Даты":
+        menu "Даты" {
+            item "19/08/2026 → 19.08.2026":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^(\d{1,2})/(\d{1,2})/(\d{4})$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '$1.$2.$3'
+                        setClipboard(@clip)
+                }
+            item "2026-08-19 → 19.08.2026":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^(\d{4})-(\d{2})-(\d{2})$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '$3.$2.$1'
+                        setClipboard(@clip)
+                }
+            item "19.08.26 → 19.08.2026":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^(\d{1,2})\.(\d{1,2})\.(\d{2})$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '$1.$2.20$3'
+                        setClipboard(@clip)
+                }
+            item "19-08-2026 → 19.08.2026":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^(\d{1,2})-(\d{1,2})-(\d{4})$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '$1.$2.$3'
+                        setClipboard(@clip)
+                }
+            item "Унифицирует обозначение года: 1927г / 1927г. / 1927 г → 1927 г.":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '(\d{4})\s*г\.?\b'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '$1 г.'
+                        setClipboard(@clip)
+                }
+            item "Убирает дату и оставляет время/текст после неё":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^\d{1,2}\.\d{1,2}\.\d{4}\s+(.+)$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '$1'
+                        setClipboard(@clip)
+                }
+        }
+    item "Время и длительность":
+        menu "Время и длительность" {
+            item "Добавляет ведущий ноль к однозначному часу: 7:11:26 → 07:11:26":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^(\d):(\d{2}):(\d{2})$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '0$1:$2:$3'
+                        setClipboard(@clip)
+                }
+            item "Добавляет дни к времени: 07:11:26 → 00:07:11:26":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^(\d{2}):(\d{2}):(\d{2})$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '00:$1:$2:$3'
+                        setClipboard(@clip)
+                }
+            item "Добавляет ведущий ноль к однозначному числу дней: 3:05:20:10 → 03:05:20:10":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^(\d):(\d{2}):(\d{2}):(\d{2})$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '0$1:$2:$3:$4'
+                        setClipboard(@clip)
+                }
+            item "12 ч 34 мин 56 сек → 12:34:56":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^(\d{2})\s*ч\.?\s*(\d{2})\s*мин\.?\s*(\d{2})\s*сек\.?$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '$1:$2:$3'
+                        setClipboard(@clip)
+                }
+            item "12:34:56 → 12 ч 34 мин 56 сек":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^(\d{2}):(\d{2}):(\d{2})$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '$1 ч $2 мин $3 сек'
+                        setClipboard(@clip)
+                }
+            item "12 дн. 05:20:10 → 12:05:20:10":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^(\d{1,2})\s*дн\.?\s*(\d{1,2}):(\d{2}):(\d{2})$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '$1:$2:$3:$4'
+                        setClipboard(@clip)
+                }
+            item "12:05:20:10 → 12 дн. 05:20:10":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^(\d{1,2}):(\d{1,2}):(\d{2}):(\d{2})$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '$1 дн. $2:$3:$4'
+                        setClipboard(@clip)
+                }
+            item "Часы и минуты → Ч:ММ":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^(\d{1,2})\s*ч\.?\s*(\d{1,2})\s*мин\.?$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '$1:$2'
+                        setClipboard(@clip)
+                }
+        }
+    item "Пробелы и переносы":
+        menu "Пробелы и переносы" {
+            item "Убирает пробелы в начале":
+                @clip = '^\s+'
+                setClipboard(@clip)
+            item "Убирает пробелы в конце":
+                @clip = '\s+$'
+                setClipboard(@clip)
+            item "Сжимает двойные и лишние пробелы":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = ' {2,}'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = ' '
+                        setClipboard(@clip)
+                }
+            item "Убирает переносы строк внутри ячеек":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '\n+'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = ' '
+                        setClipboard(@clip)
+                }
+            item "Убирает табуляцию":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '\t+'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = ' '
+                        setClipboard(@clip)
+                }
+            item "Находит ячейки, содержащие только пробелы":
+                @clip = '^\s*$'
+                setClipboard(@clip)
+        }
+    item "Поиск по структуре значения":
+        menu "Поиск по структуре значения" {
+            item "Находит значения, начинающиеся с текста":
+                @clip = '^ТЕКСТ'
+                setClipboard(@clip)
+            item "Находит значения, заканчивающиеся текстом":
+                @clip = 'ТЕКСТ$'
+                setClipboard(@clip)
+            item "Находит только точное совпадение всей ячейки":
+                @clip = '^ТЕКСТ$'
+                setClipboard(@clip)
+            item "Находит любой из нескольких вариантов":
+                @clip = 'ТЕКСТ1|ТЕКСТ2|ТЕКСТ3'
+                setClipboard(@clip)
+            item "Находит ячейки только с целым числом":
+                @clip = '^\d+$'
+                setClipboard(@clip)
+            item "Находит ячейки только с дробным числом":
+                @clip = '^\d+[.,]\d+$'
+                setClipboard(@clip)
+            item "Находит только значения, где после ТЕКСТ есть пробел и ещё хотя бы один символ. Само значение «ТЕКСТ» не совпадёт.":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^ТЕКСТ\s+.+$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = 'ТЕКСТ'
+                        setClipboard(@clip)
+                }
+            item "Находит и точное значение «ТЕКСТ», и варианты «ТЕКСТ ...». Отличие: часть после ТЕКСТ здесь необязательна.":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^ТЕКСТ(?:\s+.*)?$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = 'ТЕКСТ'
+                        setClipboard(@clip)
+                }
+        }
+    item "Тире, дефисы и прямая речь":
+        menu "Тире, дефисы и прямая речь" {
+            item "Приводит тире между частями текста к виду « — », не трогая дефисы внутри слов":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '\s+[-–—]\s+'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = ' — '
+                        setClipboard(@clip)
+                }
+            item "Приводит начало реплики к виду «— Текст»":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^\s*[-–—]\s*'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '— '
+                        setClipboard(@clip)
+                }
+        }
+    item "Кавычки":
+        menu "Кавычки" {
+            item "“Текст” → «Текст»":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '“([^”]+)”'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '«$1»'
+                        setClipboard(@clip)
+                }
+            item "\"Текст\" → «Текст»":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '"([^"]+)"'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '«$1»'
+                        setClipboard(@clip)
+                }
+        }
+    item "Пробелы и пунктуация":
+        menu "Пробелы и пунктуация" {
+            item "Убирает лишние пробелы перед , . ; : ! ?":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '\s+([,.;:!?])'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '$1'
+                        setClipboard(@clip)
+                }
+            item "Оставляет после , ; : ! ? ровно один пробел, если их было несколько":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '([,;:!?])\s{2,}'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '$1 '
+                        setClipboard(@clip)
+                }
+            item "Сжимает несколько обычных пробелов до одного":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = ' {2,}'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = ' '
+                        setClipboard(@clip)
+                }
+        }
+    item "Строки и разделители":
+        menu "Строки и разделители" {
+            item "Три и более переноса подряд → два переноса":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '\n{3,}'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '\n\n'
+                        setClipboard(@clip)
+                }
+            item "Два и более переноса подряд → один перенос":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '\n{2,}'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '\n'
+                        setClipboard(@clip)
+                }
+            item "Перенос строки → пробел":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '\n'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = ' '
+                        setClipboard(@clip)
+                }
+            item "Унифицирует разделитель: текст/текст → текст / текст":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '\s*/\s*'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = ' / '
+                        setClipboard(@clip)
+                }
+            item "Обратный вариант: текст / текст → текст/текст":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '\s+/\s+'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '/'
+                        setClipboard(@clip)
+                }
+            item "Оставляет всё до первого двоеточия":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^([^:]+):.*$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '$1'
+                        setClipboard(@clip)
+                }
+            item "Оставляет всё после первого двоеточия":
+                menu "Что скопировать?" {
+                    item "Найти":
+                        @clip = '^[^:]+:\s*(.*)$'
+                        setClipboard(@clip)
+                    item "Заменить на":
+                        @clip = '$1'
+                        setClipboard(@clip)
+                }
+        }
+    item "Элементы для сборки выражений":
+        menu "Элементы для сборки выражений" {
+            item "Перенос строки внутри ячейки.":
+                @clip = '\n'
+                setClipboard(@clip)
+            item "Символ табуляции.":
+                @clip = '\t'
+                setClipboard(@clip)
+            item "Один обычный пробел.":
+                @clip = ' '
+                setClipboard(@clip)
+            item "Один пробельный символ: пробел, табуляция, перенос строки и т. п.":
+                @clip = '\s'
+                setClipboard(@clip)
+            item "Один или несколько пробельных символов подряд.":
+                @clip = '\s+'
+                setClipboard(@clip)
+            item "Начало всего содержимого ячейки.":
+                @clip = '^'
+                setClipboard(@clip)
+            item "Конец всего содержимого ячейки. Это не перенос строки внутри ячейки.":
+                @clip = '$'
+                setClipboard(@clip)
+            item "Один любой символ.":
+                @clip = '.'
+                setClipboard(@clip)
+            item "Любое количество любых символов, в том числе ноль.":
+                @clip = '.*'
+                setClipboard(@clip)
+            item "Один ASCII-знак препинания или пунктуации.":
+                @clip = '[[:punct:]]'
+                setClipboard(@clip)
+            item "Любой знак пунктуации, сразу после него один пробельный символ.":
+                @clip = '[[:punct:]]\s'
+                setClipboard(@clip)
+            item "Одна цифра от 0 до 9.":
+                @clip = '\d'
+                setClipboard(@clip)
+            item "Одна или несколько цифр подряд.":
+                @clip = '\d+'
+                setClipboard(@clip)
+            item "Одна русская или латинская буква.":
+                @clip = '[А-Яа-яЁёA-Za-z]'
+                setClipboard(@clip)
+            item "Одна или несколько букв подряд.":
+                @clip = '[А-Яа-яЁёA-Za-z]+'
+                setClipboard(@clip)
+            item "Ноль или несколько пробельных символов.":
+                @clip = '\s*'
+                setClipboard(@clip)
+            item "Один из перечисленных вариантов: А, Б или В.":
+                @clip = 'А|Б|В'
+                setClipboard(@clip)
+            item "Группа. Найденное внутри можно вернуть в замене как $1; следующую группу — как $2 и т. д.":
+                @clip = '(ТЕКСТ)'
+                setClipboard(@clip)
+            item "Группа без сохранения для $1/$2. Нужна только для объединения частей выражения.":
+                @clip = '(?:ТЕКСТ)'
+                setClipboard(@clip)
+            item "Предыдущий символ или группа необязательны: встречаются 0 или 1 раз.":
+                @clip = 'ТЕКСТ?'
+                setClipboard(@clip)
+            item "Предыдущий символ или группа должны повториться от 2 до 5 раз.":
+                @clip = 'ТЕКСТ{2,5}'
+                setClipboard(@clip)
+            item "Именно символ точки, а не «любой символ».":
+                @clip = '\.'
+                setClipboard(@clip)
+            item "Именно знак вопроса.":
+                @clip = '\?'
+                setClipboard(@clip)
+            item "Именно символ *.":
+                @clip = '\*'
+                setClipboard(@clip)
+            item "Именно открывающая круглая скобка.":
+                @clip = '\('
+                setClipboard(@clip)
+            item "Именно закрывающая круглая скобка.":
+                @clip = '\)'
+                setClipboard(@clip)
+            item "Именно символ |, а не оператор «или».":
+                @clip = '\|'
+                setClipboard(@clip)
+        }
+}
