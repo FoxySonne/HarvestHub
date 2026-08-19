@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0e1a16">
+<title>Регулярные выражения</title>
+<style>
+:root{color-scheme:dark;--bg:#0e1a16;--panel:#15231e;--panel2:#1b2d26;--text:#eef7f2;--muted:#a9bcb2;--accent:#3fb67f;--border:#29453a;--danger:#ff7a7a}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+header{position:sticky;top:0;z-index:5;background:rgba(14,26,22,.96);backdrop-filter:blur(12px);padding:calc(12px + env(safe-area-inset-top)) 14px 12px;border-bottom:1px solid var(--border)}
+h1{font-size:20px;margin:0 0 10px}.search{display:flex;gap:8px}input{width:100%;border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:12px;padding:12px;font-size:16px;outline:none}
+.tabs{display:flex;gap:8px;overflow:auto;padding:10px 14px 0;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tab{white-space:nowrap;border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:999px;padding:8px 12px;font-size:14px}.tab.active{background:var(--accent);border-color:var(--accent);color:#07120e;font-weight:700}
+main{padding:12px 14px calc(24px + env(safe-area-inset-bottom));max-width:850px;margin:auto}
+.category{margin:10px 0 18px}.category h2{font-size:16px;margin:0 0 8px;color:#cfe7db}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;margin:8px 0;padding:12px}
+.top{display:flex;gap:10px;align-items:flex-start}.title{font-size:15px;font-weight:650;line-height:1.35;flex:1}.fav{border:0;background:none;color:#8ba399;font-size:24px;padding:0 2px;line-height:1}.fav.on{color:#ffd36a}
+.row{margin-top:10px}.label{font-size:12px;color:var(--muted);margin-bottom:5px}
+.value{display:flex;gap:8px;align-items:stretch}code{flex:1;background:#0a1511;border:1px solid var(--border);border-radius:10px;padding:10px;overflow-wrap:anywhere;white-space:pre-wrap;font-family:"SFMono-Regular",Consolas,monospace;font-size:14px}
+.copy{min-width:94px;border:0;border-radius:10px;background:var(--accent);color:#07120e;font-weight:700;padding:0 12px}.copy:active{transform:scale(.98)}
+.empty{color:var(--muted);text-align:center;padding:40px 12px}.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#eef7f2;color:#0e1a16;padding:10px 14px;border-radius:999px;font-weight:700;opacity:0;pointer-events:none;transition:.2s;z-index:20}.toast.show{opacity:1}
+.small{font-size:12px;color:var(--muted);margin-top:6px}
+@media(min-width:700px){.copy{min-width:120px}}
+</style>
+</head>
+<body>
+<header>
+<h1>Регулярные выражения</h1>
+<div class="search"><input id="q" type="search" placeholder="Поиск: время, пробелы, кавычки…" autocomplete="off"></div>
+<div class="tabs">
+<button class="tab active" data-mode="all">Все</button>
+<button class="tab" data-mode="fav">★ Избранное</button>
+</div>
+</header>
+<main id="app"></main>
+<div class="toast" id="toast">Скопировано</div>
+<script>
+const DATA=[{"category":"Массовая замена текста","items":[{"title":"Удаляет всё после заданного начала","find":"^ТЕКСТ\\s+.+$","replace":"ТЕКСТ"},{"title":"Оставляет всё до дефиса или тире","find":"^(.+?)\\s*[-–—]\\s*.+$","replace":"$1"},{"title":"Оставляет всё после двоеточия","find":"^.+?:\\s*(.+)$","replace":"$1"},{"title":"Удаляет число в конце значения","find":"^(.+?)\\s+\\d+$","replace":"$1"},{"title":"Удаляет всё перед заданным текстом","find":"^.*?(ТЕКСТ.*)$","replace":"$1"},{"title":"Удаляет заданный текст и всё после него","find":"^(.*?)ТЕКСТ.*$","replace":"$1"}]},{"category":"Числа и сокращения","items":[{"title":"Разворачивает целые миллионы","find":"^(\\d+)М$","replace":"$1000000"},{"title":"Разворачивает миллионы с 1 знаком","find":"^(\\d+)[,.](\\d)М$","replace":"$1$200000"},{"title":"Разворачивает миллионы с 2 знаками","find":"^(\\d+)[,.](\\d{2})М$","replace":"$1$20000"},{"title":"Разворачивает миллионы с 3 знаками","find":"^(\\d+)[,.](\\d{3})М$","replace":"$1$2000"},{"title":"Разворачивает целые тысячи","find":"^(\\d+)К$","replace":"$1000"},{"title":"Разворачивает тысячи с 2 знаками","find":"^(\\d+)[,.](\\d{2})К$","replace":"$1$20"}]},{"category":"Даты","items":[{"title":"19/08/2026 → 19.08.2026","find":"^(\\d{1,2})/(\\d{1,2})/(\\d{4})$","replace":"$1.$2.$3"},{"title":"2026-08-19 → 19.08.2026","find":"^(\\d{4})-(\\d{2})-(\\d{2})$","replace":"$3.$2.$1"},{"title":"19.08.26 → 19.08.2026","find":"^(\\d{1,2})\\.(\\d{1,2})\\.(\\d{2})$","replace":"$1.$2.20$3"},{"title":"19-08-2026 → 19.08.2026","find":"^(\\d{1,2})-(\\d{1,2})-(\\d{4})$","replace":"$1.$2.$3"},{"title":"Унифицирует обозначение года: 1927г / 1927г. / 1927 г → 1927 г.","find":"(\\d{4})\\s*г\\.?\\b","replace":"$1 г."},{"title":"Убирает дату и оставляет время/текст после неё","find":"^\\d{1,2}\\.\\d{1,2}\\.\\d{4}\\s+(.+)$","replace":"$1"}]},{"category":"Время и длительность","items":[{"title":"Добавляет ведущий ноль к однозначному часу: 7:11:26 → 07:11:26","find":"^(\\d):(\\d{2}):(\\d{2})$","replace":"0$1:$2:$3"},{"title":"Добавляет дни к времени: 07:11:26 → 00:07:11:26","find":"^(\\d{2}):(\\d{2}):(\\d{2})$","replace":"00:$1:$2:$3"},{"title":"Добавляет ведущий ноль к однозначному числу дней: 3:05:20:10 → 03:05:20:10","find":"^(\\d):(\\d{2}):(\\d{2}):(\\d{2})$","replace":"0$1:$2:$3:$4"},{"title":"12 ч 34 мин 56 сек → 12:34:56","find":"^(\\d{2})\\s*ч\\.?\\s*(\\d{2})\\s*мин\\.?\\s*(\\d{2})\\s*сек\\.?$","replace":"$1:$2:$3"},{"title":"12:34:56 → 12 ч 34 мин 56 сек","find":"^(\\d{2}):(\\d{2}):(\\d{2})$","replace":"$1 ч $2 мин $3 сек"},{"title":"12 дн. 05:20:10 → 12:05:20:10","find":"^(\\d{1,2})\\s*дн\\.?\\s*(\\d{1,2}):(\\d{2}):(\\d{2})$","replace":"$1:$2:$3:$4"},{"title":"12:05:20:10 → 12 дн. 05:20:10","find":"^(\\d{1,2}):(\\d{1,2}):(\\d{2}):(\\d{2})$","replace":"$1 дн. $2:$3:$4"},{"title":"Часы и минуты → Ч:ММ","find":"^(\\d{1,2})\\s*ч\\.?\\s*(\\d{1,2})\\s*мин\\.?$","replace":"$1:$2"}]},{"category":"Пробелы и переносы","items":[{"title":"Убирает пробелы в начале","find":"^\\s+","replace":""},{"title":"Убирает пробелы в конце","find":"\\s+$","replace":""},{"title":"Сжимает двойные и лишние пробелы","find":" {2,}","replace":" "},{"title":"Убирает переносы строк внутри ячеек","find":"\\n+","replace":" "},{"title":"Убирает табуляцию","find":"\\t+","replace":" "},{"title":"Находит ячейки, содержащие только пробелы","find":"^\\s*$","replace":""}]},{"category":"Поиск по структуре значения","items":[{"title":"Находит значения, начинающиеся с текста","find":"^ТЕКСТ","replace":""},{"title":"Находит значения, заканчивающиеся текстом","find":"ТЕКСТ$","replace":""},{"title":"Находит только точное совпадение всей ячейки","find":"^ТЕКСТ$","replace":""},{"title":"Находит любой из нескольких вариантов","find":"ТЕКСТ1|ТЕКСТ2|ТЕКСТ3","replace":""},{"title":"Находит ячейки только с целым числом","find":"^\\d+$","replace":""},{"title":"Находит ячейки только с дробным числом","find":"^\\d+[.,]\\d+$","replace":""},{"title":"Находит только значения, где после ТЕКСТ есть пробел и ещё хотя бы один символ. Само значение «ТЕКСТ» не совпадёт.","find":"^ТЕКСТ\\s+.+$","replace":"ТЕКСТ"},{"title":"Находит и точное значение «ТЕКСТ», и варианты «ТЕКСТ ...». Отличие: часть после ТЕКСТ здесь необязательна.","find":"^ТЕКСТ(?:\\s+.*)?$","replace":"ТЕКСТ"}]},{"category":"Тире, дефисы и прямая речь","items":[{"title":"Приводит тире между частями текста к виду « — », не трогая дефисы внутри слов","find":"\\s+[-–—]\\s+","replace":" — "},{"title":"Приводит начало реплики к виду «— Текст»","find":"^\\s*[-–—]\\s*","replace":"— "}]},{"category":"Кавычки","items":[{"title":"“Текст” → «Текст»","find":"“([^”]+)”","replace":"«$1»"},{"title":"\"Текст\" → «Текст»","find":"\"([^\"]+)\"","replace":"«$1»"}]},{"category":"Пробелы и пунктуация","items":[{"title":"Убирает лишние пробелы перед , . ; : ! ?","find":"\\s+([,.;:!?])","replace":"$1"},{"title":"Оставляет после , ; : ! ? ровно один пробел, если их было несколько","find":"([,;:!?])\\s{2,}","replace":"$1 "},{"title":"Сжимает несколько обычных пробелов до одного","find":" {2,}","replace":" "}]},{"category":"Строки и разделители","items":[{"title":"Три и более переноса подряд → два переноса","find":"\\n{3,}","replace":"\n\n"},{"title":"Два и более переноса подряд → один перенос","find":"\\n{2,}","replace":"\n"},{"title":"Перенос строки → пробел","find":"\\n","replace":" "},{"title":"Унифицирует разделитель: текст/текст → текст / текст","find":"\\s*/\\s*","replace":" / "},{"title":"Обратный вариант: текст / текст → текст/текст","find":"\\s+/\\s+","replace":"/"},{"title":"Оставляет всё до первого двоеточия","find":"^([^:]+):.*$","replace":"$1"},{"title":"Оставляет всё после первого двоеточия","find":"^[^:]+:\\s*(.*)$","replace":"$1"}]},{"category":"Элементы для сборки выражений","items":[{"title":"Перенос строки внутри ячейки.","find":"\\n","replace":"","example":"ТЕКСТ\\nТЕКСТ — два фрагмента на разных строках"},{"title":"Символ табуляции.","find":"\\t","replace":"","example":"\\t+ — одна или несколько табуляций"},{"title":"Один обычный пробел.","find":" ","replace":"","example":"ТЕКСТ ТЕКСТ — ровно один пробел между частями"},{"title":"Один пробельный символ: пробел, табуляция, перенос строки и т. п.","find":"\\s","replace":"","example":"ТЕКСТ\\sТЕКСТ — между частями один пробельный символ"},{"title":"Один или несколько пробельных символов подряд.","find":"\\s+","replace":"","example":"ТЕКСТ\\s+ТЕКСТ — между частями есть хотя бы один пробельный символ"},{"title":"Начало всего содержимого ячейки.","find":"^","replace":"","example":"^ТЕКСТ — значение начинается с ТЕКСТ"},{"title":"Конец всего содержимого ячейки. Это не перенос строки внутри ячейки.","find":"$","replace":"","example":"ТЕКСТ$ — значение заканчивается на ТЕКСТ"},{"title":"Один любой символ.","find":".","replace":"","example":"А.Б — между А и Б ровно один любой символ"},{"title":"Любое количество любых символов, в том числе ноль.","find":".*","replace":"","example":"А.*Б — сначала А, затем где-то позже Б"},{"title":"Один ASCII-знак препинания или пунктуации.","find":"[[:punct:]]","replace":"","example":"[[:punct:]] — например точка, запятая, двоеточие, скобка"},{"title":"Любой знак пунктуации, сразу после него один пробельный символ.","find":"[[:punct:]]\\s","replace":"","example":"Ищет конструкции вроде «, » или «. »"},{"title":"Одна цифра от 0 до 9.","find":"\\d","replace":"","example":""},{"title":"Одна или несколько цифр подряд.","find":"\\d+","replace":"","example":""},{"title":"Одна русская или латинская буква.","find":"[А-Яа-яЁёA-Za-z]","replace":"","example":""},{"title":"Одна или несколько букв подряд.","find":"[А-Яа-яЁёA-Za-z]+","replace":"","example":""},{"title":"Ноль или несколько пробельных символов.","find":"\\s*","replace":"","example":""},{"title":"Один из перечисленных вариантов: А, Б или В.","find":"А|Б|В","replace":"","example":""},{"title":"Группа. Найденное внутри можно вернуть в замене как $1; следующую группу — как $2 и т. д.","find":"(ТЕКСТ)","replace":"","example":""},{"title":"Группа без сохранения для $1/$2. Нужна только для объединения частей выражения.","find":"(?:ТЕКСТ)","replace":"","example":""},{"title":"Предыдущий символ или группа необязательны: встречаются 0 или 1 раз.","find":"ТЕКСТ?","replace":"","example":""},{"title":"Предыдущий символ или группа должны повториться от 2 до 5 раз.","find":"ТЕКСТ{2,5}","replace":"","example":""},{"title":"Именно символ точки, а не «любой символ».","find":"\\.","replace":"","example":""},{"title":"Именно знак вопроса.","find":"\\?","replace":"","example":""},{"title":"Именно символ *.","find":"\\*","replace":"","example":""},{"title":"Именно открывающая круглая скобка.","find":"\\(","replace":"","example":""},{"title":"Именно закрывающая круглая скобка.","find":"\\)","replace":"","example":""},{"title":"Именно символ |, а не оператор «или».","find":"\\|","replace":"","example":""}]}];
+const favs=new Set(JSON.parse(localStorage.getItem('regex-favs')||'[]'));
+let mode='all';
+const q=document.getElementById('q'), app=document.getElementById('app'), toast=document.getElementById('toast');
+const key=(c,i)=>c+'::'+i;
+function save(){localStorage.setItem('regex-favs',JSON.stringify([...favs]))}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+async function copyText(text){try{await navigator.clipboard.writeText(text)}catch(e){const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),900)}
+function render(){
+ const s=q.value.trim().toLowerCase(); let out='', count=0;
+ DATA.forEach(group=>{
+  let cards='';
+  group.items.forEach((it,i)=>{
+   const k=key(group.category,i);
+   if(mode==='fav'&&!favs.has(k)) return;
+   const hay=(group.category+' '+it.title+' '+it.find+' '+it.replace+' '+(it.example||'')).toLowerCase();
+   if(s&&!hay.includes(s)) return;
+   count++;
+   const repl=it.replace!==''?`<div class="row"><div class="label">Заменить на</div><div class="value"><code>${esc(it.replace)}</code><button class="copy" data-copy="${encodeURIComponent(it.replace)}">Копировать</button></div></div>`:'';
+   const ex=it.example?`<div class="small">${esc(it.example)}</div>`:'';
+   cards+=`<div class="card"><div class="top"><div class="title">${esc(it.title)}</div><button class="fav ${favs.has(k)?'on':''}" data-fav="${encodeURIComponent(k)}">★</button></div><div class="row"><div class="label">${it.replace!==''?'Найти':'Выражение'}</div><div class="value"><code>${esc(it.find)}</code><button class="copy" data-copy="${encodeURIComponent(it.find)}">Копировать</button></div></div>${repl}${ex}</div>`;
+  });
+  if(cards) out+=`<section class="category"><h2>${esc(group.category)}</h2>${cards}</section>`;
+ });
+ app.innerHTML=out||'<div class="empty">Ничего не найдено</div>';
+ document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>copyText(decodeURIComponent(b.dataset.copy)));
+ document.querySelectorAll('[data-fav]').forEach(b=>b.onclick=()=>{const k=decodeURIComponent(b.dataset.fav);favs.has(k)?favs.delete(k):favs.add(k);save();render()});
+}
+q.addEventListener('input',render);
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');mode=b.dataset.mode;render()});
+render();
+</script>
+</body>
+</html>
