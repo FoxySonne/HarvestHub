@@ -1,81 +1,73 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="dark">
-  <meta name="description" content="HarvestHub — будущие калькуляторы и база знаний для игроков Tiles Survive.">
-  <title>HarvestHub — помощник для Tiles Survive</title>
-  <link rel="stylesheet" href="styles.css">
-  <script src="script.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HarvestHub</title>
+    <script src="js/core/theme.js?v=20260721-light-theme-1"></script>
+    <link id="siteStylesheet" rel="stylesheet" href="css/style.css?v=20261002-responsive-2" data-stylesheet-target="css/style.css?v=20261002-responsive-2">
+    <link rel="stylesheet" href="css/features/alliance-vs-inline-editor.css?v=20260811-unified-table-sort-1">
+    <link rel="stylesheet" href="css/features/alliance-mobile-table-density.css?v=20260811-fullscreen-table-1">
 </head>
 <body>
-  <a class="skip-link" href="#main">Перейти к содержимому</a>
-  <header class="site-header">
-    <div class="container header-inner">
-      <a class="brand" href="#home" aria-label="HarvestHub — главная">
-        <span class="brand-mark" aria-hidden="true">H</span>
-        <span>Harvest<span class="accent">Hub</span></span>
-      </a>
-      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="navigation" hidden>
-        <span class="menu-icon" aria-hidden="true">☰</span><span>Меню</span>
-      </button>
-      <nav id="navigation" class="navigation" aria-label="Основная навигация">
-        <a href="#home">Главная</a>
-        <a href="#tools">Калькуляторы</a>
-        <a href="#knowledge">База знаний</a>
-      </nav>
+    <div class="overlay" id="overlay"></div>
+    <header class="topbar">
+        <button type="button" class="menu-button" id="openMenu" aria-label="Открыть меню" aria-controls="sidebar" aria-expanded="false">☰</button>
+        <div class="topbar-title">HarvestHub</div>
+        <div class="topbar-profile-group" id="topbarProfileGroup">
+            <span class="topbar-sync-status" aria-hidden="true"></span>
+            <span class="topbar-profile-name" id="topbarProfileName"></span>
+            <button type="button" class="account-trigger topbar-account-trigger" data-account-button aria-label="Профиль">Профиль</button>
+        </div>
+    </header>
+    <div class="container">
+        <aside class="left" id="sidebar">
+            <div id="sidebar-container"></div>
+        </aside>
+        <main class="main">
+            <div id="main-title-container"></div>
+            <div id="page-content"></div>
+        </main>
+        <aside class="right" id="right-sidebar">
+            <div id="rightbar-container"></div>
+        </aside>
     </div>
-  </header>
-
-  <main id="main" tabindex="-1">
-    <section class="hero container" id="home" aria-labelledby="hero-title">
-      <div class="hero-copy">
-        <h1 id="hero-title">Всё для твоей игры</h1>
-        <p class="hero-description">Калькуляторы и справочные материалы для Tiles Survive.</p>
-      </div>
-    </section>
-
-    <div class="container content">
-      <section id="tools" class="section" aria-labelledby="tools-title">
-        <div class="section-heading">
-          <div><h2 id="tools-title">Калькуляторы</h2></div>
-          <p class="section-note">Калькуляторы появятся здесь по мере готовности.</p>
-        </div>
-        <div class="card-grid">
-          <article class="card">
-            <h3>Захват вышки</h3>
-            <span class="badge">В разработке</span>
-          </article>
-          <article class="card">
-            <h3>Логово</h3>
-            <span class="badge">В разработке</span>
-          </article>
-          <article class="card">
-            <h3>Обучение войск</h3>
-            <span class="badge">В разработке</span>
-          </article>
-        </div>
-      </section>
-
-      <section id="knowledge" class="knowledge section" aria-labelledby="knowledge-title">
-        <div>
-          <h2 id="knowledge-title">База знаний</h2>
-          <p>Инструкции и справочные материалы появятся здесь по мере готовности.</p>
-        </div>
-        <div class="knowledge-status">
-          <span class="badge">Готовим материалы</span>
-        </div>
-      </section>
-    </div>
-  </main>
-
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <a class="brand footer-brand" href="#home">Harvest<span class="accent">Hub</span></a>
-      <p>Независимый проект для игроков Tiles Survive.</p>
-      <a class="back-to-top" href="#home">Наверх <span aria-hidden="true">↑</span></a>
-    </div>
-  </footer>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/ui/notifications.js?v=20260811-interface-audit-1"></script>
+    <script src="js/core/supabase-client.js?v=20260721-light-theme-1"></script>
+    <script src="js/ui/menu.js?v=20260811-interface-followup-1"></script>
+    <script src="js/core/local-storage.js?v=20260725-profile-sync-1"></script>
+    <script src="js/account/advanced-mode-access.js?v=20260723-access-status-sync-1"></script>
+    <script src="js/account/advanced-access-store.js?v=20260723-access-supabase-1"></script>
+    <script src="js/core/utc-clock.js?v=20260811-interface-followup-1"></script>
+    <script src="js/core/navigation.js?v=20261002-responsive-1"></script>
+    <script src="js/core/app-loader.js?v=20260725-profile-sync-1"></script>
+    <script src="js/account/account-storage.js?v=20260725-profile-sync-1"></script>
+    <script src="js/account/game-profile-manager.js?v=20260725-profile-sync-1"></script>
+    <script src="js/account/account-session.js?v=20260725-profile-sync-1"></script>
+    <script src="js/account/account-ui.js?v=20260723-login-default-1"></script>
+    <script src="js/account/account-modal.js?v=20260721-light-theme-1"></script>
+    <script src="js/account/account-personal-data.js?v=20260724-linked-player-sync-1"></script>
+    <script src="js/alliance/invite-code-access.js?v=20260726-permanent-code-1"></script>
+    <script src="js/alliance/vs-local-draft.js?v=20260728-vs-inline-bulk-fix-1"></script>
+    <script src="js/alliance/vs-player-search.js?v=20260811-table-visual-fix-1"></script>
+    <script src="js/alliance/power-table-ui.js?v=20260811-unified-table-sort-1"></script>
+    <script src="js/alliance/power-editor-details.js?v=20260801-mobile-alliance-workspace-1"></script>
+    <script src="js/alliance/reservoir-secondary-drop.js?v=20260726-reservoir-secondary-drop-3"></script>
+    <script type="module" src="js/alliance/vs-inline-row-editor.js?v=20260811-unified-table-sort-1"></script>
+    <script type="module" src="js/alliance/vs-proposals.js?v=20260724-vs-proposals-3"></script>
+    <script type="module" src="js/alliance/twin-labels.js?v=20260724-alliance-twins-1"></script>
+    <script src="js/ui/mobile-edge-panels.js?v=20260721-fullscreen-1"></script>
+    <script src="js/ui/table-scrollbars.js?v=20260811-table-visual-fix-1"></script>
+    <script src="js/ui/mobile-overflow-warning.js?v=20260724-1"></script>
+    <script src="js/sync/sync-engine.js?v=20260725-profile-sync-1"></script>
+    <script src="js/sync/calculator-sync.js?v=20260809-oil-dna-copper-1"></script>
+    <script src="js/calculators/page-reset.js?v=20260809-oil-dna-copper-1"></script>
+    <script src="js/ui/cards.js?v=20260724-fixed-toggle-1"></script>
+    <script src="js/ui/number-input-selection.js?v=20260721-light-theme-1"></script>
+    <script type="module" src="js/ui/page-enhancements.js?v=20260721-light-theme-1"></script>
+    <script src="js/ui/tooltips.js?v=20260728-mobile-tooltip-popover-1"></script>
+    <script src="js/core/app.js?v=20260724-app-loader-fix-1"></script>
+    <script src="js/sync/sync-status.js?v=20260721-light-theme-1"></script>
 </body>
 </html>

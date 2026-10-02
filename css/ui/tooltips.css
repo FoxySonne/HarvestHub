@@ -1,0 +1,108 @@
+.tooltip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: help;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+
+.tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 8px);
+  width: max-content;
+  max-width: min(320px, 80vw);
+  padding: 7px 10px;
+  background: var(--tooltip-bg);
+  border: 1px solid var(--tooltip-border);
+  border-radius: 3px;
+  color: var(--tooltip-text);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.35;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition: var(--transition);
+  pointer-events: none;
+  z-index: 9999;
+  box-shadow: var(--tooltip-shadow);
+  white-space: normal;
+}
+
+.tooltip:hover::after,
+.tooltip:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.tooltip-trigger {
+  display: none;
+}
+
+.tooltip.is-open::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.mobile-tooltip-popover {
+  position: fixed;
+  z-index: 10000;
+  width: max-content;
+  max-width: min(280px, calc(100vw - 24px));
+  padding: 8px 10px;
+  border: 1px solid var(--tooltip-border);
+  border-radius: 4px;
+  background: var(--tooltip-bg);
+  color: var(--tooltip-text);
+  box-shadow: var(--tooltip-shadow);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.4;
+  white-space: normal;
+}
+
+.mobile-tooltip-popover[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 899px) {
+  .tooltip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: default;
+    text-decoration: none;
+  }
+
+  .tooltip-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 20px;
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: var(--panel);
+    color: var(--text-soft);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .tooltip::after,
+  .tooltip:hover::after,
+  .tooltip:focus-visible::after,
+  .tooltip.is-open::after {
+    display: none;
+  }
+}

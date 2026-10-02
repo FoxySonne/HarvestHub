@@ -1,0 +1,58 @@
+<section class="page-section alliance-hub-page">
+  <h1>Союзный штаб</h1>
+  <div id="allianceMessage" class="alliance-message" hidden></div>
+
+  <section id="allianceEntryCard" class="card alliance-entry-card">
+    <div class="card-header"><div><h3>Войти в союзный штаб</h3><p>Выбери подключённый союз или введи пригласительный код. После входа в аккаунт союз сохранится в списке «Мои союзы».</p></div></div>
+    <div class="alliance-entry-grid">
+      <label id="allianceHubSelectorField" hidden><span>Мои союзы</span><select id="allianceHubSelector" data-no-persist="true"></select></label>
+      <form id="allianceHubJoinForm" class="alliance-inline-form">
+        <label><span>Пригласительный код</span><input id="allianceHubJoinCode" type="text" maxlength="20" autocomplete="off" autocapitalize="characters" data-no-persist="true" required></label>
+        <button type="submit">Подключить штаб</button>
+      </form>
+    </div>
+  </section>
+
+  <section id="allianceCreateCard" class="card alliance-entry-card" hidden>
+    <div class="card-header"><div><h3>Создать союзный штаб</h3><p>Доступно после входа в аккаунт.</p></div></div>
+    <form id="allianceHubCreateForm" class="alliance-inline-form">
+      <label><span>Название союза</span><input id="allianceHubCreateName" type="text" maxlength="80" data-no-persist="true" required></label>
+      <label><span>Номер штата</span><input id="allianceHubCreateState" type="text" maxlength="30" data-no-persist="true"></label>
+      <button type="submit">Создать штаб</button>
+    </form>
+  </section>
+
+  <section id="allianceHubAccountHint" class="card" hidden>
+    <div class="card-header"><div><h3>Нужен аккаунт</h3><p>Без входа код откроет временный просмотр. Чтобы сохранить союз и получить постоянный доступ, войди в HarvestHub.</p></div></div>
+    <button type="button" data-account-button>Войти или создать аккаунт</button>
+  </section>
+
+  <section id="allianceDashboard" hidden>
+    <article class="card alliance-user-summary">
+      <div class="card-header"><div><h3 id="allianceDashboardName">Союз</h3><p id="allianceDashboardState"></p></div></div>
+      <div class="alliance-user-summary-grid">
+        <div><span>Участник</span><strong id="allianceDashboardNickname">—</strong></div>
+        <div><span>Ранг</span><strong id="allianceDashboardRank">—</strong></div>
+        <div><span>Права</span><strong id="allianceDashboardRole">—</strong></div>
+      </div>
+      <div class="alliance-actions">
+        <button id="alliancePlayerProfileButton" type="button" hidden>Профиль игрока</button>
+        <button id="allianceManageButton" type="button" hidden>Управление союзом</button>
+        <button id="allianceOwnPowerButton" type="button" hidden>Добавить силу отрядов</button>
+        <button id="allianceDashboardChangeButton" type="button" class="secondary-button">Сменить или подключить союз</button>
+      </div>
+    </article>
+
+    <section class="alliance-dashboard-links">
+      <h2>Разделы штаба</h2>
+      <div class="alliance-dashboard-grid">
+        <article class="card alliance-dashboard-card"><div class="card-header"><div><h3>Состав союза</h3><p>Участники, ранги, дни рождения и комментарии.</p></div></div><button type="button" data-page-path="alliance/roster.html">Открыть</button></article>
+        <article class="card alliance-dashboard-card" data-alliance-edit-only><div class="card-header"><div><h3>Сила отрядов</h3><p>Замеры силы и сравнение прироста.</p></div></div><button type="button" data-page-path="alliance/power.html">Открыть</button></article>
+        <article class="card alliance-dashboard-card" data-alliance-edit-only><div class="card-header"><div><h3>VS</h3><p>Ввод результатов и текущая неделя.</p></div></div><button type="button" data-page-path="alliance/vs.html">Открыть</button></article>
+        <article class="card alliance-dashboard-card" data-alliance-edit-only><div class="card-header"><div><h3>Статистика VS</h3><p>Прошедшие недели, сравнение, периоды и фильтры.</p></div></div><button type="button" data-page-path="alliance/vs-statistics.html">Открыть</button></article>
+        <article class="card alliance-dashboard-card" data-alliance-edit-only><div class="card-header"><div><h3>Резервуар: активность</h3><p>Отслеживание активности участников.</p></div></div><button type="button" data-page-path="alliance/reservoir-activity.html">Открыть</button></article>
+        <article class="card alliance-dashboard-card"><div class="card-header"><div><h3>Резервуар: расстановка</h3><p>Схема размещения участников.</p></div></div><button type="button" data-page-path="alliance/reservoir-layout.html">Открыть</button></article>
+      </div>
+    </section>
+  </section>
+</section>

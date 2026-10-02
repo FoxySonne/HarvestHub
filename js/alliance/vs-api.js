@@ -1,0 +1,46 @@
+export function fetchAllianceVsStatistics(client, allianceId, dateFrom, dateTo) {
+  return client.rpc("get_alliance_vs_statistics", {
+    target_alliance_id: allianceId,
+    target_date_from: dateFrom,
+    target_date_to: dateTo
+  });
+}
+
+export function saveAllianceVsResult(client, allianceId, payload) {
+  return client.rpc("save_alliance_vs_result", {
+    target_alliance_id: allianceId,
+    target_participant_id: payload.participantId,
+    target_result_date: payload.resultDate,
+    target_points: payload.points,
+    target_is_vacation: payload.isVacation
+  });
+}
+
+export function deleteAllianceVsResult(client, allianceId, participantId, resultDate) {
+  return client.rpc("delete_alliance_vs_result", {
+    target_alliance_id: allianceId,
+    target_participant_id: participantId,
+    target_result_date: resultDate
+  });
+}
+
+export function saveAllianceVsResultsBatch(client, allianceId, rows) {
+  return client.rpc("save_alliance_vs_results_batch", {
+    target_alliance_id: allianceId,
+    target_rows: rows
+  });
+}
+
+export function setAllianceVsDailyTarget(client, allianceId, dailyTarget) {
+  return client.rpc("set_alliance_vs_daily_target", {
+    target_alliance_id: allianceId,
+    target_daily_target: dailyTarget
+  });
+}
+
+export function setAllianceVsSaturdayTotal(client, allianceId, includeSaturday) {
+  return client.rpc("set_alliance_vs_saturday_total", {
+    target_alliance_id: allianceId,
+    target_include_saturday: includeSaturday
+  });
+}

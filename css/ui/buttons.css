@@ -1,0 +1,163 @@
+/* ==========================================================
+BUTTONS
+========================================================== */
+
+.button,
+button,
+input[type=submit],
+input[type=button] {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 0;
+  min-height: var(--control-height);
+  height: auto;
+  padding: 10px clamp(14px, 1vw, 24px);
+  background: var(--button);
+  border: none;
+  border-radius: var(--radius);
+  color: #fff;
+  font-size: clamp(14px, .15vw + 13px, 17px);
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  white-space: normal;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.button:hover,
+button:hover,
+input[type=submit]:hover,
+input[type=button]:hover {
+  background: var(--button-hover);
+}
+
+.button:focus-visible,
+button:focus-visible,
+input[type=submit]:focus-visible,
+input[type=button]:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.button:active,
+button:active,
+input[type=submit]:active,
+input[type=button]:active {
+  transform: translateY(1px);
+}
+
+.button:disabled,
+button:disabled,
+input[type=submit]:disabled,
+input[type=button]:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.button:disabled:hover,
+button:disabled:hover,
+input[type=submit]:disabled:hover,
+input[type=button]:disabled:hover {
+  background: var(--button);
+}
+
+.secondary-button {
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--border);
+}
+
+.secondary-button:hover {
+  background: var(--card-hover);
+}
+
+.secondary-button:disabled:hover {
+  background: var(--panel);
+}
+
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.button-group > * {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.button-block,
+.full-width-button,
+.button-group.is-stacked > * {
+  width: 100%;
+}
+
+.compact-button,
+.icon-button,
+.collapsible-card-toggle,
+.alliance-fullscreen-close {
+  min-height: 36px;
+  padding: 6px 10px;
+}
+
+.icon-button,
+.collapsible-card-toggle,
+.alliance-fullscreen-close {
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+}
+
+.danger-button {
+  background: #8b3030 !important;
+  border: 1px solid #b94b4b !important;
+  color: #fff !important;
+}
+
+.danger-button:hover {
+  background: #a43a3a !important;
+}
+
+.danger-button:disabled:hover {
+  background: #8b3030 !important;
+}
+
+.calculator-data-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.calculator-data-actions [data-calculator-reset-status] {
+  min-height: 1.4em;
+  margin: 0;
+  color: var(--text-muted);
+}
+
+@media (max-width: 479px) {
+  .button,
+  button,
+  input[type=submit],
+  input[type=button] {
+    min-height: 44px;
+    padding: 10px 14px;
+  }
+}
+
+@media (max-width: 899px) {
+  .icon-button,
+  .alliance-fullscreen-close {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+  }
+}

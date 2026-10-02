@@ -1,0 +1,189 @@
+/* ==========================================================
+   RESPONSIVE FOUNDATION
+   Единые правила масштаба, ширины и поведения основных блоков.
+   Подключается последним и постепенно заменяет точечные адаптивные
+   исправления отдельных страниц.
+========================================================== */
+
+:root {
+  --site-max-width: 2400px;
+  --reading-max-width: 100%;
+  --page-padding: clamp(12px, 1vw, 20px);
+  --layout-gap: clamp(12px, 0.9vw, 18px);
+  --card-padding-responsive: clamp(14px, 1vw, 22px);
+  --font-body-responsive: clamp(15px, 0.22vw + 14px, 19px);
+  --font-small-responsive: clamp(12px, 0.14vw + 11px, 15px);
+  --font-title-responsive: clamp(25px, 1vw + 18px, 40px);
+  --control-min-width: 180px;
+}
+
+html,
+body {
+  min-width: 0;
+  max-width: 100%;
+}
+
+body {
+  font-size: var(--font-body-responsive);
+}
+
+h1 {
+  font-size: var(--font-title-responsive);
+}
+
+small {
+  font-size: var(--font-small-responsive);
+}
+
+.container {
+  width: min(100%, var(--site-max-width));
+  margin-inline: auto;
+}
+
+.main,
+.right,
+#page-content,
+#main-title-container,
+#rightbar-container,
+.page-section,
+.card,
+.box,
+form,
+fieldset {
+  min-width: 0;
+}
+
+.card,
+.box {
+  padding: var(--card-padding-responsive);
+}
+
+img,
+svg,
+canvas,
+video {
+  max-width: 100%;
+}
+
+.grid,
+.form-grid,
+.cards-grid,
+.dashboard-grid {
+  min-width: 0;
+}
+
+button,
+.button,
+input[type="submit"],
+input[type="button"] {
+  width: auto;
+  max-width: 100%;
+}
+
+.button-block,
+.full-width-button,
+button[data-full-width="true"] {
+  width: 100%;
+}
+
+.button-group,
+.alliance-actions,
+.calculator-data-actions,
+.reservoir-layout-actions,
+.alliance-table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.button-group > *,
+.alliance-actions > *,
+.calculator-data-actions > *,
+.reservoir-layout-actions > *,
+.alliance-table-actions > * {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.table-wrap,
+.data-table-wrap,
+.alliance-table-wrap,
+.power-table-wrap,
+.vs-table-wrap,
+.reservoir-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 899px) {
+  button,
+  .button,
+  input[type="submit"],
+  input[type="button"] {
+    min-height: 44px !important;
+  }
+
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+  select,
+  textarea {
+    min-height: 44px !important;
+  }
+
+}
+
+@media (max-width: 479px) {
+  :root {
+    --page-padding: 12px;
+    --layout-gap: 12px;
+    --card-padding-responsive: 14px;
+  }
+
+  #rightbar-container {
+    grid-template-columns: 1fr !important;
+  }
+
+  .button-group,
+  .alliance-actions,
+  .calculator-data-actions,
+  .reservoir-layout-actions,
+  .alliance-table-actions {
+    align-items: stretch;
+  }
+
+  .button-group > *,
+  .alliance-actions > *,
+  .calculator-data-actions > *,
+  .reservoir-layout-actions > *,
+  .alliance-table-actions > * {
+    flex: 1 1 100%;
+  }
+
+  .button-group button,
+  .alliance-actions button,
+  .calculator-data-actions button,
+  .reservoir-layout-actions button,
+  .alliance-table-actions button {
+    width: 100%;
+  }
+
+  .compact-button,
+  .icon-button,
+  .collapsible-card-toggle,
+  .alliance-fullscreen-close,
+  button[aria-label="Закрыть"],
+  button[aria-label="Удалить"] {
+    width: auto !important;
+    min-width: 0;
+    flex: 0 0 auto !important;
+  }
+}
+
+@media (min-width: 480px) and (max-width: 767px) {
+  #rightbar-container {
+    grid-template-columns: 1fr !important;
+  }
+}
+

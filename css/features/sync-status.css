@@ -1,0 +1,87 @@
+.desktop-profile-status,
+.profile-sync-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 20px;
+}
+
+.desktop-profile-status {
+  margin: 0 0 12px;
+  font-size: 12px;
+}
+
+.sync-status-icon {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+  overflow: visible;
+}
+
+.sync-status-icon circle,
+.sync-status-icon path,
+.sync-status-icon line {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sync-status-icon--pending,
+.sync-status-icon--syncing {
+  animation: harvesthub-sync-spin 0.85s linear infinite;
+}
+
+.sync-status-icon--pending circle,
+.sync-status-icon--syncing circle {
+  stroke-dasharray: 34 13;
+}
+
+.sync-status-icon--synced path {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: harvesthub-sync-draw 0.55s ease-out forwards;
+}
+
+.sync-status-icon--error line:first-child {
+  stroke-dasharray: 18;
+  stroke-dashoffset: 18;
+  animation: harvesthub-sync-draw 0.32s ease-out forwards;
+}
+
+.sync-status-icon--error line:last-child {
+  stroke-dasharray: 18;
+  stroke-dashoffset: 18;
+  animation: harvesthub-sync-draw 0.32s 0.24s ease-out forwards;
+}
+
+.sync-status-icon--offline .sync-alert-mark,
+.sync-status-icon--reauth .sync-lock-shackle {
+  animation: harvesthub-sync-pop 0.35s ease-out both;
+}
+
+@keyframes harvesthub-sync-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes harvesthub-sync-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes harvesthub-sync-pop {
+  from { opacity: 0; transform: scale(0.65); transform-origin: center; }
+  to { opacity: 1; transform: scale(1); transform-origin: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sync-status-icon {
+    animation: none !important;
+  }
+
+  .sync-status-icon path,
+  .sync-status-icon line {
+    animation: none !important;
+    stroke-dashoffset: 0 !important;
+  }
+}
