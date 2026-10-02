@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="HarvestHub — будущие калькуляторы и база знаний для игроков Tiles Survive.">
+  <title>HarvestHub — помощник для Tiles Survive</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Перейти к содержимому</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#home" aria-label="HarvestHub — главная">
+        <span class="brand-mark" aria-hidden="true">H</span>
+        <span>Harvest<span class="accent">Hub</span></span>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="navigation" hidden>
+        <span class="menu-icon" aria-hidden="true">☰</span><span>Меню</span>
+      </button>
+      <nav id="navigation" class="navigation" aria-label="Основная навигация">
+        <a href="#home">Главная</a>
+        <a href="#tools">Калькуляторы</a>
+        <a href="#knowledge">База знаний</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="hero container" id="home" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <h1 id="hero-title">Всё для твоей игры</h1>
+        <p class="hero-description">Калькуляторы и справочные материалы для Tiles Survive.</p>
+      </div>
+    </section>
+
+    <div class="container content">
+      <section id="tools" class="section" aria-labelledby="tools-title">
+        <div class="section-heading">
+          <div><h2 id="tools-title">Калькуляторы</h2></div>
+          <p class="section-note">Калькуляторы появятся здесь по мере готовности.</p>
+        </div>
+        <div class="card-grid">
+          <article class="card">
+            <h3>Захват вышки</h3>
+            <span class="badge">В разработке</span>
+          </article>
+          <article class="card">
+            <h3>Логово</h3>
+            <span class="badge">В разработке</span>
+          </article>
+          <article class="card">
+            <h3>Обучение войск</h3>
+            <span class="badge">В разработке</span>
+          </article>
+        </div>
+      </section>
+
+      <section id="knowledge" class="knowledge section" aria-labelledby="knowledge-title">
+        <div>
+          <h2 id="knowledge-title">База знаний</h2>
+          <p>Инструкции и справочные материалы появятся здесь по мере готовности.</p>
+        </div>
+        <div class="knowledge-status">
+          <span class="badge">Готовим материалы</span>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <a class="brand footer-brand" href="#home">Harvest<span class="accent">Hub</span></a>
+      <p>Независимый проект для игроков Tiles Survive.</p>
+      <a class="back-to-top" href="#home">Наверх <span aria-hidden="true">↑</span></a>
+    </div>
+  </footer>
+</body>
+</html>
