@@ -65,7 +65,6 @@
  document.querySelector('#close-sheet').addEventListener('click',()=>closeSheet());
  document.querySelector('#point-choice').addEventListener('change',event=>{document.querySelector('#open-point').disabled=!event.target.value;});
  document.querySelector('#open-point').addEventListener('click',event=>openPoint(event.currentTarget));
- document.querySelector('#map-resource').addEventListener('change',()=>{closeSheet(false);});
  function fitSheet(){const viewport=window.visualViewport;if(!viewport)return;sheet.style.setProperty('--keyboard-bottom',Math.max(0,innerHeight-viewport.height-viewport.offsetTop)+'px');sheet.style.setProperty('--sheet-available',Math.max(120,viewport.height-12)+'px');}
  window.visualViewport?.addEventListener('resize',fitSheet);window.visualViewport?.addEventListener('scroll',fitSheet);
  sheetBody.addEventListener('focusin',()=>{setTimeout(()=>document.activeElement?.scrollIntoView({block:'nearest'}),120);});

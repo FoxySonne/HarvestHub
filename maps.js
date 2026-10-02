@@ -37,13 +37,15 @@
   const choice=document.querySelector('#point-choice');
   for(const node of data.nodes){
     const g=element('g',{transform:`translate(${node.x} ${node.y})`,'data-point':node.id,'class':'map-point',role:'button',tabindex:'0','aria-label':pointName(node)});
-    const size=node.kind==='base'?34:node.kind==='den'?33:24;
-    const shape=node.kind==='bench'?element('rect',{x:-size,y:-size,width:size*2,height:size*2}):node.kind==='den'?element('polygon',{points:`0,${-size} ${size},0 0,${size} ${-size},0`}):element('circle',{r:size});
-    if(node.kind==='base')g.style.setProperty('--base-color',['#008600','#74d200','#8500d4','#db1600','#db0080','#cac000','#c100cb','#0099dc'][Number(node.label)-1]);
+    const size=node.kind==='base'?30:26;
+    const shape=node.kind==='bench'?element('rect',{x:-size,y:-size,width:size*2,height:size*2,rx:7}):element('circle',{r:size});
     shape.setAttribute('class','point-shape '+node.kind);g.append(shape);
     const title=element('title');title.textContent=pointName(node);g.append(title);
-    if(node.kind!=='base'){
-      const label=element('text',{y:-4,'text-anchor':'middle','class':'point-label'});label.textContent=node.label;g.append(label);
+    if(node.kind==='base'){
+      g.append(element('path',{d:'M-7 8V-12L10-8L-7-3','class':'base-symbol',fill:'none'}));
+      const label=element('text',{y:21,'text-anchor':'middle','class':'base-label'});label.textContent=node.label;g.append(label);
+    }else{
+      const label=element('text',{y:4,'text-anchor':'middle','class':'point-label'});label.textContent=node.label;g.append(label);
       const score=element('text',{y:11,'text-anchor':'middle','class':'point-score'});g.append(score);
     }
     points.append(g);shapes.set(node.id,g);
@@ -53,7 +55,7 @@
     for(const node of data.nodes){const saved=state.points[node.id]||{},owner=alliance(saved.owner),color=owner?.color;
       const g=shapes.get(node.id);g.style.setProperty('--owner-color',color||'var(--card)');g.classList.toggle('owned',Boolean(owner));g.classList.toggle('selected',node.id===selected);
       g.setAttribute('aria-label',pointName(node)+(owner?' — '+owner.name:''));
-      const score=g.querySelector('.point-score');if(score)score.textContent=saved.score??node.referenceScore;
+      const score=g.querySelector('.point-score');if(score){score.textContent=saved.score??'';g.classList.toggle('has-score',saved.score!==undefined&&saved.score!=='');}
       const region=territories.get(node.id);region.style.fill=color||'transparent';region.classList.toggle('owned',Boolean(owner));
     }
     const paint=document.querySelector('#paint-owner'),previous=paint.value;paint.replaceChildren(new Option('Без владельца',''));
@@ -123,8 +125,6 @@
     const field=settingFields[index];field.disabled=false;field.value=state.settings[key]||'';
     field.addEventListener('change',()=>{state.settings[key]=field.value;persist();});
   });
-  const resource=document.querySelector('#map-resource');if(['oil','dna','copper'].includes(state.settings.resource))resource.value=state.settings.resource;
-  resource.addEventListener('change',()=>{state.settings.resource=resource.value;persist();});
   document.querySelector('.sheet-footer button').addEventListener('click',()=>{
     if(document.querySelector('#anchor-owner')){
       try{const owner=document.querySelector('#anchor-owner').value,date=document.querySelector('#anchor-day').value,point=document.querySelector('#anchor-point').value;
