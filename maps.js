@@ -32,16 +32,20 @@
   const regions=element('g',{'class':'map-regions'}), lines=element('g',{'class':'map-lines'}), points=element('g',{'class':'map-points'});
   svg.append(regions,lines,points);
   for(const node of data.nodes){const polygon=element('polygon',{points:territory(node),'data-point':node.id,'class':'map-region'});regions.append(polygon);territories.set(node.id,polygon);}
-  for(const segment of data.segments){const a=byId.get(segment.from),b=byId.get(segment.to);lines.append(element('polyline',{points:`${a.x},${a.y} ${segment.x1},${segment.y1} ${segment.x2},${segment.y2} ${b.x},${b.y}`,fill:'none'}));}
+  // Ровно один прямой отрезок на связь. Контуры объектов закрывают концы линии.
+  for(const [from,to] of data.edges){const a=byId.get(from),b=byId.get(to);lines.append(element('line',{x1:a.x,y1:a.y,x2:b.x,y2:b.y,'data-from':from,'data-to':to}));}
   const choice=document.querySelector('#point-choice');
   for(const node of data.nodes){
     const g=element('g',{transform:`translate(${node.x} ${node.y})`,'data-point':node.id,'class':'map-point',role:'button',tabindex:'0','aria-label':pointName(node)});
-    const size=node.kind==='base'?30:node.label.startsWith('XXL')?30:node.label.startsWith('XL')?25:node.label.startsWith('L-')?22:node.label.startsWith('M')?19:16;
-    const shape=node.kind==='bench'?element('rect',{x:-size,y:-size,width:size*2,height:size*2,rx:3}):element('circle',{r:size});
+    const size=node.kind==='base'?34:node.kind==='den'?33:24;
+    const shape=node.kind==='bench'?element('rect',{x:-size,y:-size,width:size*2,height:size*2}):node.kind==='den'?element('polygon',{points:`0,${-size} ${size},0 0,${size} ${-size},0`}):element('circle',{r:size});
+    if(node.kind==='base')g.style.setProperty('--base-color',['#008600','#74d200','#8500d4','#db1600','#db0080','#cac000','#c100cb','#0099dc'][Number(node.label)-1]);
     shape.setAttribute('class','point-shape '+node.kind);g.append(shape);
     const title=element('title');title.textContent=pointName(node);g.append(title);
-    const label=element('text',{y:node.kind==='base'?5:node.y>1190?-size-8:size+18,'text-anchor':'middle','class':'point-label'});label.textContent=node.label;g.append(label);
-    const dot=element('circle',{r:4,cy:-size+6,'class':'owner-dot'});g.append(dot);
+    if(node.kind!=='base'){
+      const label=element('text',{y:-4,'text-anchor':'middle','class':'point-label'});label.textContent=node.label;g.append(label);
+      const score=element('text',{y:11,'text-anchor':'middle','class':'point-score'});g.append(score);
+    }
     points.append(g);shapes.set(node.id,g);
     const option=document.createElement('option');option.value=node.id;option.textContent=pointName(node);choice.append(option);
   }
@@ -49,6 +53,7 @@
     for(const node of data.nodes){const saved=state.points[node.id]||{},owner=alliance(saved.owner),color=owner?.color;
       const g=shapes.get(node.id);g.style.setProperty('--owner-color',color||'var(--card)');g.classList.toggle('owned',Boolean(owner));g.classList.toggle('selected',node.id===selected);
       g.setAttribute('aria-label',pointName(node)+(owner?' — '+owner.name:''));
+      const score=g.querySelector('.point-score');if(score)score.textContent=saved.score??node.referenceScore;
       const region=territories.get(node.id);region.style.fill=color||'transparent';region.classList.toggle('owned',Boolean(owner));
     }
     const paint=document.querySelector('#paint-owner'),previous=paint.value;paint.replaceChildren(new Option('Без владельца',''));
