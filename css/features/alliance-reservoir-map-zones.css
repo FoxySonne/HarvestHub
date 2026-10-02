@@ -1,0 +1,52 @@
+/* Цветные зоны находятся только СНАРУЖИ края внутреннего плато. */
+.reservoir-map::before,
+.reservoir-map::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  pointer-events: none;
+}
+
+/*
+ * Обе дуги построены по одной форме плато.
+ * Внутри плато цвет полностью отсутствует, максимум приходится на его край,
+ * затем дымка растворяется по направлению к внешней границе изображения.
+ */
+.reservoir-map::before {
+  clip-path: polygon(0 43%, 18% 55%, 36% 72%, 53% 100%, 0 100%);
+  background: radial-gradient(
+    ellipse 73% 82% at 50% 49%,
+    transparent 0%,
+    transparent 70%,
+    rgba(190, 43, 43, .34) 74%,
+    rgba(190, 43, 43, .22) 79%,
+    rgba(190, 43, 43, .10) 87%,
+    rgba(190, 43, 43, .03) 95%,
+    transparent 100%
+  );
+}
+
+.reservoir-map::after {
+  clip-path: polygon(47% 0, 100% 0, 100% 57%, 82% 45%, 64% 28%);
+  background: radial-gradient(
+    ellipse 73% 82% at 50% 49%,
+    transparent 0%,
+    transparent 70%,
+    rgba(45, 105, 190, .32) 74%,
+    rgba(45, 105, 190, .20) 79%,
+    rgba(45, 105, 190, .09) 87%,
+    rgba(45, 105, 190, .03) 95%,
+    transparent 100%
+  );
+}
+
+.reservoir-map-side,
+.reservoir-map-location,
+.reservoir-map-collectors {
+  position: absolute;
+  z-index: 2;
+}

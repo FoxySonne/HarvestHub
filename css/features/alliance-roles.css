@@ -1,0 +1,162 @@
+.alliance-role-management-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+.alliance-role-management-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.alliance-participant-search-field small {
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
+.alliance-role-management-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.alliance-role-management-actions button,
+.alliance-role-management-grid > button {
+  width: auto;
+  max-width: 100%;
+  padding-inline: 18px;
+}
+
+.alliance-role-participant-status {
+  margin: 14px 0 0;
+  color: var(--text-soft);
+}
+
+#alliancePrivilegedAccountsCard .alliance-table-wrap {
+  width: 100%;
+  max-width: 100%;
+}
+
+#alliancePrivilegedAccountsCard .alliance-privileged-table {
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  table-layout: fixed !important;
+}
+
+.alliance-privileged-table th,
+.alliance-privileged-table td {
+  min-width: 0 !important;
+  padding-inline: 8px;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+.alliance-privileged-table th:nth-child(1),
+.alliance-privileged-table td:nth-child(1) { width: 26%; }
+.alliance-privileged-table th:nth-child(2),
+.alliance-privileged-table td:nth-child(2) { width: 9%; }
+.alliance-privileged-table th:nth-child(3),
+.alliance-privileged-table td:nth-child(3) { width: 20%; }
+.alliance-privileged-table th:nth-child(4),
+.alliance-privileged-table td:nth-child(4) { width: 45%; }
+
+.alliance-privileged-table td:first-child strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.alliance-inline-role-change {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.alliance-inline-role-change select {
+  width: 100%;
+  min-width: 0;
+}
+
+.alliance-inline-role-change button,
+.alliance-privileged-table td:last-child > button {
+  width: auto;
+  max-width: 100%;
+  min-height: 38px;
+  padding: 7px 12px;
+  white-space: normal;
+  line-height: 1.2;
+}
+
+@media (max-width: 899px) {
+  .alliance-role-management-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .alliance-role-management-actions button,
+  .alliance-role-management-grid > button {
+    width: min(100%, 360px);
+    justify-self: start;
+  }
+
+  #alliancePrivilegedAccountsCard {
+    overflow: visible;
+  }
+
+  #alliancePrivilegedAccountsCard .alliance-table-wrap {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: visible !important;
+    margin: 0;
+  }
+
+  #alliancePrivilegedAccountsCard .alliance-privileged-table {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    font-size: clamp(9px, 2.55vw, 11px);
+  }
+
+  .alliance-privileged-table th,
+  .alliance-privileged-table td {
+    padding: 8px 2px;
+    line-height: 1.15;
+    overflow: hidden;
+  }
+
+  .alliance-privileged-table th:nth-child(1),
+  .alliance-privileged-table td:nth-child(1) { width: 25%; }
+  .alliance-privileged-table th:nth-child(2),
+  .alliance-privileged-table td:nth-child(2) { width: 8%; }
+  .alliance-privileged-table th:nth-child(3),
+  .alliance-privileged-table td:nth-child(3) { width: 18%; }
+  .alliance-privileged-table th:nth-child(4),
+  .alliance-privileged-table td:nth-child(4) { width: 49%; }
+
+  .alliance-inline-role-change {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .alliance-inline-role-change select,
+  .alliance-inline-role-change button,
+  .alliance-privileged-table td:last-child > button {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    min-height: 30px;
+    padding: 3px;
+    font-size: clamp(8px, 2.35vw, 10px);
+  }
+
+  .alliance-privileged-table td:last-child > button {
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+}

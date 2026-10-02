@@ -1,0 +1,122 @@
+/* Дополнительная раскладка союзного штаба */
+.alliance-toolbar-card {
+  grid-template-columns: minmax(220px, 1.1fr) minmax(220px, 1fr) auto minmax(280px, auto);
+  align-items: stretch;
+  column-gap: 20px;
+  row-gap: 16px;
+}
+
+.alliance-opened-summary,
+.alliance-toolbar-card > label,
+.alliance-role-box,
+.alliance-invite-box {
+  display: grid;
+  grid-template-rows: 20px 44px 20px;
+  align-items: center;
+  gap: 0;
+  min-width: 0;
+  align-self: stretch;
+}
+
+.alliance-opened-summary > span,
+.alliance-toolbar-card > label > span,
+.alliance-role-box > span,
+.alliance-invite-box > span {
+  align-self: start;
+  color: var(--text-soft);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.alliance-opened-summary strong {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  height: 44px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 20px;
+}
+
+.alliance-opened-summary small {
+  align-self: end;
+  color: var(--text-soft);
+  line-height: 20px;
+}
+
+.alliance-toolbar-card > label select {
+  align-self: stretch;
+  height: 44px;
+}
+
+.alliance-role-box strong {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  color: var(--accent);
+}
+
+.alliance-invite-box {
+  grid-template-columns: auto minmax(150px, 1fr);
+  column-gap: 10px;
+}
+
+.alliance-invite-box > span {
+  grid-column: 1 / -1;
+}
+
+.alliance-invite-box strong,
+.alliance-invite-box button {
+  align-self: stretch;
+  height: 44px;
+}
+
+.alliance-invite-box strong {
+  display: flex;
+  align-items: center;
+}
+
+.alliance-details-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+  align-items: end;
+  gap: 14px;
+}
+
+.alliance-details-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.alliance-details-form label > span {
+  color: var(--text-soft);
+  font-size: 14px;
+}
+
+.alliance-details-form button {
+  width: auto;
+  white-space: nowrap;
+}
+
+@media (max-width: 1199px) {
+  .alliance-toolbar-card {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 899px) {
+  .alliance-toolbar-card,
+  .alliance-details-form {
+    grid-template-columns: 1fr;
+  }
+
+  .alliance-details-form button {
+    width: 100%;
+  }
+
+  .alliance-opened-summary strong {
+    white-space: normal;
+  }
+}

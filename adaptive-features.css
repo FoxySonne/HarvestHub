@@ -1,0 +1,87 @@
+/* All feature fields share the same bounded layout, including Safari date inputs. */
+:root { --control-height:40px; }
+.topbar-profile-name {min-width:0;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;}
+.topbar-profile-name:empty {display:none;}
+#page-content { width:100%; min-width:0; }
+#page-content *, .account-dialog * { box-sizing:border-box; }
+#page-content :where(section,article,div,form,label,fieldset) { min-width:0; }
+#page-content :where(input,select,textarea), .account-dialog :where(input,select,textarea) {
+  min-width:0; max-width:100%; width:100%; box-sizing:border-box;
+}
+#page-content input:is([type=checkbox],[type=radio]),.account-dialog input:is([type=checkbox],[type=radio]) {
+  width:20px; flex:0 0 20px;
+}
+#page-content input:is([type=date],[type=datetime-local],[type=time]) { min-inline-size:0; }
+#page-content input::-webkit-date-and-time-value { text-align:left; min-width:0; }
+#page-content input::-webkit-datetime-edit { padding:0; }
+#page-content :where(img,svg) { max-width:100%; }
+#page-content button { max-width:100%; overflow-wrap:anywhere; }
+#page-content .page-section { margin:0; }
+#page-content .card { padding:clamp(12px,2vw,20px); }
+#page-content .home-status-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:12px; }
+#page-content .home-calculator-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px; }
+#page-content .home-calculator-card { display:flex;flex-direction:column;align-items:start;gap:12px; }
+#page-content .home-calculator-card button { margin-top:auto; }
+#page-content :where(.table-wrap,.table-scroll,.table-container,.alliance-table-wrap,.turbo-table-wrapper,.data-table-wrap) { max-width:100%;overflow-x:auto;overscroll-behavior-x:contain; }
+#page-content :where(h1,h2,h3,p) { overflow-wrap:anywhere; }
+#page-content .tooltip {max-width:100%;overflow-wrap:anywhere;}
+#page-content .tooltip::after {max-width:min(320px,100%);box-sizing:border-box;overflow-wrap:anywhere;}
+.account-dialog { width:min(520px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow-y:auto; }
+.account-modal { z-index:1600; }
+.account-dialog input { font-size:16px; }
+@media(max-width:55.99rem){
+ #page-content :where(.form-grid,.settings-grid,.profile-grid,.account-profile-grid,.season-production-grid,.troop-training-fields) { grid-template-columns:minmax(0,1fr); }
+ #page-content :where(.form-group,.form-field,.field) { max-width:100%; }
+ #page-content .card { margin-inline:0; }
+ #page-content button { min-height:40px; }
+ #page-content :where(input,select,textarea){font-size:16px;}
+ #page-content :where(.alliance-hub-grid,.alliance-management-grid,.alliance-power-grid) {grid-template-columns:minmax(0,1fr);}
+ .account-dialog { padding:16px; }
+}
+@media(prefers-reduced-motion:reduce){#page-content *{scroll-behavior:auto;transition:none;}}
+
+/* Shared scene coordinates are independent of the viewport and the editor panels. */
+#page-content .interactive-reservoir { position:relative; padding:0; margin:0; width:100%;height:clamp(320px,65dvh,675px);overflow:hidden;touch-action:none;border-radius:12px; }
+.reservoir-scene-transform { position:absolute;inset:0;transform-origin:center; }
+#page-content .interactive-reservoir .reservoir-map { position:absolute;left:50%;top:50%;width:1200px;max-width:none;min-width:1200px;height:675px;min-height:675px;transform:translate(-50%,-50%) scale(var(--scene-fit,1));transform-origin:center; }
+#page-content .interactive-reservoir.is-reservoir-map-fullscreen { position:fixed;inset:0;z-index:1400;width:100vw;height:100dvh;border-radius:0;background:var(--bg); }
+#page-content .interactive-reservoir .reservoir-map-location { width:170px;max-width:170px;min-height:170px; }
+#page-content .interactive-reservoir .reservoir-map-collectors {width:110px!important;min-width:110px!important;max-width:110px!important;height:84px!important;min-height:84px!important;}
+#page-content .interactive-reservoir .reservoir-map-collectors span {width:48px!important;height:56px!important;min-width:48px!important;min-height:56px!important;}
+.interactive-reservoir .map-controls {z-index:5;}
+body.resource-screen .page-header {display:none;}
+body.reservoir-screen .page-header {display:none;}
+.reservoir-workspace-tabs {display:none;}
+body.resource-screen #resource-map > .compact-toolbar {display:none;}
+@media(max-width:55.99rem){
+ body.resource-screen .main {padding-bottom:0;}
+ body.resource-screen #resource-map {display:flex;flex-direction:column;gap:8px;}
+ body.resource-screen #resource-map > .back-link {margin:0;}
+ body.resource-screen #resource-map .page-heading {margin:0;}
+ body.resource-screen #resource-map h1 {font-size:18px;}
+ body.resource-screen #resource-map .screen-tabs {margin:0;gap:4px;}
+ body.resource-screen #resource-map .screen-tabs button {padding:8px 6px;font-size:12px;}
+ body.resource-screen #map-panel-map .map-card {padding:8px;margin:0;}
+ body.resource-screen #map-panel-map .card-heading {display:none;}
+ body.resource-screen #map-panel-map .compact-toolbar {margin:0 0 8px;gap:6px;display:flex;flex-wrap:wrap;align-items:end;}
+ body.resource-screen #map-panel-map .compact-toolbar label {flex:1 1 120px;}
+ body.resource-screen #map-paint {flex:0 1 130px;font-size:12px;}
+ body.resource-screen #oil-canvas {height:calc(100dvh - 270px);min-height:280px;aspect-ratio:auto;}
+ body.resource-screen #map-panel-map .compact-toolbar:has(#point-choice) {display:none;}
+ body:is(.resource-screen,.reservoir-screen) .main-footer {display:none;}
+ .reservoir-workspace-tabs {display:flex;gap:6px;margin:8px 0;}
+ .reservoir-workspace-tabs button {flex:1;padding:8px;font-size:13px;background:var(--field);color:var(--text);border:1px solid var(--border);}
+ .reservoir-workspace-tabs button[aria-pressed=true] {border-color:var(--accent);background:var(--accent-soft);}
+ .reservoir-layout-page:not([data-workspace-tab=map]) .reservoir-map-card,
+ .reservoir-layout-page:not([data-workspace-tab=players]) .reservoir-player-pool-card,
+ .reservoir-layout-page:not([data-workspace-tab=placements]) :is(.reservoir-placement-card,.reservoir-published-view) {display:none;}
+ #page-content .reservoir-layout-page .alliance-context-card {padding:8px 12px;margin-block:8px;}
+ #page-content .reservoir-layout-page .alliance-context-card p {margin:0;font-size:12px;}
+ #page-content .reservoir-layout-page .reservoir-map-card {padding:8px;}
+ #page-content .reservoir-layout-page .interactive-reservoir {height:calc(100dvh - 270px);min-height:300px;}
+ #page-content .reservoir-layout-page .reservoir-map-card .card-header {margin-bottom:8px;}
+ #page-content .reservoir-layout-page .reservoir-map-card .card-header h3 {font-size:16px;}
+ #page-content .reservoir-placement-grid {display:grid;grid-auto-flow:row;grid-template-columns:minmax(0,1fr);grid-auto-columns:auto;overflow:visible;}
+ #page-content .reservoir-player-pool {display:flex;flex-flow:column;max-height:calc(100dvh - 330px);overflow:auto;}
+ #page-content .reservoir-player-chip {flex:none;max-width:none;}
+}

@@ -1,0 +1,238 @@
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+
+@import url("core/variables.css?v=20260809-wide-layout-1");
+@import url("core/base.css?v=20260723-hidden-1");
+@import url("core/layout.css?v=20260721-light-theme-1");
+@import url("ui/forms.css?v=20260811-interface-audit-1");
+@import url("ui/buttons.css?v=20260811-interface-audit-1");
+@import url("ui/components.css?v=20260812-mobile-roster-table-1");
+@import url("features/home.css?v=20260726-responsive-pages-1");
+@import url("features/season-resources.css?v=20260721-light-theme-1");
+@import url("features/season-building-links.css?v=20260721-light-theme-1");
+@import url("ui/page-enhancements.css?v=20260721-light-theme-1");
+@import url("ui/tooltips.css?v=20260721-light-theme-1");
+@import url("ui/notifications.css?v=20260811-interface-audit-1");
+@import url("core/mobile.css?v=20260726-responsive-shell-1");
+@import url("features/ipk.css?v=20260721-light-theme-1");
+@import url("features/troop-training.css?v=20260721-light-theme-1");
+@import url("features/troop-training-note.css?v=20260721-light-theme-1");
+@import url("features/turbo-vs.css?v=20260721-mobile-fit-1");
+@import url("ui/cards.css?v=20260811-interface-audit-1");
+@import url("core/desktop.css?v=20260726-responsive-shell-1");
+@import url("ui/time-converter.css?v=20260721-mobile-fit-1");
+@import url("features/alliance.css?v=20260811-table-visual-fix-1");
+@import url("features/alliance-twin-labels.css?v=20260724-alliance-twins-1");
+@import url("features/alliance-fixes.css?v=20260721-light-theme-1");
+@import url("features/alliance-power.css?v=20260811-table-regression-1");
+@import url("features/alliance-vs.css?v=20260811-table-regression-1");
+@import url("features/alliance-vs-table-layout.css?v=20260811-fullscreen-table-1");
+@import url("features/alliance-membership-periods.css?v=20260728-membership-periods-1");
+@import url("features/alliance-vs-proposals.css?v=20260724-vs-proposals-2");
+@import url("features/alliance-table-search.css?v=20260811-table-visual-fix-1");
+@import url("features/alliance-roles.css?v=20260724-management-fit-5");
+@import url("features/alliance-player-profile.css?v=20260724-profile-action-row-1");
+@import url("features/alliance-pages.css?v=20260812-fullscreen-viewport-3");
+@import url("features/alliance-reservoir.css?v=20260811-table-regression-1");
+@import url("features/alliance-reservoir-layout.css?v=20260722-3");
+@import url("features/alliance-reservoir-layout-fixes.css?v=20260723-buildings-6");
+@import url("features/alliance-reservoir-layout-usability.css?v=20260727-reservoir-layout-final-1");
+@import url("features/alliance-reservoir-buildings.css?v=20260723-2");
+@import url("features/alliance-reservoir-map-typography.css?v=20260723-2");
+@import url("features/alliance-reservoir-map-zones.css?v=20260723-3");
+@import url("features/account.css?v=20260811-interface-audit-1");
+@import url("features/advanced-access.css?v=20260811-interface-audit-1");
+@import url("features/sync-status.css?v=20260721-light-theme-1");
+@import url("features/account-mobile.css?v=20260721-light-theme-1");
+@import url("core/responsive-foundation.css?v=20260811-interface-followup-1");
+@import url("features/ordinary-pages-responsive.css?v=20260727-ordinary-layout-final-1");
+@import url("features/alliance-complex-responsive.css?v=20260812-mobile-roster-table-1");
+@import url("features/layout-review-fixes.css?v=20260811-fullscreen-table-1");
+
+/* VS: компактная панель без перекрывающихся кликабельных областей. */
+.vs-table-controls {
+  display: grid !important;
+  grid-template-columns: minmax(220px, 280px) max-content minmax(0, 1fr) !important;
+  align-items: end !important;
+  gap: 10px 14px !important;
+}
+
+.vs-sort-control {
+  min-width: 0;
+}
+
+.vs-saturday-total-toggle {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  align-self: end;
+  justify-self: start;
+  width: max-content !important;
+  min-width: max-content !important;
+  max-width: 100%;
+  min-height: var(--control-height);
+  margin: 0 !important;
+  padding: 0 10px !important;
+  gap: 8px !important;
+  white-space: nowrap !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+}
+
+.vs-saturday-total-toggle input {
+  flex: 0 0 20px !important;
+  width: 20px !important;
+  min-width: 20px !important;
+  height: 20px !important;
+  margin: 0 !important;
+}
+
+.vs-saturday-total-toggle span {
+  min-width: 0;
+  white-space: nowrap !important;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+
+.vs-table-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(180px, 1fr)) 44px;
+  align-items: stretch;
+  gap: 10px;
+  min-width: 0;
+}
+
+.vs-table-actions button {
+  width: 100% !important;
+  min-width: 0;
+  margin: 0 !important;
+}
+
+@media (max-width: 1199px) {
+  .vs-table-controls {
+    grid-template-columns: minmax(220px, 1fr) max-content !important;
+  }
+
+  .vs-table-actions {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 767px) {
+  .vs-table-controls {
+    grid-template-columns: 1fr !important;
+  }
+
+  .vs-saturday-total-toggle {
+    width: max-content !important;
+    min-width: 0 !important;
+  }
+}
+
+@media (max-width: 599px) {
+  .vs-table-actions {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+/* Нефть/ДНК/Медь: две карточки рядом только когда обе помещаются целиком. */
+.territory-calculator-layout {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 540px), 1fr));
+  gap: 18px;
+  align-items: start;
+}
+
+.territory-calculator-card {
+  min-width: 0;
+}
+
+.territory-calculator-page .territory-calculator-table {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+}
+
+.territory-calculator-page .territory-calculator-table th,
+.territory-calculator-page .territory-calculator-table td {
+  padding: 8px 6px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.territory-calculator-page .territory-calculator-table th {
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.territory-calculator-page .territory-calculator-table td {
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.territory-calculator-note {
+  display: block;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.territory-input-panel {
+  gap: 12px;
+}
+
+.territory-config-row {
+  display: grid;
+  grid-template-columns: minmax(130px, 180px) 110px;
+  gap: 10px;
+  align-items: end;
+}
+
+.territory-config-row .season-field span,
+.territory-score-row .season-field span {
+  min-height: 0;
+}
+
+.territory-count-field {
+  width: 110px;
+}
+
+.territory-score-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 140px));
+  gap: 8px;
+  align-items: end;
+  justify-content: start;
+}
+
+.territory-dynamic-score-fields {
+  display: contents;
+}
+
+.territory-score-row .season-field {
+  min-width: 0;
+}
+
+.territory-score-row .season-field span {
+  font-size: 12px;
+}
+
+.territory-score-row .season-field input {
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 420px) {
+  .territory-config-row {
+    grid-template-columns: minmax(0, 1fr) 90px;
+  }
+
+  .territory-count-field {
+    width: 90px;
+  }
+
+  .territory-score-row {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  }
+}

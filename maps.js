@@ -6,6 +6,8 @@
   const storageKey='harvesthub_event_map_v1';
   let state={alliances:[],points:{},history:[],expenses:[],settings:{}}, bridge=null, selected='', painting=false, formKind='';
   const undo=[];
+  let paintSnapshot=null, strokeSnapshot=null, brushPrevious=null;
+  const strokePoints=new Set();
   try { const saved=JSON.parse(localStorage.getItem(storageKey));
     if(saved&&Array.isArray(saved.alliances)&&saved.points&&Array.isArray(saved.history))state={...state,...saved};
   } catch { /* Карта доступна и при запрете локального хранения. */ }
@@ -15,7 +17,10 @@
   const shapes=new Map(), territories=new Map();
   function element(tag,attributes={}){const node=document.createElementNS(ns,tag);for(const [key,value] of Object.entries(attributes))node.setAttribute(key,value);return node;}
   function status(message){document.querySelector('#map-status').textContent=message;}
-  function persist(){try{localStorage.setItem(storageKey,JSON.stringify(state));status('Сохранено на этом устройстве');}catch{status('Изменения доступны до закрытия страницы: браузер запретил сохранение');}}
+  function persist(){try{
+    const saved=painting&&paintSnapshot?{...state,points:JSON.parse(paintSnapshot).points}:state;
+    localStorage.setItem(storageKey,JSON.stringify(saved));status('Сохранено на этом устройстве');
+  }catch{status('Изменения доступны до закрытия страницы: браузер запретил сохранение');}}
   function record(message){undo.push(JSON.stringify(state));if(undo.length>50)undo.shift();state.history.push({time:new Date().toISOString(),message});if(state.history.length>200)state.history.shift();document.querySelector('#map-undo').disabled=false;}
   function alliance(id){return state.alliances.find(item=>item.id===id);}
   function pointName(node){return (node.kind==='den'?'Логово ':node.kind==='bench'?'Верстак ':'База ')+node.label;}
@@ -111,15 +116,37 @@
     document.querySelector('.sheet-footer button').disabled=false;document.querySelector('.sheet-footer>span').textContent='Сохранение на этом устройстве';
   }
   function activate(id,trigger){if(painting){const old=state.points[id]||{},owner=document.querySelector('#paint-owner').value;if(old.owner===owner)return;
-      record(pointName(byId.get(id))+' — '+(alliance(owner)?.name||'без владельца'));state.points[id]={...old,owner};refresh();persist();
+      if(!strokeSnapshot)strokeSnapshot=JSON.stringify(state);
+      state.points[id]={...old,owner};strokePoints.add(id);refresh();
     }else openPoint(id,trigger);}
   document.querySelector('#add-map-alliance').addEventListener('click',()=>{
     const input=document.querySelector('#alliance-name'),name=input.value.trim();if(!name){input.focus();return;}
     if(state.alliances.some(item=>item.name===name)){status('Этот союз уже добавлен');return;}
     record('Добавлен союз '+name);state.alliances.push({id:'a'+Date.now().toString(36),name,color:document.querySelector('#alliance-color').value});input.value='';refresh();persist();
   });
-  document.querySelector('#map-paint').addEventListener('click',event=>{painting=!painting;event.currentTarget.setAttribute('aria-pressed',String(painting));svg.classList.toggle('painting',painting);status(painting?'Выберите владельца и территории':'');});
-  document.querySelector('#map-undo').addEventListener('click',()=>{const prior=undo.pop();if(!prior)return;state=JSON.parse(prior);document.querySelector('#map-undo').disabled=!undo.length;refresh();persist();});
+  function finishStroke(){
+    if(strokeSnapshot&&strokePoints.size){undo.push(strokeSnapshot);if(undo.length>50)undo.shift();document.querySelector('#map-undo').disabled=false;}
+    strokeSnapshot=null;strokePoints.clear();brushPrevious=null;
+  }
+  function endPaint(commit){
+    finishStroke();
+    if(!commit&&paintSnapshot)state=JSON.parse(paintSnapshot);
+    painting=false;
+    if(commit){state.history.push({time:new Date().toISOString(),message:'Массовое назначение владельцев'});persist();}
+    painting=false;paintSnapshot=null;undo.length=0;
+    document.querySelector('#map-paint').setAttribute('aria-pressed','false');
+    document.querySelector('#map-paint-done').hidden=true;document.querySelector('#map-paint-cancel').hidden=true;
+    document.querySelector('#map-undo').disabled=true;svg.classList.remove('painting');refresh();
+  }
+  document.querySelector('#map-paint').addEventListener('click',event=>{
+    if(painting){endPaint(false);return;}
+    painting=true;paintSnapshot=JSON.stringify(state);undo.length=0;
+    event.currentTarget.setAttribute('aria-pressed','true');svg.classList.add('painting');
+    document.querySelector('#map-paint-done').hidden=false;document.querySelector('#map-paint-cancel').hidden=false;status('');
+  });
+  document.querySelector('#map-paint-done').addEventListener('click',()=>endPaint(true));
+  document.querySelector('#map-paint-cancel').addEventListener('click',()=>endPaint(false));
+  document.querySelector('#map-undo').addEventListener('click',()=>{finishStroke();const prior=undo.pop();if(!prior)return;state=JSON.parse(prior);document.querySelector('#map-undo').disabled=!undo.length;refresh();if(!painting)persist();});
   const settingFields=[...document.querySelectorAll('#map-panel-settings input')];
   ['name','start','end'].forEach((key,index)=>{
     const field=settingFields[index];field.disabled=false;field.value=state.settings[key]||'';
@@ -141,7 +168,17 @@
     const owner=document.querySelector('#point-owner');if(!owner||!selected)return;const score=document.querySelector('#point-score');if(!score.reportValidity())return;
     record('Изменена точка '+pointName(byId.get(selected)));state.points[selected]={owner:owner.value,score:score.value===''?null:Number(score.value),note:document.querySelector('#point-note').value};refresh();persist();bridge.closeSheet();
   });
-  svg.addEventListener('keydown',event=>{if(!['Enter',' '].includes(event.key))return;const point=event.target.closest('[data-point]');if(point){event.preventDefault();activate(point.dataset.point,point);}});
+  svg.addEventListener('keydown',event=>{if(!['Enter',' '].includes(event.key))return;const point=event.target.closest('[data-point]');if(point){event.preventDefault();activate(point.dataset.point,point);if(painting)finishStroke();}});
+  function brush(event){
+    const matrix=svg.getScreenCTM();if(!matrix)return;
+    const p=new DOMPoint(event.clientX,event.clientY).matrixTransform(matrix.inverse());
+    const a=brushPrevious||p,dx=p.x-a.x,dy=p.y-a.y,length=dx*dx+dy*dy;
+    for(const node of data.nodes){
+      const t=length?Math.max(0,Math.min(1,((node.x-a.x)*dx+(node.y-a.y)*dy)/length)):0;
+      if(Math.hypot(node.x-a.x-t*dx,node.y-a.y-t*dy)<=30)activate(node.id,shapes.get(node.id));
+    }
+    brushPrevious=p;
+  }
   function makeMap(canvas,transform,onTap){
     const pointers=new Map();let scale=1,offset={x:0,y:0},gesture=null,origin=null,moved=false;
     function render(){const lx=canvas.clientWidth*(scale-1)/2,ly=canvas.clientHeight*(scale-1)/2;offset.x=Math.max(-lx,Math.min(lx,offset.x));offset.y=Math.max(-ly,Math.min(ly,offset.y));
@@ -150,25 +187,26 @@
     function start(){const p=[...pointers.values()];gesture=p.length>1?{distance:Math.hypot(p[1].x-p[0].x,p[1].y-p[0].y),scale,center:{x:(p[0].x+p[1].x)/2,y:(p[0].y+p[1].y)/2},offset:{...offset}}:p.length?{point:p[0],offset:{...offset}}:null;}
     canvas.addEventListener('pointerdown',event=>{if(event.target.closest('.map-controls,.expand-close'))return;
       if(!pointers.size){origin={x:event.clientX,y:event.clientY,target:event.target};moved=false;}else moved=true;
-      pointers.set(event.pointerId,{x:event.clientX,y:event.clientY});canvas.setPointerCapture(event.pointerId);start();});
+      pointers.set(event.pointerId,{x:event.clientX,y:event.clientY});canvas.setPointerCapture(event.pointerId);start();
+      if(canvas.id==='oil-canvas'&&painting&&pointers.size===1)brush(event);
+      else if(pointers.size>1){if(strokeSnapshot){state=JSON.parse(strokeSnapshot);strokeSnapshot=null;strokePoints.clear();brushPrevious=null;refresh();}}});
     canvas.addEventListener('pointermove',event=>{if(!pointers.has(event.pointerId)||!gesture)return;if(origin&&Math.hypot(event.clientX-origin.x,event.clientY-origin.y)>6)moved=true;
       pointers.set(event.pointerId,{x:event.clientX,y:event.clientY});const p=[...pointers.values()];
+      if(canvas.id==='oil-canvas'&&painting&&p.length===1){brush(event);return;}
       if(p.length>1&&gesture.distance){const rect=canvas.getBoundingClientRect();scale=gesture.scale;offset={...gesture.offset};zoom(gesture.scale*Math.hypot(p[1].x-p[0].x,p[1].y-p[0].y)/gesture.distance,{x:gesture.center.x-rect.left,y:gesture.center.y-rect.top});offset.x+=(p[0].x+p[1].x)/2-gesture.center.x;offset.y+=(p[0].y+p[1].y)/2-gesture.center.y;render();}
       else if(gesture.point){offset.x=gesture.offset.x+event.clientX-gesture.point.x;offset.y=gesture.offset.y+event.clientY-gesture.point.y;render();}});
-    canvas.addEventListener('pointerup',event=>{pointers.delete(event.pointerId);if(!pointers.size&&origin&&!moved)onTap(origin.target);start();});
+    canvas.addEventListener('pointerup',event=>{pointers.delete(event.pointerId);if(canvas.id==='oil-canvas'&&painting)finishStroke();else if(!pointers.size&&origin&&!moved)onTap(origin.target);start();});
     for(const type of ['pointercancel','lostpointercapture'])canvas.addEventListener(type,event=>{pointers.delete(event.pointerId);start();});
     // Синтетический click после перетаскивания не открывает локацию.
-    canvas.addEventListener('click',event=>{if(event.target.closest('.map-controls,.expand-close'))return;if(event.detail===0){onTap(event.target);return;}event.stopImmediatePropagation();},true);
+    canvas.addEventListener('click',event=>{if(event.target.closest('.map-controls,.expand-close,.alliance-fullscreen-close'))return;if(event.detail===0){if(canvas.id!=='reservoirMapViewport')onTap(event.target);return;}event.stopImmediatePropagation();},true);
     canvas.addEventListener('wheel',event=>{if(event.target.closest('button'))return;event.preventDefault();const r=canvas.getBoundingClientRect();zoom(scale*Math.exp(-event.deltaY*.0015),{x:event.clientX-r.left,y:event.clientY-r.top});},{passive:false});
     canvas.querySelectorAll('[data-zoom]').forEach(button=>button.addEventListener('click',()=>{if(button.dataset.zoom==='fit'){scale=1;offset={x:0,y:0};render();}else zoom(scale*(button.dataset.zoom==='in'?1.4:1/1.4));}));
     new ResizeObserver(render).observe(canvas);render();
   }
   makeMap(document.querySelector('#oil-canvas'),document.querySelector('#oil-transform'),target=>{const point=target.closest('[data-point]');if(point)activate(point.dataset.point,point);});
-  makeMap(document.querySelector('#reservoir-canvas'),document.querySelector('#reservoir-transform'),target=>{
-    const button=target.closest('[data-location],[data-collector]');if(button)document.dispatchEvent(new CustomEvent('harvesthub:location',{detail:{button}}));
-  });
+
   // Клавиатурные нажатия SVG обрабатываются выше, без дублирования.
-  window.HarvestMaps={openPoint,openAnchor,connect(api){bridge=api;}};
+  window.HarvestMaps={openPoint,openAnchor,attach:makeMap,connect(api){bridge=api;}};
   new MutationObserver(()=>{
     if(!document.querySelector('#point-owner,#anchor-owner')){document.querySelector('.sheet-footer button').disabled=true;document.querySelector('.sheet-footer>span').textContent='Данные и сохранение пока не подключены';}
   }).observe(document.querySelector('#sheet-body'),{childList:true});

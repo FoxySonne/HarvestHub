@@ -1,0 +1,421 @@
+.power-season-form label,
+.power-bulk-date,
+.power-inline-editor label,
+.power-single-editor-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.power-season-form input,
+.power-bulk-date input,
+.power-inline-editor input,
+.power-single-editor-form input,
+.power-single-editor-form select {
+  width: 100%;
+}
+
+.power-season-form button {
+  width: auto;
+}
+
+.power-season-form {
+  display: grid;
+  grid-template-columns: minmax(220px, 360px) auto;
+  gap: 14px;
+  align-items: end;
+}
+
+.power-single-editor-card {
+  overflow: hidden;
+  padding: 0;
+}
+
+.power-single-editor-card > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  font-weight: 700;
+  list-style: none;
+}
+
+.power-single-editor-card > summary::-webkit-details-marker {
+  display: none;
+}
+
+.power-single-editor-card > summary::after {
+  content: "⌄";
+  flex: 0 0 auto;
+  transition: transform .2s ease;
+}
+
+.power-single-editor-card[open] > summary::after {
+  transform: rotate(180deg);
+}
+
+.power-single-editor-form {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px 12px;
+  padding: 0 16px 16px;
+}
+
+.power-single-player,
+.power-single-date {
+  grid-column: span 2;
+}
+
+.power-single-editor-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 10px;
+}
+
+.power-single-editor-actions button {
+  width: auto;
+  min-width: 150px;
+}
+
+.power-table td:nth-child(2) strong,
+.power-table td:nth-child(2) small {
+  display: block;
+}
+
+.power-table td:nth-child(2) small {
+  margin-top: 4px;
+  color: var(--text-soft);
+}
+
+.power-table.is-bulk-editing input {
+  width: 110px;
+  min-width: 110px;
+  padding: 8px;
+}
+
+.power-row-edit,
+.vs-row-edit {
+  width: auto;
+  min-width: 0;
+  padding: 7px 10px;
+  white-space: nowrap;
+}
+
+.power-missing-toggle {
+  width: 44px;
+  min-width: 44px;
+  padding-inline: 0;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.power-missing-toggle.is-active,
+.power-inline-missing.is-active {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+
+.power-table tr.is-power-missing td {
+  background: color-mix(in srgb, var(--panel) 82%, var(--border));
+}
+
+.power-table tr.is-power-missing input:disabled,
+.power-inline-editor input:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+.power-missing-value {
+  color: var(--text-soft);
+  font-weight: 700;
+}
+
+.power-positive {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.power-negative {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.power-tools {
+  grid-template-columns: minmax(180px, 1fr) minmax(150px, 190px) auto auto auto;
+}
+
+.power-controls-row {
+  display: grid;
+  width: 100%;
+  margin: 0 0 14px;
+  gap: 10px;
+  align-items: center;
+}
+
+.power-controls-row input,
+.power-controls-row select,
+.power-controls-row button {
+  min-width: 0;
+  width: 100%;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.power-bulk-controls {
+  display: grid;
+  grid-template-columns: minmax(240px, 340px) minmax(0, 1fr);
+  align-items: end;
+  gap: 12px 16px;
+  margin: 0 0 16px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.power-bulk-date {
+  min-width: 0;
+  margin: 0;
+}
+
+.power-bulk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  min-width: 0;
+}
+
+.power-bulk-actions button {
+  width: auto;
+  min-width: 190px;
+  margin: 0;
+}
+
+.power-view-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 18px;
+  margin: 0 0 16px;
+}
+
+.power-view-options .checkbox {
+  margin: 0;
+}
+
+.power-view-options .checkbox input {
+  flex: 0 0 auto;
+}
+
+.power-inline-editor-row > td {
+  padding: 0 !important;
+  border-bottom: 2px solid var(--accent);
+  background: color-mix(in srgb, var(--panel) 92%, var(--accent));
+}
+
+.power-inline-editor,
+.power-inline-editor-loading {
+  min-width: min(1120px, calc(100vw - 48px));
+  padding: 16px;
+}
+
+.power-inline-editor {
+  display: grid;
+  grid-template-columns: minmax(180px, 240px) minmax(180px, 240px) minmax(0, 1fr);
+  gap: 14px 16px;
+  align-items: end;
+}
+
+.power-inline-editor-title {
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  gap: 4px;
+}
+
+.power-inline-editor-title span,
+.power-inline-editor-loading {
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.power-inline-editor-date {
+  min-width: 0;
+}
+
+.power-inline-editor-fields {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(110px, 1fr));
+  grid-column: 1 / -1;
+  gap: 10px;
+}
+
+.power-inline-editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  grid-column: 1 / -1;
+  gap: 10px;
+}
+
+.power-inline-editor-actions button {
+  width: auto;
+  min-width: 130px;
+  margin: 0;
+}
+
+.power-inline-missing {
+  min-width: 150px !important;
+}
+
+.power-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.power-summary > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.power-summary span {
+  color: var(--text-soft);
+  font-size: 14px;
+}
+
+.power-statistics-card.is-expanded {
+  position: fixed;
+  inset: 12px;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  margin: 0;
+  padding-top: calc(64px + env(safe-area-inset-top));
+  background: var(--card);
+  box-shadow: var(--shadow-heavy);
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.power-statistics-card.is-expanded .power-table-wrap {
+  flex: 0 0 auto;
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.power-table-open { overflow: hidden; }
+
+@media (max-width: 1100px) {
+  .power-tools { grid-template-columns: minmax(180px, 1fr) minmax(150px, 190px) repeat(3, auto); }
+  .power-inline-editor { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .power-inline-editor-fields { grid-template-columns: repeat(3, minmax(110px, 1fr)); }
+}
+
+@media (max-width: 899px) {
+  .power-season-form,
+  .power-bulk-controls,
+  .power-inline-editor { grid-template-columns: 1fr; }
+  .power-tools { grid-template-columns: 1fr 1fr; }
+  .power-bulk-actions,
+  .power-inline-editor-actions { justify-content: stretch; }
+  .power-bulk-actions button,
+  .power-controls-row button,
+  .power-season-form button,
+  .power-inline-editor-actions button { width: 100%; min-width: 0; margin-left: 0; }
+  .power-inline-editor-fields { grid-template-columns: repeat(2, minmax(110px, 1fr)); }
+  .power-statistics-card.is-expanded { inset: 0; border-radius: 0; }
+}
+
+@media (max-width: 520px) {
+  .power-tools { grid-template-columns: 1fr; }
+  .power-bulk-controls { padding: 10px; }
+
+  .power-inline-editor,
+  .power-inline-editor-loading {
+    width: min(100%, calc(100vw - 24px));
+    min-width: min(520px, calc(100vw - 24px));
+    padding: 9px;
+  }
+
+  .power-inline-editor {
+    gap: 8px;
+  }
+
+  .power-inline-editor label {
+    gap: 4px;
+  }
+
+  .power-inline-editor-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .power-inline-editor-fields label:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .power-inline-editor-fields input {
+    min-height: 38px;
+    padding: 6px 8px;
+  }
+
+  .power-inline-editor-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .power-inline-editor-actions .power-inline-missing {
+    grid-column: 1 / -1;
+  }
+
+  .power-single-editor-card > summary {
+    padding: 11px 12px;
+  }
+
+  .power-single-editor-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    padding: 0 12px 12px;
+  }
+
+  .power-single-player,
+  .power-single-date,
+  .power-single-editor-actions {
+    grid-column: 1 / -1;
+  }
+
+  .power-single-editor-form label {
+    gap: 4px;
+  }
+
+  .power-single-editor-form input,
+  .power-single-editor-form select {
+    min-height: 38px;
+    padding: 6px 8px;
+  }
+
+  .power-single-editor-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .power-single-editor-actions button {
+    width: 100%;
+    min-width: 0;
+  }
+}

@@ -1,0 +1,258 @@
+(() => {
+  const SITE_ASSET_VERSION = "20261002-adaptive-functions-1";
+  const DEFAULT_STYLESHEET = "features.css?v=20261002-adaptive-functions-1";
+  const QUICK_LINKS_STORAGE_KEY = "harvesthub_page_visits";
+  const MAX_QUICK_LINKS = 5;
+  const pagesDatabase = [
+    { title: "Главная", path: "home.html", group: "Основное" },
+    { title: "База знаний", path: "knowledge.html", group: "Основное" },
+    { title: "Калькулятор", path: "calculator.html", group: "Основное" },
+    { title: "Ивенты", path: "events.html", group: "Основное" },
+    { title: "Список дел", path: "todo.html", group: "Основное" },
+    { title: "События", path: "timeline.html", group: "Основное" },
+    { title: "Советы", path: "tips.html", group: "Основное" },
+    { title: "Настройки", path: "settings.html", group: "Основное" },
+    { title: "Союзный штаб", path: "alliance/members.html", group: "Союз" },
+    { title: "Управление союзом", path: "alliance/management.html", group: "Союз" },
+    { title: "Профиль игрока", path: "alliance/player-profile.html", group: "Союз" },
+    { title: "Состав союза", path: "alliance/roster.html", group: "Союз" },
+    { title: "Сила отрядов", path: "alliance/power.html", group: "Союз" },
+    { title: "VS", path: "alliance/vs.html", group: "Союз" },
+    { title: "Статистика VS", path: "alliance/vs-statistics.html", group: "Союз" },
+    { title: "Резервуар: активность", path: "alliance/reservoir-activity.html", group: "Союз" },
+    { title: "Резервуар: расстановка", path: "alliance/reservoir-layout.html", group: "Союз" },
+    { title: "Игра по-крупному", path: "calculator/ipk.html", group: "Калькуляторы" },
+    { title: "Турбочерепашка & VS", path: "calculator/turbo-vs.html", group: "Калькуляторы" },
+    { title: "Сезонные ресурсы", path: "calculator/season-resources.html", group: "Калькуляторы" },
+    { title: "Нефть/ДНК/Медь", path: "calculator/oil-dna-copper.html", group: "Калькуляторы" },
+    { title: "Обучение войск", path: "calculator/troop-training.html", group: "Калькуляторы" }
+  ];
+  const pageModulePaths = {
+    home: "../pages/home.js",
+    members: "../pages/alliance-hub.js",
+    management: "../pages/alliance-management.js",
+    "player-profile": "../pages/alliance-player-profile.js",
+    roster: "../pages/alliance-roster.js?v=20260811-fullscreen-viewport-1",
+    power: "../pages/alliance-power.js?v=20260811-fullscreen-viewport-1",
+    vs: "../pages/alliance-vs-current.js?v=20260811-fullscreen-viewport-1",
+    "vs-statistics": "../pages/alliance-vs-statistics.js?v=20260811-fullscreen-viewport-1",
+    "reservoir-activity": "../pages/alliance-reservoir-activity.js",
+    "reservoir-layout": "../pages/alliance-reservoir-layout.js",
+    profile: "../pages/profile.js",
+    "advanced-access": "../pages/advanced-access.js",
+    settings: "../pages/settings.js",
+    ipk: "../calculators/ipk.js",
+    "turbo-vs": "../calculators/turbo-vs.js",
+    "troop-training": "../calculators/troop-training.js",
+    "season-resources": "../season/season-resources.js",
+    "oil-dna-copper": "../season/oil-dna-copper.js"
+  };
+
+  let currentLoadedPage = localStorage.getItem("currentPage") || "";
+
+  function setPageStylesheet() {
+    const link = document.getElementById("siteStylesheet");
+    if (!link) return Promise.resolve();
+    const target = DEFAULT_STYLESHEET;
+    if (link.dataset.stylesheetTarget === target) return Promise.resolve();
+
+    return new Promise(resolve => {
+      const finish = () => {
+        link.dataset.stylesheetTarget = target;
+        resolve();
+      };
+      link.addEventListener("load", finish, { once: true });
+      link.addEventListener("error", finish, { once: true });
+      link.href = target;
+    });
+  }
+
+  function readPageVisits() {
+    return window.harvestHubStorage.readJsonStorage(QUICK_LINKS_STORAGE_KEY, {});
+  }
+
+  function savePageVisits(visits) {
+    window.harvestHubStorage.writeJsonStorage(QUICK_LINKS_STORAGE_KEY, visits);
+  }
+
+  function getPageByPath(pagePath) {
+    return pagesDatabase.find(page => page.path === pagePath);
+  }
+
+  function trackPageVisit(pageName) {
+    if (!getPageByPath(pageName)) return;
+    const visits = readPageVisits();
+    visits[pageName] = (Number(visits[pageName]) || 0) + 1;
+    savePageVisits(visits);
+  }
+
+  function getDefaultQuickLinks() {
+    return [
+      "calculator/ipk.html",
+      "calculator/turbo-vs.html",
+      "calculator/season-resources.html",
+      "calculator/oil-dna-copper.html",
+      "calculator/troop-training.html",
+      "calculator.html"
+    ].map(getPageByPath).filter(Boolean);
+  }
+
+  function getPopularPages(currentPage = "") {
+    const visits = readPageVisits();
+    const popularPages = pagesDatabase
+      .map(page => ({ ...page, visits: Number(visits[page.path]) || 0 }))
+      .filter(page => page.visits > 0 && page.path !== currentPage)
+      .sort((a, b) => b.visits - a.visits || a.title.localeCompare(b.title, "ru"));
+
+    if (popularPages.length > 0) return popularPages.slice(0, MAX_QUICK_LINKS);
+    return getDefaultQuickLinks().filter(page => page.path !== currentPage).slice(0, MAX_QUICK_LINKS);
+  }
+
+  function renderQuickLinks(currentPage = localStorage.getItem("currentPage") || "") {
+    const container = document.getElementById("quickLinks");
+    if (!container) return;
+
+    const pages = getPopularPages(currentPage);
+    if (pages.length === 0) {
+      container.innerHTML = `<p class="quick-links-empty">Пока нет статистики переходов</p>`;
+      return;
+    }
+
+    container.innerHTML = pages.map(page => `
+      <a href="#" class="quick-link-item" data-page-path="${page.path}">
+        <span>${page.title}</span>
+        <small>${page.group}</small>
+      </a>
+    `).join("");
+  }
+
+  function activatePageLink(target) {
+    const link = target.closest?.("[data-page-path]");
+    const pagePath = link?.dataset.pagePath;
+    if (!pagePath) return false;
+    window.loadPage(pagePath);
+    return true;
+  }
+
+  document.addEventListener("click", event => {
+    if (!activatePageLink(event.target)) return;
+    event.preventDefault();
+  });
+
+  document.addEventListener("keydown", event => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    if (!activatePageLink(event.target)) return;
+    event.preventDefault();
+  });
+
+  function getGlobalInitName(fileName) {
+    return fileName
+      .split("-")
+      .map((part, index) => index === 0 ? part : part.charAt(0).toUpperCase() + part.slice(1))
+      .join("") + "Init";
+  }
+
+  function withCacheBust(filePath) {
+    const separator = filePath.includes("?") ? "&" : "?";
+    return `${filePath}${separator}v=${SITE_ASSET_VERSION}-${Date.now()}`;
+  }
+
+  async function loadBlock(containerId, filePath, signal) {
+    const container = document.getElementById(containerId);
+    if (!container) return false;
+
+    let response;
+    try {
+      response = await fetch(withCacheBust(filePath), { cache: "no-store", signal });
+    } catch (error) {
+      if (signal?.aborted) return false;
+      window.harvestHubNotifications?.error(error, "Не удалось загрузить раздел сайта. Проверьте подключение и попробуйте ещё раз.");
+      return false;
+    }
+    if (!response.ok) {
+      console.warn(`Не удалось загрузить ${filePath}:`, response.status);
+      window.harvestHubNotifications?.error(
+        { message: `HTTP ${response.status}`, status: response.status },
+        "Не удалось загрузить раздел сайта. Обновите страницу и попробуйте ещё раз."
+      );
+      return false;
+    }
+
+    const markup = await response.text();
+    if (signal?.aborted) return false;
+    container.innerHTML = markup;
+    window.harvestHubTheme?.syncControls?.();
+    const fileName = filePath.split("/").pop().replace(".html", "");
+    const modulePath = pageModulePaths[fileName];
+
+    if (modulePath) {
+      try {
+        const module = await import(`${modulePath}?v=${SITE_ASSET_VERSION}-${Date.now()}`);
+        if (signal?.aborted) return false;
+        if (typeof module.init === "function") await module.init();
+        else {
+          const globalInitName = getGlobalInitName(fileName);
+          if (typeof window[globalInitName] === "function") await window[globalInitName]();
+        }
+      } catch (error) {
+        if (signal?.aborted) return false;
+        console.warn(`JS-модуль для страницы ${fileName} не был запущен:`, error);
+        const globalInitName = getGlobalInitName(fileName);
+        if (typeof window[globalInitName] === "function") await window[globalInitName]();
+        else window.harvestHubNotifications?.error(
+          error,
+          "Не удалось запустить этот раздел сайта. Обновите страницу и попробуйте ещё раз."
+        );
+      }
+    } else {
+      const globalInitName = getGlobalInitName(fileName);
+      if (typeof window[globalInitName] === "function") await window[globalInitName]();
+    }
+
+    if (containerId === "rightbar-container") {
+      renderQuickLinks();
+      window.renderHarvestHubClock?.();
+    }
+    return !signal?.aborted;
+  }
+
+  async function loadPage(pageName, options = {}) {
+    const previousLeaveGuard = window.harvestHubConfirmPageLeave;
+    if (typeof previousLeaveGuard === "function"
+        && previousLeaveGuard(pageName) === false) {
+      return false;
+    }
+    window.harvestHubConfirmPageLeave = null;
+    window.harvestHubPageAbortController?.abort();
+    window.harvestHubPageAbortController = new AbortController();
+    const signal = window.harvestHubPageAbortController.signal;
+    if (!options.skipCurrentSave && typeof window.savePageFormState === "function") {
+      window.savePageFormState(currentLoadedPage);
+    }
+    const previousPage = currentLoadedPage;
+    window.harvestHubNotifications?.clearPage?.();
+    localStorage.setItem("currentPage", pageName);
+    await setPageStylesheet(pageName);
+    if (signal.aborted) return false;
+    const isLoaded = await loadBlock("page-content", `pages/${pageName}`, signal);
+    if (!isLoaded) {
+      if (signal.aborted) return false;
+      window.harvestHubConfirmPageLeave = previousLeaveGuard;
+      return false;
+    }
+    currentLoadedPage = pageName;
+    if (options.trackVisit !== false) trackPageVisit(pageName);
+    renderQuickLinks(pageName);
+    window.scrollTo({ top: 0, behavior: options.behavior || "auto" });
+    document.dispatchEvent(new CustomEvent("harvesthub:page-loaded", { detail: { pageName, previousPage } }));
+    return true;
+  }
+
+  window.harvestHubNavigation = {
+    getCurrentPage: () => currentLoadedPage,
+    pages: pagesDatabase
+  };
+  window.loadBlock = loadBlock;
+  window.loadPage = loadPage;
+  window.renderQuickLinks = renderQuickLinks;
+})();

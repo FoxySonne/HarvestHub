@@ -1,34 +1,5 @@
 // Интерактивное оформление экранов. Игровые данные, расчёты и сервер не подключены.
 (() => {
- const locations = [
-  ['treatment_1','Водоочистительный центр 1',37,70,'water-treatment-center.webp'],
-  ['treatment_2','Водоочистительный центр 2',72,20,'water-treatment-center.webp'],
-  ['processing_1','Водообрабатывающий завод 1',25,70,'water-processing-plant.webp'],
-  ['processing_2','Водообрабатывающий завод 2',84,18,'water-processing-plant.webp'],
-  ['processing_3','Водообрабатывающий завод 3',35,15,'water-processing-plant.webp'],
-  ['processing_4','Водообрабатывающий завод 4',72,76,'water-processing-plant.webp'],
-  ['solar','Солнечная электростанция',18,25,'solar-power-plant.webp'],
-  ['helipad','Заброшенная вертолётная площадка',88,63,'abandoned-helipad.webp'],
-  ['central','Центральный резервуар',51,48,'central-reservoir.webp'],
-  ['development','Комплекс разработки',43,30,'development-complex.webp'],
-  ['military','Военный завод',66,57,'military-factory.webp']
- ];
- const markers = document.querySelector('#reservoir-markers');
- const locationGrid = document.querySelector('#reservoir-locations');
- locations.forEach(([key,name,x,y,image]) => {
-  const marker = document.createElement('button');
-  marker.type='button'; marker.className='reservoir-marker'; marker.dataset.location=key;
-  marker.style.left=x+'%';marker.style.top=y+'%';marker.setAttribute('aria-label',name);
-  const img=document.createElement('img');img.src='assets/'+image;img.alt='';img.draggable=false;
-  const label=document.createElement('span');label.textContent=({'treatment_1':'ВЦ 1','treatment_2':'ВЦ 2','processing_1':'ВЗ 1','processing_2':'ВЗ 2','processing_3':'ВЗ 3','processing_4':'ВЗ 4','solar':'СЭС','helipad':'ВП','central':'Резервуар','development':'Комплекс','military':'Завод'})[key];marker.title=name;
-  marker.append(img,label);markers.append(marker);
-  const card=document.createElement('button');card.type='button';card.className='location-card';card.dataset.location=key;
-  const text=document.createElement('span');const strong=document.createElement('strong');strong.textContent=name;
-  const empty=document.createElement('small');empty.textContent='Игроки не назначены';text.append(strong,empty);
-  card.append(img.cloneNode(),text);locationGrid.append(card);
- });
-
- [['north',51,35],['east',64,48],['south',51,61],['west',38,48]].forEach(([key,x,y])=>{const button=document.createElement('button');button.type='button';button.className='collector-zone';button.dataset.collector=key;button.style.left=x+'%';button.style.top=y+'%';button.setAttribute('aria-label','Водосборники');for(let i=0;i<3;i++){const image=document.createElement('img');image.src='assets/water-collector.webp';image.alt='';image.draggable=false;button.append(image);}markers.append(button);});
  const sheet=document.querySelector('#detail-sheet');const sheetBody=document.querySelector('#sheet-body');
  const sheetTitle=document.querySelector('#sheet-title');let sheetTrigger=null;let sheetKey=null;
  const drafts=new Map();
@@ -42,18 +13,12 @@
  function closeSheet(restore=true){rememberDraft();sheet.hidden=true;sheetKey=null;if(restore&&sheetTrigger?.getClientRects().length)sheetTrigger.focus({preventScroll:true});}
  function openForm(kind,trigger){window.HarvestMaps.openAnchor(kind,trigger);}
  function openPoint(trigger){window.HarvestMaps.openPoint(document.querySelector("#point-choice").value,trigger);}
- function openLocation(target){
-  const collector=target.closest('[data-collector]');if(collector)openSheet('Водосборники','<p>Группа водосборников рядом с центральным резервуаром.</p><label class="field-label">Комментарий<textarea rows="3"></textarea></label>','collector-'+collector.dataset.collector,collector);
-  const location=target.closest('[data-location]');
-  if(location){const info=locations.find(item=>item[0]===location.dataset.location);openSheet(info[1],`<h3>Назначенные игроки</h3><div class="quiet-empty"><p>На эту локацию пока никто не назначен.</p></div><button class="button secondary-button" disabled>Добавить игрока</button><label class="field-label">Комментарий к локации<textarea rows="3"></textarea></label>`,info[0],location);}
- }
- document.addEventListener('harvesthub:location',event=>openLocation(event.detail.button));
  document.addEventListener('click',event=>{
-  openLocation(event.target);
+
   const action=event.target.closest('[data-sheet]');if(action)openForm(action.dataset.sheet,action);
   const expand=event.target.closest('[data-expand]');if(expand){document.querySelector('.map-expanded')?.classList.remove('map-expanded');const canvas=document.getElementById(expand.dataset.expand);canvas.classList.add('map-expanded');canvas.querySelector('[data-collapse]').focus();}
   const collapse=event.target.closest('[data-collapse]');if(collapse){const canvas=collapse.closest('.map-expanded');canvas?.classList.remove('map-expanded');document.querySelector('[data-expand="'+canvas?.id+'"]')?.focus();}
-  const plus=event.target.closest('[data-add-player]');if(plus){const row=plus.closest('.player-line');const next=row.cloneNode(true);row.querySelector('button').hidden=true;next.querySelectorAll('input').forEach(field=>field.value='');row.after(next);next.querySelector('input').focus();}
+  const plus=event.target.closest('[data-add-player]');if(plus?.closest('.player-line')){const row=plus.closest('.player-line');const next=row.cloneNode(true);row.querySelector('button').hidden=true;next.querySelectorAll('input').forEach(field=>field.value='');row.after(next);next.querySelector('input').focus();}
  });
  document.querySelectorAll('[data-roster]').forEach(button=>button.addEventListener('click',()=>{
   document.querySelectorAll('[data-roster]').forEach(tab=>tab.setAttribute('aria-pressed',String(tab===button)));

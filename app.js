@@ -3,7 +3,7 @@
   const main = document.querySelector("#content");
   const sidebar = document.querySelector("#sidebar");
   const utilities = document.querySelector("#utilities");
-  const profiles = document.querySelector("#profiles");
+
   const backdrop = document.querySelector("#backdrop");
   const topbar = document.querySelector(".topbar");
   const menuButton = document.querySelector("#open-menu");
@@ -12,7 +12,7 @@
   const desktopMenu = matchMedia("(min-width: 56rem)");
   const desktopPanel = matchMedia("(min-width: 80rem)");
   const pages = [...document.querySelectorAll(".page")];
-  const pageTitles = new Map(pages.map(page => [page.id, page.querySelector("h1").textContent]));
+  const pageTitles = new Map(pages.map(page => [page.id, page.querySelector("h1")?.textContent || "HarvestHub"]));
   const tools = new Map([
     ["ipk", "Игра по-крупному"],
     ["turbo-vs", "Турбочерепашка & VS"],
@@ -51,7 +51,7 @@
     topbar.inert = false;
     sidebar.inert = !desktopMenu.matches;
     utilities.inert = !desktopPanel.matches;
-    profiles.inert = true;
+
     panelLauncher.inert = false;
     [menuButton, panelButton, panelLauncher, profileButton].forEach(button => button.setAttribute("aria-expanded", "false"));
     if (restoreFocus && trigger?.getClientRects().length) trigger.focus({preventScroll: true});
@@ -72,7 +72,7 @@
     panelLauncher.inert = true;
     if (drawer !== sidebar) sidebar.inert = true;
     if (drawer !== utilities) utilities.inert = true;
-    if (drawer !== profiles) profiles.inert = true;
+
     trigger.setAttribute("aria-expanded", "true");
     drawer.querySelector("[data-close-drawer]").focus({preventScroll: true});
   }
@@ -113,7 +113,16 @@
     syncTheme();
   }
 
-  function showPage(moveFocus = false) {
+  async function showPage(moveFocus = false) {
+    const route=location.hash.slice(1)||"home";
+    document.body.classList.toggle('resource-screen',route==='resource-map');
+    document.body.classList.toggle('reservoir-screen',route==='reservoir');
+    if(window.harvestHubFeatures?.has(route)){
+      closeDrawer(false);
+      const loaded=await window.harvestHubFeatures.show(route);
+      if(loaded && moveFocus){main.focus({preventScroll:true}); window.scrollTo({top:0,behavior:"instant"});}
+      return;
+    }
     const requested = location.hash.slice(1) || "home";
     const isTool = tools.has(requested);
     const id = isTool ? "tool" : pageTitles.has(requested) && requested !== "tool" ? requested : "home";
@@ -150,7 +159,7 @@
     });
   }
 
-  profileButton.addEventListener("click", () => showDrawer(profiles, profileButton));
+  profileButton.addEventListener("click", () => window.harvestHubAccountUI.open());
   menuButton.addEventListener("click", () => showDrawer(sidebar, menuButton));
   panelButton.addEventListener("click", () => showDrawer(utilities, panelButton));
   panelLauncher.addEventListener("click", () => showDrawer(utilities, panelLauncher));
@@ -219,9 +228,9 @@
     if (gesture.edge && Math.abs(dx)<8 && Math.abs(dy)<8) { gesture.target.closest('a,button')?.click(); return; }
     if (Math.abs(dx) < 64 || Math.abs(dx) < Math.abs(dy)*1.4 || performance.now()-gesture.started > 1000) return;
     if (gesture.drawer) {
-      if ((gesture.drawer===sidebar && dx<0) || (gesture.drawer===profiles && dx>0)) closeDrawer();
+      if ((gesture.drawer===sidebar && dx<0)) closeDrawer();
     } else if (dx>0) showDrawer(sidebar,menuButton);
-    else showDrawer(profiles,profileButton);
+    else window.harvestHubAccountUI.open();
   }, {passive:true});
   document.addEventListener("touchcancel", () => {swipe=null;}, {passive:true});
 

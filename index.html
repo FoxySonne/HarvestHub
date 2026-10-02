@@ -11,12 +11,48 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20261002-map-style-5">
-  <script src="app.js?v=20261002-map-style-5" defer></script>
-  <script src="map-data.js?v=20261002-map-style-5" defer></script>
-  <script src="maps.js?v=20261002-map-style-5" defer></script>
-  <script src="screens.js?v=20261002-map-style-5" defer></script>
-</head>
+  <link id="siteStylesheet" data-stylesheet-target="features.css?v=20261002-adaptive-functions-1" rel="stylesheet" href="features.css?v=20261002-adaptive-functions-1">
+  <link rel="stylesheet" href="styles.css?v=20261002-adaptive-functions-1">
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="js/ui/notifications.js?v=20261002-adaptive-functions-1"></script>
+<script defer src="js/core/supabase-client.js?v=20261002-adaptive-functions-1"></script>
+<script defer src="js/core/local-storage.js?v=20261002-adaptive-functions-1"></script>
+<script defer src="js/account/advanced-mode-access.js?v=20261002-adaptive-functions-1"></script>
+<script defer src="js/account/advanced-access-store.js?v=20261002-adaptive-functions-1"></script>
+<script defer src="js/core/utc-clock.js?v=20261002-adaptive-functions-1"></script>
+<script defer src="js/core/navigation.js?v=20261002-adaptive-functions-1"></script>
+<script defer src="js/core/app-loader.js?v=20261002-adaptive-functions-1"></script>
+<script defer src="js/account/account-storage.js?v=20261002-adaptive-functions-1"></script>
+<script defer src="js/account/game-profile-manager.js?v=20261002-adaptive-functions-1"></script>
+<script defer src="js/account/account-session.js?v=20261002-adaptive-functions-1"></script>
+<script defer src="js/account/account-ui.js?v=20261002-adaptive-functions-1"></script>
+<script defer src="js/account/account-modal.js?v=20261002-adaptive-functions-1"></script>
+<script defer src="js/account/account-personal-data.js?v=20261002-adaptive-functions-1"></script>
+<script defer src="js/alliance/invite-code-access.js?v=20261002-adaptive-functions-1"></script>
+<script defer src="js/alliance/vs-local-draft.js?v=20261002-adaptive-functions-1"></script>
+<script defer src="js/alliance/vs-player-search.js?v=20261002-adaptive-functions-1"></script>
+<script defer src="js/alliance/power-table-ui.js?v=20261002-adaptive-functions-1"></script>
+<script defer src="js/alliance/power-editor-details.js?v=20261002-adaptive-functions-1"></script>
+<script defer src="js/alliance/reservoir-secondary-drop.js?v=20261002-adaptive-functions-1"></script>
+<script type="module" src="js/alliance/vs-inline-row-editor.js?v=20261002-adaptive-functions-1"></script>
+<script type="module" src="js/alliance/vs-proposals.js?v=20261002-adaptive-functions-1"></script>
+<script type="module" src="js/alliance/twin-labels.js?v=20261002-adaptive-functions-1"></script>
+<script defer src="js/ui/table-scrollbars.js?v=20261002-adaptive-functions-1"></script>
+<script defer src="js/sync/sync-engine.js?v=20261002-adaptive-functions-1"></script>
+<script defer src="js/sync/calculator-sync.js?v=20261002-adaptive-functions-1"></script>
+<script defer src="js/calculators/page-reset.js?v=20261002-adaptive-functions-1"></script>
+<script defer src="js/ui/cards.js?v=20261002-adaptive-functions-1"></script>
+<script defer src="js/ui/number-input-selection.js?v=20261002-adaptive-functions-1"></script>
+<script type="module" src="js/ui/page-enhancements.js?v=20261002-adaptive-functions-1"></script>
+<script defer src="js/ui/tooltips.js?v=20261002-adaptive-functions-1"></script>
+<script defer src="js/sync/sync-status.js?v=20261002-adaptive-functions-1"></script>
+  <script src="feature-bridge.js?v=20261002-adaptive-functions-1" defer></script>
+  <script src="app.js?v=20261002-adaptive-functions-1" defer></script>
+  <script src="map-data.js?v=20261002-adaptive-functions-1" defer></script>
+  <script src="maps.js?v=20261002-adaptive-functions-1" defer></script>
+  <script src="screens.js?v=20261002-adaptive-functions-1" defer></script>
+  <link rel="stylesheet" href="adaptive-features.css?v=20261002-adaptive-functions-1">
+<script src="reservoir-viewport.js?v=20261002-adaptive-functions-1" defer></script></head>
 <body>
   <a class="skip-link" href="#content">Перейти к содержимому</a>
   <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -30,9 +66,9 @@
   <header class="topbar">
     <button id="open-menu" class="icon-button" type="button" aria-label="Открыть меню" aria-controls="sidebar" aria-expanded="false" hidden><svg><use href="#icon-menu"/></svg></button>
     <a class="topbar-title" href="#home">HarvestHub</a>
-    <div class="topbar-actions">
+    <div class="topbar-actions" id="topbarProfileGroup"><span class="topbar-profile-name" id="topbarProfileName"></span>
       <button id="open-panel" class="icon-button" type="button" aria-label="Открыть полезную панель" aria-controls="utilities" aria-expanded="false" hidden><svg><use href="#icon-panel"/></svg></button>
-      <button id="open-profiles" class="icon-button profile-button" type="button" aria-label="Открыть профили" aria-controls="profiles" aria-expanded="false"><svg><use href="#icon-user"/></svg></button>
+      <button id="open-profiles" class="icon-button profile-button topbar-account-trigger" type="button" aria-label="Открыть профили" aria-expanded="false"><svg><use href="#icon-user"/></svg></button>
     </div>
   </header>
 
@@ -64,92 +100,117 @@
         <div class="button-group"><a class="button" href="#knowledge">База знаний</a><a class="button" href="#calculators">Калькулятор</a></div>
       </section>
 
-      <div class="pages">
-        <section id="home" class="page" aria-labelledby="home-heading">
-          <h1 class="visually-hidden" id="home-heading">Главная</h1>
-          <div class="status-grid">
-            <article class="card status-card"><h2>Время по UTC</h2><p>Сейчас: <time data-clock="utc">—</time></p><p class="muted">Время сервера</p></article>
-            <article class="card status-card"><h2>Экспедиция славы</h2><p class="muted">Расписание появится позже.</p><span class="status-label">Скоро</span></article>
-            <article class="card status-card"><h2>Истребление ужаса</h2><p class="muted">Расписание появится позже.</p><span class="status-label">Скоро</span></article>
-          </div>
-          <section class="section" aria-labelledby="home-calculators-heading">
-            <h2 id="home-calculators-heading" class="section-title">Калькуляторы</h2>
-            <div class="tool-grid">
-              <a class="card tool-card" href="#ipk"><span><strong>ИПК</strong><span class="tool-description">Игра по-крупному</span></span><span class="chevron" aria-hidden="true">›</span></a>
-              <a class="card tool-card" href="#turbo-vs"><span><strong>Черепашка &amp; VS</strong><span class="tool-description">Очки и ускорения</span></span><span class="chevron" aria-hidden="true">›</span></a>
-              <a class="card tool-card" href="#season-resources"><span><strong>Сезонные ресурсы</strong><span class="tool-description">Постройки и рейды</span></span><span class="chevron" aria-hidden="true">›</span></a>
-              <a class="card tool-card" href="#territory"><span><strong>Нефть/ДНК/Медь</strong><span class="tool-description">Вышки и логово</span></span><span class="chevron" aria-hidden="true">›</span></a>
-              <a class="card tool-card" href="#troops"><span><strong>Обучение войск</strong><span class="tool-description">Войска и ресурсы</span></span><span class="chevron" aria-hidden="true">›</span></a>
-            </div>
-            <p class="section-caption">Расчёты пока недоступны. Разделы будут появляться постепенно.</p>
-          </section>
-        </section>
+      <div class="pages"><section id="functional" class="page" hidden><div id="page-content"></div></section>
+        
 
-        <section id="calculators" class="page" aria-labelledby="calculators-heading"><h1 id="calculators-heading" class="section-title">Калькулятор</h1><nav class="card section-links" aria-label="Калькуляторы"><a href="#ipk">Игра по-крупному <span aria-hidden="true">›</span></a><a href="#turbo-vs">Турбочерепашка &amp; VS <span aria-hidden="true">›</span></a><a href="#season-resources">Сезонные ресурсы <span aria-hidden="true">›</span></a><a href="#territory">Нефть/ДНК/Медь <span aria-hidden="true">›</span></a><a href="#troops">Обучение войск <span aria-hidden="true">›</span></a></nav><p class="section-caption">Расчёты пока недоступны.</p></section>
-        <section id="settings" class="page" aria-labelledby="settings-heading"><h1 id="settings-heading" class="section-title">Настройки</h1><div class="card settings-card"><h2>Тема сайта</h2><label class="theme-setting"><span>Тёмная</span><span class="theme-switch"><input type="checkbox" data-theme-toggle aria-label="Светлая тема"><span class="theme-track" aria-hidden="true"><span>☀</span><span>☾</span></span></span><span>Светлая</span></label></div></section>
+        
+        
         <section id="knowledge" class="page"><h1 class="section-title">База знаний</h1><section class="card"><label class="field-label">Поиск по базе знаний<input type="search" disabled placeholder="Тема или название"></label></section><div class="tool-grid"><article class="card"><h2>Начало игры</h2><p class="section-caption">Первые шаги и развитие поселения</p></article><article class="card"><h2>Герои и отряды</h2><p class="section-caption">Подготовка к боям и событиям</p></article><article class="card"><h2>Сезонные события</h2><p class="section-caption">Нефть, ДНК и медь</p></article></div><p class="section-caption">Разделы подготовлены. Статьи будут добавлены позже.</p></section>
-        <section id="alliance" class="page" aria-labelledby="alliance-heading">
-<div class="page-heading"><h1 id="alliance-heading" class="section-title">Союзный штаб</h1><span class="status-label">Макет</span></div>
-<section class="card alliance-banner"><div><h2>Ваш союз</h2><p>Состав, подготовка и карты событий</p></div><span class="status-label">Не подключён</span></section>
-<div class="tool-grid">
-<a class="card tool-card" href="#reservoir"><span><strong>Расстановка на резервуар</strong><span class="tool-description">Карта локаций · основа и резерв</span></span><span class="chevron">›</span></a>
-<a class="card tool-card" href="#resource-map"><span><strong>Карта нефть/ДНК/медь</strong><span class="tool-description">Территории · якоря · итоги события</span></span><span class="chevron">›</span></a>
-<a class="card tool-card" href="#roster"><span><strong>Состав союза</strong><span class="tool-description">Участники и игровые профили</span></span><span class="chevron">›</span></a>
-<a class="card tool-card" href="#alliance-vs"><span><strong>VS и активность</strong><span class="tool-description">Неделя · участие · статистика</span></span><span class="chevron">›</span></a>
-</div><p class="section-caption">Подготовлено оформление. Данные союза и совместное редактирование пока не подключены.</p></section>
+        
         <section id="events" class="page"><h1 class="section-title">Ивенты</h1><div class="tool-grid"><article class="card"><h2>Экспедиция славы</h2><p class="section-caption">Расписание ещё не внесено</p></article><article class="card"><h2>Истребление ужаса</h2><p class="section-caption">Расписание ещё не внесено</p></article><a class="card tool-card" href="#resource-map"><span><strong>Сражение за территорию</strong><span class="tool-description">Карта ресурсов в союзном штабе</span></span><span class="chevron">›</span></a></div></section>
         <section id="todo" class="page"><h1 class="section-title">Список дел</h1><section class="card"><div class="card-heading"><h2>Игровые задачи</h2><button class="button secondary-button" disabled>Добавить</button></div><div class="mini-metrics"><div><span>Сегодня</span><strong>—</strong></div><div><span>Выполнено</span><strong>—</strong></div></div><div class="quiet-empty"><p>Задач пока нет. Сохранение будет подключено позже.</p></div></section></section>
         <section id="timeline" class="page"><h1 class="section-title">События</h1><section class="card"><div class="card-heading"><h2>Расписание</h2><span class="status-label">UTC</span></div><label class="field-label">Дата<input type="date" disabled></label><div class="quiet-empty"><p>События для выбранной даты пока не добавлены.</p></div></section></section>
         <section id="tips" class="page"><h1 class="section-title">Советы</h1><article class="card"><h2>Бей крокодила!</h2><p class="section-caption">Совет дня</p></article><section class="card"><h2>Подборки</h2><div class="quiet-empty"><p>Здесь появятся советы по развитию и союзным событиям.</p></div></section></section>
-        <section id="profile" class="page empty-page" data-title="Профиль"><h1 class="section-title">Профиль</h1><div class="card empty-state"><span class="status-label">Скоро</span><h2>Профиль появится позже</h2><p>Вход и сохранение игровых данных пока недоступны.</p></div></section>
-        <section id="tool" class="page" aria-labelledby="tool-heading"><a class="back-link" href="#calculators"><svg class="icon"><use href="#icon-back"/></svg> К калькуляторам</a><h1 class="section-title" id="tool-heading">Калькулятор</h1><div class="card empty-state"><span class="status-label">Скоро</span><h2>Калькулятор готовится</h2><p>Расчёты будут доступны после добавления этого раздела.</p></div></section>
+        
+        
 
-<section id="reservoir" class="page" aria-labelledby="reservoir-heading">
-<a class="back-link" href="#alliance">← В союзный штаб</a>
-<div class="page-heading"><h1 id="reservoir-heading" class="section-title">Расстановка на резервуар</h1><span class="status-label">Макет</span></div>
-<div class="compact-toolbar"><label>Неделя<select disabled><option>Не выбрана</option></select></label><span class="section-caption">Расстановка ещё не создана</span></div>
-<div class="reservoir-layout">
-<section class="card map-card"><div class="card-heading"><h2>Карта локаций</h2><button type="button" class="button secondary-button" data-expand="reservoir-canvas">Развернуть</button></div><div id="reservoir-canvas" class="reservoir-canvas" data-no-swipe><div class="map-transform" id="reservoir-transform"><div class="reservoir-surface"><img src="assets/map-background.jpg" alt="Карта резервуара" draggable="false"><div id="reservoir-markers"></div></div></div><div class="map-controls"><button type="button" data-zoom="in" aria-label="Приблизить карту">+</button><button type="button" data-zoom="out" aria-label="Отдалить карту">−</button><button type="button" data-zoom="fit">Вся карта</button></div><button class="icon-button expand-close" type="button" data-collapse aria-label="Свернуть карту">×</button></div><p class="section-caption">Нажмите на локацию, чтобы открыть её плашку.</p></section>
-<section class="card roster-card"><h2>Участники</h2><div class="segmented"><button type="button" aria-pressed="true" data-roster="main">Основа</button><button type="button" aria-pressed="false" data-roster="reserve">Резерв</button></div><label class="field-label">Поиск по нику<input type="search" placeholder="Никнейм" disabled></label><div class="quiet-empty"><strong data-roster-title>Основной состав</strong><p>Участники появятся после подключения союза.</p></div><div class="mini-metrics"><div><span>Назначены</span><strong>—</strong></div><div><span>Без локации</span><strong>—</strong></div></div></section>
-</div>
-<section class="card"><div class="card-heading"><h2>Расстановка по локациям</h2><span class="status-label">Без назначений</span></div><div id="reservoir-locations" class="location-grid"></div></section>
-<section class="card"><label class="field-label">Общий комментарий<textarea rows="3" placeholder="Информация для участников" disabled></textarea></label><div class="button-group"><button class="button" disabled>Сохранить черновик</button><button class="button secondary-button" disabled>Опубликовать для союза</button></div><p class="section-caption">Сохранение и назначение игроков пока недоступны.</p></section>
-</section>
+
 <section id="resource-map" class="page" aria-labelledby="resource-map-heading">
 <a class="back-link" href="#alliance">← В союзный штаб</a>
 <div class="page-heading"><h1 id="resource-map-heading" class="section-title">Карта нефть/ДНК/медь</h1></div>
-<div class="compact-toolbar"><label>Событие<select disabled><option>Не выбрано</option></select></label></div>
+
 <div class="screen-tabs" role="tablist" aria-label="Разделы карты"><button role="tab" id="map-tab-map" aria-controls="map-panel-map" aria-selected="true" data-map-tab="map">Карта</button><button role="tab" id="map-tab-totals" aria-controls="map-panel-totals" aria-selected="false" data-map-tab="totals">Итоги</button><button role="tab" id="map-tab-anchors" aria-controls="map-panel-anchors" aria-selected="false" data-map-tab="anchors">Якоря</button><button role="tab" id="map-tab-history" aria-controls="map-panel-history" aria-selected="false" data-map-tab="history">История</button><button role="tab" id="map-tab-settings" aria-controls="map-panel-settings" aria-selected="false" data-map-tab="settings">Настройки</button></div>
 <div id="map-panel-map" class="map-tab-panel" role="tabpanel" aria-labelledby="map-tab-map">
 <section class="card map-card"><div class="card-heading"><h2>Территории</h2><button class="button secondary-button" type="button" data-expand="oil-canvas">Развернуть</button></div>
-<div id="oil-canvas" class="oil-canvas" data-no-swipe><div id="oil-transform"><svg id="resource-svg" viewBox="0 0 1280 1247" role="group" aria-label="Территории события"></svg></div><div class="map-controls"><button type="button" aria-label="Приблизить карту" data-zoom="in">+</button><button type="button" aria-label="Отдалить карту" data-zoom="out">−</button><button type="button" data-zoom="fit">Вся карта</button></div><button class="icon-button expand-close" type="button" data-collapse aria-label="Свернуть карту">×</button></div>
+<div class="compact-toolbar"><label>Владелец<select id="paint-owner"><option value="">Без владельца</option></select></label><button id="map-paint" class="button secondary-button" aria-pressed="false">Массовое назначение</button><button id="map-paint-done" class="button" hidden>Готово</button><button id="map-paint-cancel" class="button secondary-button" hidden>Отмена</button><button id="map-undo" class="button secondary-button" disabled>Отменить</button></div><div id="oil-canvas" class="oil-canvas" data-no-swipe><div id="oil-transform"><svg id="resource-svg" viewBox="0 0 1280 1247" role="group" aria-label="Территории события"></svg></div><div class="map-controls"><button type="button" aria-label="Приблизить карту" data-zoom="in">+</button><button type="button" aria-label="Отдалить карту" data-zoom="out">−</button><button type="button" data-zoom="fit">Вся карта</button></div><button class="icon-button expand-close" type="button" data-collapse aria-label="Свернуть карту">×</button></div>
 <div class="compact-toolbar"><label>Точка<select id="point-choice"><option value="">Выберите точку</option></select></label><button type="button" class="button secondary-button" id="open-point" disabled>Открыть</button></div>
 
 </section>
-<section class="card"><h2>Союзы и владельцы</h2><div class="form-grid"><label class="field-label">Союз<input id="alliance-name" maxlength="40" autocomplete="off"></label><label class="field-label">Цвет<input id="alliance-color" type="color" value="#35a7a0"></label></div><div class="button-group"><button id="add-map-alliance" class="button">Добавить союз</button></div><div id="map-alliance-list" class="alliance-list"></div><div class="compact-toolbar"><label>Владелец<select id="paint-owner"><option value="">Без владельца</option></select></label><button id="map-paint" class="button secondary-button" aria-pressed="false">Покраска</button><button id="map-undo" class="button secondary-button" disabled>Отменить</button></div><p id="map-status" class="section-caption" role="status"></p></section>
+
 </div>
 <div id="map-panel-totals" class="map-tab-panel" role="tabpanel" aria-labelledby="map-tab-totals" hidden><section class="card"><h2>Итоги события</h2><div class="mini-metrics"><div><span>Очки союза</span><strong>—</strong></div><div><span>Потрачено якорей</span><strong>—</strong></div><div><span>Логова</span><strong>—</strong></div><div><span>Верстаки</span><strong>—</strong></div></div><div class="quiet-empty"><p>Итоги появятся после ввода данных события.</p></div></section></div>
 <div id="map-panel-anchors" class="map-tab-panel" role="tabpanel" aria-labelledby="map-tab-anchors" hidden><section class="card"><div class="card-heading"><h2>Расход якорей</h2><button class="help-button" type="button" aria-label="Об учёте якорей" data-help="Новые траты увеличивают общую сумму. Добавление игрока расшифровывает уже учтённые траты и не меняет сумму союза.">?</button></div><div class="mini-metrics"><div><span>Всего</span><strong>—</strong></div><div><span>По игрокам</span><strong>—</strong></div><div><span>Без игроков</span><strong>—</strong></div></div><div class="button-group"><button class="button" data-sheet="expenses">Добавить траты союза</button><button class="button secondary-button" data-sheet="players">Добавить игрока</button></div><div class="quiet-empty"><p>Расходы пока не внесены.</p></div></section></div>
 <div id="map-panel-history" class="map-tab-panel" role="tabpanel" aria-labelledby="map-tab-history" hidden><section class="card"><h2>История изменений</h2><div class="quiet-empty"><p>Здесь появятся сохранённые изменения карты и якорей: дата, автор и действие.</p></div></section></div>
-<div id="map-panel-settings" class="map-tab-panel" role="tabpanel" aria-labelledby="map-tab-settings" hidden><section class="card"><h2>Настройки события</h2><div class="form-grid"><label class="field-label">Название<input disabled></label><label class="field-label">Начало<input type="date" disabled></label><label class="field-label">Конец<input type="date" disabled></label></div><details class="quiet-details"><summary>Редактирование R4/R5</summary><p>Доступ пока не подключён. В рабочей версии один редактор будет изменять событие, остальные — видеть последнее сохранённое состояние.</p></details></section></div>
+<div id="map-panel-settings" class="map-tab-panel" role="tabpanel" aria-labelledby="map-tab-settings" hidden><section class="card"><h2>Союзы и владельцы</h2><div class="form-grid"><label class="field-label">Союз<input id="alliance-name" maxlength="40" autocomplete="off"></label><label class="field-label">Цвет<input id="alliance-color" type="color" value="#35a7a0"></label></div><div class="button-group"><button id="add-map-alliance" class="button">Добавить союз</button></div><div id="map-alliance-list" class="alliance-list"></div><p id="map-status" class="section-caption" role="status"></p></section><section class="card"><h2>Настройки события</h2><div class="form-grid"><label class="field-label">Название<input disabled></label><label class="field-label">Начало<input type="date" disabled></label><label class="field-label">Конец<input type="date" disabled></label></div><details class="quiet-details"><summary>Редактирование R4/R5</summary><p>Доступ пока не подключён. В рабочей версии один редактор будет изменять событие, остальные — видеть последнее сохранённое состояние.</p></details></section></div>
 </section>
-<section id="roster" class="page"><a class="back-link" href="#alliance">← В союзный штаб</a><h1 class="section-title">Состав союза</h1><section class="card"><div class="card-heading"><h2>Участники</h2><span class="status-label">Макет</span></div><label class="field-label">Поиск<input type="search" disabled placeholder="Никнейм"></label><div class="quiet-empty"><p>Состав союза пока не подключён.</p></div></section></section>
-<section id="alliance-vs" class="page"><a class="back-link" href="#alliance">← В союзный штаб</a><h1 class="section-title">VS и активность</h1><section class="card"><h2>Текущая неделя</h2><div class="mini-metrics"><div><span>Очки</span><strong>—</strong></div><div><span>Участие</span><strong>—</strong></div></div><div class="quiet-empty"><p>Статистика союза пока не подключена.</p></div></section></section>
+
+
       </div>
       <footer class="main-footer"><span>HarvestHub</span><span>Dig. Grow. Survive.</span></footer>
       <noscript><p class="noscript-note">Меню и разделы доступны ниже на этой странице. Для переключения темы включите JavaScript.</p></noscript>
     </main>
 
     <aside id="utilities" class="utilities" aria-label="Полезная панель">
-      <div class="drawer-heading utilities-heading"><h2>Полезная панель</h2><button class="icon-button drawer-close" type="button" data-close-drawer aria-label="Закрыть полезную панель" hidden><svg><use href="#icon-close"/></svg></button></div>
-      <section class="box"><h2>День и время</h2><div class="clock-row"><span>Местное</span><strong data-weekday="local">—</strong><time data-clock="local">—</time></div><div class="clock-row"><span>UTC</span><strong data-weekday="utc">—</strong><time data-clock="utc">—</time></div></section>
-      <section class="box"><h2>Быстрые ссылки</h2><nav class="quick-links" aria-label="Быстрые ссылки"><a href="#calculators">Калькулятор</a><a href="#knowledge">База знаний</a><a href="#home">Главная</a></nav></section>
-      <section class="box"><h2>Перевод времени</h2><div class="converter-preview" aria-label="Перевод времени пока недоступен"><div><span>Дни</span><span class="field-preview">—</span></div><div><span>Часы</span><span class="field-preview">—</span></div><div><span>Минуты</span><span class="field-preview">—</span></div><div><span>Секунды</span><span class="field-preview">—</span></div></div><p class="section-caption">Будет доступен позже.</p></section>
-      <section class="box"><h2>Совет дня</h2><p>Бей крокодила!</p></section>
-    </aside>
+      <div class="drawer-heading utilities-heading"><h2>Полезная панель</h2><button class="icon-button drawer-close" type="button" data-close-drawer aria-label="Закрыть полезную панель" hidden><svg><use href="#icon-close"/></svg></button></div><div id="rightbar-container"><div class="box current-time-box">
+    <h4>День и время</h4>
+    <div class="current-time-list">
+        <div class="current-time-row">
+            <span>Местное</span>
+            <strong id="localClockWeekday">—</strong>
+            <time id="localClockTime">--:--</time>
+        </div>
+        <div class="current-time-row">
+            <span>UTC</span>
+            <strong id="utcClockWeekday">—</strong>
+            <time id="utcClockTime">--:--</time>
+        </div>
+    </div>
+</div>
+
+<div class="box quick-links-box">
+    <h4>Быстрые ссылки</h4>
+    <div id="quickLinks" class="quick-links-list">
+        <p class="quick-links-empty">Пока нет статистики переходов</p>
+    </div>
+</div>
+
+
+
+<div class="box time-converter-box">
+    <h4>Перевод времени</h4>
+
+    <div class="time-converter-fields">
+        <label class="time-converter-field">
+            <span>Дни</span>
+            <input id="timeConverterDays" type="number" min="0" inputmode="numeric" value="0">
+        </label>
+
+        <label class="time-converter-field">
+            <span>Часы</span>
+            <input id="timeConverterHours" type="number" min="0" inputmode="numeric" value="0">
+        </label>
+
+        <label class="time-converter-field">
+            <span>Минуты</span>
+            <input id="timeConverterMinutes" type="number" min="0" inputmode="numeric" value="0">
+        </label>
+
+        <label class="time-converter-field">
+            <span>Секунды</span>
+            <input id="timeConverterSeconds" type="number" min="0" inputmode="numeric" value="0">
+        </label>
+    </div>
+
+    <div class="time-converter-result" aria-live="polite">
+        <div>
+            <span>Итого в минутах:</span>
+            <strong id="timeConverterTotalMinutes">0</strong>
+        </div>
+        <div>
+            <span>Формат:</span>
+            <strong id="timeConverterFormatted">00д 00:00:00</strong>
+        </div>
+    </div>
+</div>
+
+<div class="box">
+    <h4>Совет дня</h4>
+    <p>Бей крокодила!</p>
+</div>
+</div></aside>
   </div>
-<aside id="profiles" class="profile-drawer is-drawer" aria-label="Профили" hidden><div class="drawer-heading"><h2>Профили</h2><button class="icon-button" data-close-drawer type="button" aria-label="Закрыть профили">×</button></div><section class="card"><h3>Игровой профиль</h3><p>Аккаунты пока не подключены.</p><a class="button secondary-button" href="#profile">Открыть профиль</a></section></aside>
-<section id="detail-sheet" class="detail-sheet" role="dialog" aria-modal="false" aria-labelledby="sheet-title" hidden><div class="sheet-handle" data-sheet-handle><span></span></div><header class="sheet-heading"><button class="icon-button" type="button" id="close-sheet" aria-label="Закрыть плашку">×</button><h2 id="sheet-title"></h2><span class="status-label">Макет</span></header><div id="sheet-body" class="sheet-body"></div><footer class="sheet-footer"><span>Данные и сохранение пока не подключены</span><button class="button" disabled>Сохранить</button></footer></section>
+
+<section id="detail-sheet" class="detail-sheet" role="dialog" aria-modal="false" aria-labelledby="sheet-title" hidden><div class="sheet-handle" data-sheet-handle><span></span></div><header class="sheet-heading"><button class="icon-button" type="button" id="close-sheet" aria-label="Закрыть плашку">×</button><h2 id="sheet-title"></h2></header><div id="sheet-body" class="sheet-body"></div><footer class="sheet-footer"><span>Данные и сохранение пока не подключены</span><button class="button" disabled>Сохранить</button></footer></section>
 <div id="help-note" class="help-note" role="status" hidden></div>
 </body>
 </html>

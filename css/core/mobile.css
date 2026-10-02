@@ -1,0 +1,190 @@
+/* ==========================================================
+MOBILE SHELL: до 1099px
+Только оболочка мобильной версии. Общие кнопки, формы, сетки и
+панели действий регулируются responsive-foundation.css.
+========================================================== */
+
+@media (max-width: 1099px) {
+  html,
+  body {
+    max-width: 100%;
+    overscroll-behavior-x: none;
+  }
+
+  .container {
+    width: 100%;
+    min-height: 100vh;
+  }
+
+  .topbar {
+    display: flex !important;
+    align-items: center !important;
+    width: calc(100% - 32px) !important;
+    min-height: 0 !important;
+    height: 44px !important;
+    margin: 0 auto 14px !important;
+    padding: 4px 14px !important;
+    gap: 12px !important;
+    border-radius: 0 0 var(--radius-large) var(--radius-large);
+    box-sizing: border-box !important;
+  }
+
+  .menu-button {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    padding: 0 !important;
+    font-size: 22px !important;
+    line-height: 1 !important;
+  }
+
+  .topbar-title {
+    min-width: 0;
+    font-size: 18px !important;
+    line-height: 1 !important;
+  }
+
+  .topbar-profile-group {
+    min-width: 0;
+    margin-left: auto;
+  }
+
+  .main {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .left {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 260px;
+    max-width: calc(100vw - 48px);
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  .left.active {
+    left: 0;
+  }
+
+  #sidebar-container {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 100%;
+  }
+
+  .right {
+    min-width: 0;
+  }
+
+  #rightbar-container .box {
+    min-width: 0;
+    height: 100%;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  p,
+  span,
+  strong,
+  small,
+  label,
+  th,
+  td,
+  button,
+  a {
+    word-break: normal;
+    overflow-wrap: break-word;
+    hyphens: none;
+  }
+
+  .mobile-overflow-warning {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    background: rgba(8, 20, 21, .58);
+  }
+
+  .mobile-overflow-warning[hidden] {
+    display: none !important;
+  }
+
+  .mobile-overflow-warning__dialog {
+    width: min(100%, 520px);
+    max-height: calc(100dvh - 36px);
+    overflow: auto;
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-large);
+    background: var(--card);
+    box-shadow: var(--shadow-heavy);
+  }
+
+  .mobile-overflow-warning__dialog h3 {
+    margin-bottom: 10px;
+  }
+
+  .mobile-overflow-warning__dialog p {
+    font-size: 14px;
+  }
+
+  .mobile-overflow-warning__dialog button {
+    margin-top: 12px;
+  }
+}
+
+@media (max-width: 420px) {
+  .topbar {
+    width: calc(100% - 24px) !important;
+    height: 40px !important;
+    margin-bottom: 12px !important;
+    padding: 3px 12px !important;
+  }
+
+  .menu-button {
+    width: 26px !important;
+    height: 26px !important;
+    min-width: 26px !important;
+    font-size: 21px !important;
+  }
+
+  .topbar-title {
+    font-size: 17px !important;
+  }
+
+  #rightbar-container {
+    gap: 12px;
+  }
+
+  #rightbar-container .box h4 {
+    font-size: 14px;
+  }
+
+  #rightbar-container .box p,
+  #rightbar-container .quick-link-item span,
+  #rightbar-container .quick-links-empty {
+    font-size: 13px;
+  }
+}
