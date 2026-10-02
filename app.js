@@ -189,11 +189,20 @@
   // Горизонтальные жесты панелей не вмешиваются в поля, карты и прокрутку таблиц.
   let swipe = null;
   document.addEventListener("touchstart", event => {
+    if (event.touches.length!==1 || desktopMenu.matches || !event.target.closest('[data-no-swipe]')) return;
+    const x=event.touches[0].clientX;
+    if ((x<24 || x>innerWidth-24) && event.cancelable) event.preventDefault();
+  }, {passive:false});
+  document.addEventListener("touchstart", event => {
     swipe = null;
     if (event.touches.length !== 1 || desktopMenu.matches || event.target.closest("input,textarea,select,[data-no-swipe],.detail-sheet,.screen-tabs") || (!openDrawer && event.target.closest("button"))) return;
     const touch = event.touches[0];
     swipe = {x:touch.clientX, y:touch.clientY, started:performance.now(), drawer:openDrawer};
-  }, {passive:true});
+    // Safari начинает навигацию от края уже на touchstart.
+    if ((touch.clientX < 24 || touch.clientX > innerWidth-24) && event.cancelable) {
+      event.preventDefault(); swipe.edge=true; swipe.target=event.target;
+    }
+  }, {passive:false});
   document.addEventListener("touchmove", event => {
     if (!swipe) return;
     if (event.touches.length !== 1) { swipe = null; return; }
@@ -207,13 +216,26 @@
     const gesture = swipe; swipe = null;
     const touch = event.changedTouches[0];
     const dx = touch.clientX - gesture.x, dy = touch.clientY - gesture.y;
+    if (gesture.edge && Math.abs(dx)<8 && Math.abs(dy)<8) { gesture.target.closest('a,button')?.click(); return; }
     if (Math.abs(dx) < 64 || Math.abs(dx) < Math.abs(dy)*1.4 || performance.now()-gesture.started > 1000) return;
     if (gesture.drawer) {
-      if ((gesture.drawer===sidebar && dx<0) || (gesture.drawer!==sidebar && dx>0)) closeDrawer();
+      if ((gesture.drawer===sidebar && dx<0) || (gesture.drawer===profiles && dx>0)) closeDrawer();
     } else if (dx>0) showDrawer(sidebar,menuButton);
     else showDrawer(profiles,profileButton);
   }, {passive:true});
   document.addEventListener("touchcancel", () => {swipe=null;}, {passive:true});
+
+  let utilitySwipe=null;
+  utilities.addEventListener('touchstart',event=>{
+    utilitySwipe=null;
+    if(openDrawer!==utilities||event.touches.length!==1||!event.target.closest('.utilities-heading'))return;
+    utilitySwipe={x:event.touches[0].clientX,y:event.touches[0].clientY};
+  },{passive:true});
+  utilities.addEventListener('touchend',event=>{
+    if(!utilitySwipe)return;const dx=event.changedTouches[0].clientX-utilitySwipe.x,dy=event.changedTouches[0].clientY-utilitySwipe.y;
+    if(dy>64&&dy>Math.abs(dx)*1.4)closeDrawer();utilitySwipe=null;
+  },{passive:true});
+  utilities.addEventListener('touchcancel',()=>utilitySwipe=null,{passive:true});
 
   document.documentElement.classList.add("js");
   syncTheme();

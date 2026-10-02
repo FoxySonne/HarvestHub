@@ -28,7 +28,7 @@
   card.append(img.cloneNode(),text);locationGrid.append(card);
  });
 
- [['north',51,35],['east',64,48],['south',51,61],['west',38,48]].forEach(([key,x,y])=>{const button=document.createElement('button');button.type='button';button.className='collector-zone';button.dataset.collector=key;button.style.left=x+'%';button.style.top=y+'%';button.setAttribute('aria-label','Водосборники');button.textContent='•••';markers.append(button);});
+ [['north',51,35],['east',64,48],['south',51,61],['west',38,48]].forEach(([key,x,y])=>{const button=document.createElement('button');button.type='button';button.className='collector-zone';button.dataset.collector=key;button.style.left=x+'%';button.style.top=y+'%';button.setAttribute('aria-label','Водосборники');for(let i=0;i<3;i++){const image=document.createElement('img');image.src='assets/water-collector.webp';image.alt='';image.draggable=false;button.append(image);}markers.append(button);});
  const sheet=document.querySelector('#detail-sheet');const sheetBody=document.querySelector('#sheet-body');
  const sheetTitle=document.querySelector('#sheet-title');let sheetTrigger=null;let sheetKey=null;
  const drafts=new Map();
@@ -40,20 +40,16 @@
   document.querySelector('#close-sheet').focus({preventScroll:true});fitSheet();
  }
  function closeSheet(restore=true){rememberDraft();sheet.hidden=true;sheetKey=null;if(restore&&sheetTrigger?.getClientRects().length)sheetTrigger.focus({preventScroll:true});}
- const scopeFields = `<div class="form-grid"><label class="field-label">День<input type="date"></label><label class="field-label">Союз<select disabled><option>Не добавлен</option></select></label><label class="field-label">Точка (необязательно)<select disabled><option>Без привязки к точке</option></select></label></div>`;
- function openForm(kind,trigger){
-  if(kind==='expenses')openSheet('Добавить траты союза',scopeFields+`<label class="field-label">Якоря<textarea rows="4" spellcheck="false" aria-describedby="expense-help"></textarea></label><p id="expense-help" class="section-caption">Одна трата на строку: количество или никнейм и количество в конце. Enter создаёт новую строку.</p><div class="mini-metrics"><div><span>Добавится всего</span><strong>—</strong></div><div><span>По игрокам</span><strong>—</strong></div><div><span>Без игроков</span><strong>—</strong></div></div>`,kind,trigger);
-  else openSheet('Добавить игрока',scopeFields+`<p class="section-caption">Расшифровка общего числа трат. Сумма якорей союза не меняется.</p><div id="player-lines"><div class="player-line"><button class="button secondary-button" type="button" data-add-player aria-label="Добавить строку игрока">+</button><label>Игрок<input autocomplete="off"></label><label>Якоря<input inputmode="numeric" type="text"></label></div></div>`,kind,trigger);
- }
- function openPoint(trigger){
-  const point=document.querySelector('#point-choice').value;
-  const title=(['XS-14','M-02'].includes(point)?'Логово ':'Верстак ')+point;
-  openSheet(title,`<div class="mini-metrics"><div><span>Владелец</span><strong>—</strong></div><div><span>Очки</span><strong>—</strong></div><div><span>Якоря</span><strong>—</strong></div></div><label class="field-label">Союз-владелец<select disabled><option>Данные не внесены</option></select></label><div class="button-group"><button class="button secondary-button" data-sheet="expenses">Добавить траты союза</button><button class="button secondary-button" data-sheet="players">Добавить игрока</button></div><p class="section-caption">Пока показано оформление точки. Её владельцы, очки и история не загружены.</p>`,point,trigger);
- }
- document.addEventListener('click',event=>{
-  const collector=event.target.closest('[data-collector]');if(collector)openSheet('Водосборники','<p>Группа водосборников рядом с центральным резервуаром.</p><p class="section-caption">Пока показано расположение на карте.</p>','collector-'+collector.dataset.collector,collector);
-  const location=event.target.closest('[data-location]');
+ function openForm(kind,trigger){window.HarvestMaps.openAnchor(kind,trigger);}
+ function openPoint(trigger){window.HarvestMaps.openPoint(document.querySelector("#point-choice").value,trigger);}
+ function openLocation(target){
+  const collector=target.closest('[data-collector]');if(collector)openSheet('Водосборники','<p>Группа водосборников рядом с центральным резервуаром.</p><label class="field-label">Комментарий<textarea rows="3"></textarea></label>','collector-'+collector.dataset.collector,collector);
+  const location=target.closest('[data-location]');
   if(location){const info=locations.find(item=>item[0]===location.dataset.location);openSheet(info[1],`<h3>Назначенные игроки</h3><div class="quiet-empty"><p>На эту локацию пока никто не назначен.</p></div><button class="button secondary-button" disabled>Добавить игрока</button><label class="field-label">Комментарий к локации<textarea rows="3"></textarea></label>`,info[0],location);}
+ }
+ document.addEventListener('harvesthub:location',event=>openLocation(event.detail.button));
+ document.addEventListener('click',event=>{
+  openLocation(event.target);
   const action=event.target.closest('[data-sheet]');if(action)openForm(action.dataset.sheet,action);
   const expand=event.target.closest('[data-expand]');if(expand){document.querySelector('.map-expanded')?.classList.remove('map-expanded');const canvas=document.getElementById(expand.dataset.expand);canvas.classList.add('map-expanded');canvas.querySelector('[data-collapse]').focus();}
   const collapse=event.target.closest('[data-collapse]');if(collapse){const canvas=collapse.closest('.map-expanded');canvas?.classList.remove('map-expanded');document.querySelector('[data-expand="'+canvas?.id+'"]')?.focus();}
@@ -69,10 +65,7 @@
  document.querySelector('#close-sheet').addEventListener('click',()=>closeSheet());
  document.querySelector('#point-choice').addEventListener('change',event=>{document.querySelector('#open-point').disabled=!event.target.value;});
  document.querySelector('#open-point').addEventListener('click',event=>openPoint(event.currentTarget));
- document.querySelector('#map-resource').addEventListener('change',event=>{
-  const isOil=event.target.value==='oil';document.querySelector('#oil-canvas').hidden=!isOil;document.querySelector('#missing-map').hidden=isOil;
-  document.querySelector('#point-choice').disabled=!isOil;document.querySelector('#point-choice').value='';document.querySelector('#open-point').disabled=true;closeSheet(false);
- });
+ document.querySelector('#map-resource').addEventListener('change',()=>{closeSheet(false);});
  function fitSheet(){const viewport=window.visualViewport;if(!viewport)return;sheet.style.setProperty('--keyboard-bottom',Math.max(0,innerHeight-viewport.height-viewport.offsetTop)+'px');sheet.style.setProperty('--sheet-available',Math.max(120,viewport.height-12)+'px');}
  window.visualViewport?.addEventListener('resize',fitSheet);window.visualViewport?.addEventListener('scroll',fitSheet);
  sheetBody.addEventListener('focusin',()=>{setTimeout(()=>document.activeElement?.scrollIntoView({block:'nearest'}),120);});
@@ -82,17 +75,7 @@
  sheet.addEventListener('touchmove',event=>{if(event.touches.length!==1)sheetGesture=null;},{passive:true});
  sheet.addEventListener('touchcancel',()=>sheetGesture=null,{passive:true});
  // Панель точки не модальная: карта остаётся доступна при открытой плашке.
- const canvas=document.querySelector('#oil-canvas'),transform=document.querySelector('#oil-transform');
- const pointers=new Map();let scale=1,offset={x:0,y:0},gesture=null;
- function renderMap(){const limitX=canvas.clientWidth*(scale-1)/2,limitY=canvas.clientHeight*(scale-1)/2;offset.x=Math.max(-limitX,Math.min(limitX,offset.x));offset.y=Math.max(-limitY,Math.min(limitY,offset.y));transform.style.transform=`translate(${offset.x}px,${offset.y}px) scale(${scale})`;}
- function zoom(next,center={x:canvas.clientWidth/2,y:canvas.clientHeight/2}){const previous=scale;scale=Math.max(1,Math.min(6,next));offset.x=(offset.x+canvas.clientWidth/2-center.x)*scale/previous+center.x-canvas.clientWidth/2;offset.y=(offset.y+canvas.clientHeight/2-center.y)*scale/previous+center.y-canvas.clientHeight/2;renderMap();}
- function startGesture(){const points=[...pointers.values()];gesture=points.length>=2?{distance:Math.hypot(points[1].x-points[0].x,points[1].y-points[0].y),scale,center:{x:(points[0].x+points[1].x)/2,y:(points[0].y+points[1].y)/2},offset:{...offset}}:points.length?{point:points[0],offset:{...offset}}:null;}
- canvas.addEventListener('pointerdown',event=>{if(event.target.closest('button'))return;pointers.set(event.pointerId,{x:event.clientX,y:event.clientY});canvas.setPointerCapture(event.pointerId);startGesture();});
- canvas.addEventListener('pointermove',event=>{if(!pointers.has(event.pointerId)||!gesture)return;pointers.set(event.pointerId,{x:event.clientX,y:event.clientY});const points=[...pointers.values()];if(points.length>=2&&gesture.distance){const rect=canvas.getBoundingClientRect();scale=gesture.scale;offset={...gesture.offset};zoom(gesture.scale*Math.hypot(points[1].x-points[0].x,points[1].y-points[0].y)/Math.max(1,gesture.distance),{x:gesture.center.x-rect.left,y:gesture.center.y-rect.top});offset.x+=(points[0].x+points[1].x)/2-gesture.center.x;offset.y+=(points[0].y+points[1].y)/2-gesture.center.y;renderMap();}else if(gesture.point){offset.x=gesture.offset.x+event.clientX-gesture.point.x;offset.y=gesture.offset.y+event.clientY-gesture.point.y;renderMap();}});
- for(const type of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(type,event=>{pointers.delete(event.pointerId);startGesture();});
- canvas.addEventListener('wheel',event=>{if(event.target.closest('button'))return;event.preventDefault();const rect=canvas.getBoundingClientRect();zoom(scale*Math.exp(-event.deltaY*.0015),{x:event.clientX-rect.left,y:event.clientY-rect.top});},{passive:false});
- document.querySelectorAll('[data-zoom]').forEach(button=>button.addEventListener('click',()=>{if(button.dataset.zoom==='fit'){scale=1;offset={x:0,y:0};renderMap();}else zoom(scale*(button.dataset.zoom==='in'?1.4:1/1.4));}));
- new ResizeObserver(renderMap).observe(canvas);
+ window.HarvestMaps.connect({openSheet,closeSheet,forgetDraft:key=>drafts.delete(key)});
  const note=document.querySelector('#help-note');
  document.querySelectorAll('[data-help]').forEach(button=>{const show=()=>{note.textContent=button.dataset.help;note.hidden=false;};button.addEventListener('click',show);button.addEventListener('mouseenter',()=>{if(matchMedia('(hover:hover)').matches)show();});button.addEventListener('mouseleave',()=>note.hidden=true);button.addEventListener('focus',show);button.addEventListener('blur',()=>note.hidden=true);});
  document.addEventListener('click',event=>{if(!event.target.closest('[data-help],#help-note'))note.hidden=true;});
