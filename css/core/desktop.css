@@ -1,4 +1,0 @@
-/* Поведение групп кнопок на широком экране. Оболочка — layout.css. */
-@media (min-width: 1100px) {
-  .button-group { flex-direction: row; }
-}
