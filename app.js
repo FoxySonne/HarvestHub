@@ -3,10 +3,12 @@
   const main = document.querySelector("#content");
   const sidebar = document.querySelector("#sidebar");
   const utilities = document.querySelector("#utilities");
+  const profiles = document.querySelector("#profiles");
   const backdrop = document.querySelector("#backdrop");
   const topbar = document.querySelector(".topbar");
   const menuButton = document.querySelector("#open-menu");
   const panelButton = document.querySelector("#open-panel");
+  const profileButton = document.querySelector("#open-profiles");
   const desktopMenu = matchMedia("(min-width: 56rem)");
   const desktopPanel = matchMedia("(min-width: 80rem)");
   const pages = [...document.querySelectorAll(".page")];
@@ -49,8 +51,9 @@
     topbar.inert = false;
     sidebar.inert = !desktopMenu.matches;
     utilities.inert = !desktopPanel.matches;
+    profiles.inert = true;
     panelLauncher.inert = false;
-    [menuButton, panelButton, panelLauncher].forEach(button => button.setAttribute("aria-expanded", "false"));
+    [menuButton, panelButton, panelLauncher, profileButton].forEach(button => button.setAttribute("aria-expanded", "false"));
     if (restoreFocus && trigger?.getClientRects().length) trigger.focus({preventScroll: true});
   }
 
@@ -69,6 +72,7 @@
     panelLauncher.inert = true;
     if (drawer !== sidebar) sidebar.inert = true;
     if (drawer !== utilities) utilities.inert = true;
+    if (drawer !== profiles) profiles.inert = true;
     trigger.setAttribute("aria-expanded", "true");
     drawer.querySelector("[data-close-drawer]").focus({preventScroll: true});
   }
@@ -117,12 +121,13 @@
     if (isTool) document.querySelector("#tool-heading").textContent = title;
     pages.forEach(page => page.hidden = page.id !== id);
     document.querySelectorAll(".main-nav a").forEach(link => {
-      const active = link.hash === "#" + (isTool ? "calculators" : id);
+      const active = link.hash === "#" + (isTool ? "calculators" : ["reservoir","resource-map","roster","alliance-vs"].includes(id) ? "alliance" : id);
       if (active) link.setAttribute("aria-current", "page");
       else link.removeAttribute("aria-current");
     });
     document.title = title + " — HarvestHub";
     closeDrawer(false);
+    window.dispatchEvent(new Event("harvesthub:pagechange"));
     if (moveFocus) {
       main.focus({preventScroll:true});
       window.scrollTo({top:0,behavior:"instant"});
@@ -145,6 +150,7 @@
     });
   }
 
+  profileButton.addEventListener("click", () => showDrawer(profiles, profileButton));
   menuButton.addEventListener("click", () => showDrawer(sidebar, menuButton));
   panelButton.addEventListener("click", () => showDrawer(utilities, panelButton));
   panelLauncher.addEventListener("click", () => showDrawer(utilities, panelLauncher));
@@ -178,6 +184,36 @@
   desktopMenu.addEventListener("change", applyLayout);
   desktopPanel.addEventListener("change", applyLayout);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) updateClocks(); });
+
+
+  // Горизонтальные жесты панелей не вмешиваются в поля, карты и прокрутку таблиц.
+  let swipe = null;
+  document.addEventListener("touchstart", event => {
+    swipe = null;
+    if (event.touches.length !== 1 || desktopMenu.matches || event.target.closest("input,textarea,select,[data-no-swipe],.detail-sheet,.screen-tabs") || (!openDrawer && event.target.closest("button,a"))) return;
+    const touch = event.touches[0];
+    swipe = {x:touch.clientX, y:touch.clientY, started:performance.now(), drawer:openDrawer};
+  }, {passive:true});
+  document.addEventListener("touchmove", event => {
+    if (!swipe) return;
+    if (event.touches.length !== 1) { swipe = null; return; }
+    const dx = event.touches[0].clientX - swipe.x;
+    const dy = event.touches[0].clientY - swipe.y;
+    if (Math.abs(dy) > 16 && Math.abs(dy) > Math.abs(dx)) { swipe = null; return; }
+    if (Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy)*1.4 && event.cancelable) event.preventDefault();
+  }, {passive:false});
+  document.addEventListener("touchend", event => {
+    if (!swipe) return;
+    const gesture = swipe; swipe = null;
+    const touch = event.changedTouches[0];
+    const dx = touch.clientX - gesture.x, dy = touch.clientY - gesture.y;
+    if (Math.abs(dx) < 64 || Math.abs(dx) < Math.abs(dy)*1.4 || performance.now()-gesture.started > 1000) return;
+    if (gesture.drawer) {
+      if ((gesture.drawer===sidebar && dx<0) || (gesture.drawer!==sidebar && dx>0)) closeDrawer();
+    } else if (dx>0) showDrawer(sidebar,menuButton);
+    else showDrawer(profiles,profileButton);
+  }, {passive:true});
+  document.addEventListener("touchcancel", () => {swipe=null;}, {passive:true});
 
   document.documentElement.classList.add("js");
   syncTheme();
