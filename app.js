@@ -190,7 +190,7 @@
   let swipe = null;
   document.addEventListener("touchstart", event => {
     swipe = null;
-    if (event.touches.length !== 1 || desktopMenu.matches || event.target.closest("input,textarea,select,[data-no-swipe],.detail-sheet,.screen-tabs") || (!openDrawer && event.target.closest("button,a"))) return;
+    if (event.touches.length !== 1 || desktopMenu.matches || event.target.closest("input,textarea,select,[data-no-swipe],.detail-sheet,.screen-tabs") || (!openDrawer && event.target.closest("button"))) return;
     const touch = event.touches[0];
     swipe = {x:touch.clientX, y:touch.clientY, started:performance.now(), drawer:openDrawer};
   }, {passive:true});
