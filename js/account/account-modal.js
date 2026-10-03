@@ -92,18 +92,18 @@
                   <button type="button" class="is-active" data-cloud-mode-button="signup" role="tab" aria-selected="true">Создать новый</button>
                   <button type="button" data-cloud-mode-button="login" role="tab" aria-selected="false">Войти</button>
                 </div>
-                <form id="cloudSignupForm" data-cloud-mode-panel="signup">
+                <form id="cloudSignupForm" name="signup" autocomplete="on" method="post" data-cloud-mode-panel="signup">
                   <label class="form-group"><span>Никнейм</span><input id="cloudProfileNickname" required autocomplete="nickname"></label>
                   <label class="form-group"><span>Номер штата</span><input id="cloudProfileState" inputmode="numeric" required></label>
-                  <label class="form-group"><span>Email</span><input id="cloudProfileEmail" type="email" required autocomplete="email"></label>
-                  <label class="form-group"><span>Пароль</span><span class="password-field"><input id="cloudProfilePassword" type="password" required minlength="8" autocomplete="new-password"><button type="button" data-password-toggle="cloudProfilePassword">Показать</button></span></label>
-                  <label class="form-group"><span>Повторите пароль</span><span class="password-field"><input id="cloudProfilePasswordConfirm" type="password" required minlength="8" autocomplete="new-password"><button type="button" data-password-toggle="cloudProfilePasswordConfirm">Показать</button></span></label>
+                  <label class="form-group"><span>Email</span><input id="cloudProfileEmail" name="username" data-no-persist="true" type="email" required autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false"></label>
+                  <label class="form-group"><span>Пароль</span><span class="password-field"><input id="cloudProfilePassword" name="password" data-no-persist="true" type="password" required minlength="8" autocomplete="new-password"><button type="button" data-password-toggle="cloudProfilePassword">Показать</button></span></label>
+                  <label class="form-group"><span>Повторите пароль</span><span class="password-field"><input id="cloudProfilePasswordConfirm" name="password-confirmation" data-no-persist="true" type="password" required minlength="8" autocomplete="new-password"><button type="button" data-password-toggle="cloudProfilePasswordConfirm">Показать</button></span></label>
                   <p class="cloud-login-note">После регистрации на почту придёт письмо для подтверждения email.</p>
                   <button type="submit" id="createCloudProfile">Создать профиль</button>
                 </form>
-                <form id="cloudLoginForm" data-cloud-mode-panel="login">
-                  <label class="form-group"><span>Email профиля</span><input id="cloudLoginEmail" type="email" required autocomplete="email"></label>
-                  <label class="form-group"><span>Пароль</span><span class="password-field"><input id="cloudLoginPassword" type="password" required autocomplete="current-password"><button type="button" data-password-toggle="cloudLoginPassword">Показать</button></span></label>
+                <form id="cloudLoginForm" name="login" autocomplete="on" method="post" data-cloud-mode-panel="login">
+                  <label class="form-group"><span>Email профиля</span><input id="cloudLoginEmail" name="username" data-no-persist="true" type="email" required autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false"></label>
+                  <label class="form-group"><span>Пароль</span><span class="password-field"><input id="cloudLoginPassword" name="password" data-no-persist="true" type="password" required autocomplete="current-password"><button type="button" data-password-toggle="cloudLoginPassword">Показать</button></span></label>
                   <button type="submit" id="loginCloudProfile">Войти</button>
                   <button type="button" id="forgotCloudPassword" class="account-link-button">Забыли пароль?</button>
                 </form>
@@ -112,8 +112,8 @@
           </div>
           <form id="passwordRecoveryForm" class="password-recovery-form">
             <p class="cloud-login-note">Ссылка подтверждена. Установите новый пароль.</p>
-            <label class="form-group"><span>Новый пароль</span><span class="password-field"><input id="recoveryPassword" type="password" required minlength="8" autocomplete="new-password"><button type="button" data-password-toggle="recoveryPassword">Показать</button></span></label>
-            <label class="form-group"><span>Повторите новый пароль</span><span class="password-field"><input id="recoveryPasswordConfirm" type="password" required minlength="8" autocomplete="new-password"><button type="button" data-password-toggle="recoveryPasswordConfirm">Показать</button></span></label>
+            <label class="form-group"><span>Новый пароль</span><span class="password-field"><input id="recoveryPassword" name="new-password" data-no-persist="true" type="password" required minlength="8" autocomplete="new-password"><button type="button" data-password-toggle="recoveryPassword">Показать</button></span></label>
+            <label class="form-group"><span>Повторите новый пароль</span><span class="password-field"><input id="recoveryPasswordConfirm" name="password-confirmation" data-no-persist="true" type="password" required minlength="8" autocomplete="new-password"><button type="button" data-password-toggle="recoveryPasswordConfirm">Показать</button></span></label>
             <button type="submit" id="saveRecoveredPassword">Сохранить новый пароль</button>
           </form>
           <p id="accountMessage" class="account-message"></p>

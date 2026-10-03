@@ -1,6 +1,6 @@
 (() => {
-  const SITE_ASSET_VERSION = "20261003-layout-corrections-1";
-  const DEFAULT_STYLESHEET = "features.css?v=20261003-layout-corrections-1";
+  const SITE_ASSET_VERSION = "20261003-card-auth-privacy-1";
+  const DEFAULT_STYLESHEET = "features.css?v=20261003-card-auth-privacy-1";
   const QUICK_LINKS_STORAGE_KEY = "harvesthub_page_visits";
   const MAX_QUICK_LINKS = 5;
   const pagesDatabase = [
