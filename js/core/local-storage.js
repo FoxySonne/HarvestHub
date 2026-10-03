@@ -273,12 +273,35 @@
     return `${PAGE_FORM_STATE_PREFIX}${scope}:${pageName}`;
   }
 
+  function isCredentialField(field) {
+    const autocomplete = String(field.autocomplete || '').toLowerCase().split(/\s+/);
+    return String(field.type || '').toLowerCase() === 'password'
+      || autocomplete.some(value => ['current-password', 'new-password', 'one-time-code'].includes(value))
+      || /password|passwd/i.test(String(field.id || '') + ':' + String(field.name || ''));
+  }
+
+  function removeLegacyCredentialValues() {
+    // Remove credential properties only; preserve calculator and profile data.
+    listStorageKeys().filter(key => key.startsWith(PAGE_FORM_STATE_PREFIX)).forEach(key => {
+      const state = readJsonStorage(key, null);
+      if (!state || typeof state !== 'object' || Array.isArray(state)) return;
+      let changed = false;
+      Object.keys(state).forEach(fieldKey => {
+        if (/password|passwd/i.test(fieldKey)) {
+          delete state[fieldKey];
+          changed = true;
+        }
+      });
+      if (changed) writeJsonStorage(key, state);
+    });
+  }
+
   function getPersistableFields(container) {
     if (!container) return [];
 
     return Array.from(container.querySelectorAll("input, select, textarea")).filter(field => {
       const type = (field.type || "").toLowerCase();
-      if (field.dataset.noPersist === "true") return false;
+      if (isCredentialField(field) || field.dataset.noPersist === "true") return false;
       if (field.closest("[data-no-form-persistence='true']")) return false;
       return !["button", "submit", "reset", "hidden", "file"].includes(type);
     });
@@ -368,7 +391,7 @@
     if (!(target instanceof HTMLElement)) return false;
     if (!target.closest("#page-content")) return false;
     if (!target.matches("input, select, textarea")) return false;
-    if (target.dataset.noPersist === "true") return false;
+    if (isCredentialField(target) || target.dataset.noPersist === "true") return false;
     if (target.closest("[data-no-form-persistence='true']")) return false;
     return !["button", "submit", "reset", "hidden", "file"].includes(String(target.type || "").toLowerCase());
   }
@@ -377,6 +400,8 @@
     if (!isPersistablePageField(event.target) || isRestoringPageFormState) return;
     savePageFormState();
   }
+
+  removeLegacyCredentialValues();
 
   document.addEventListener("input", saveDynamicField, true);
   document.addEventListener("change", saveDynamicField, true);

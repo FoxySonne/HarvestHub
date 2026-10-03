@@ -22,7 +22,7 @@
 <div class="card account-security-card" id="accountSecurityCard" hidden>
     <h3>Безопасность аккаунта</h3>
 
-    <form id="changePasswordForm" class="settings-account-form">
+    <form id="changePasswordForm" name="change-password" method="post" data-no-form-persistence="true" class="settings-account-form">
         <h4>Установить или изменить пароль</h4>
         <p class="cloud-login-note">
             Пароль должен содержать не менее 8 символов и отличаться от текущего. Для надёжности используйте сочетание строчных и заглавных букв, цифр и специальных символов.
@@ -30,14 +30,14 @@
         <label class="form-group">
             <span>Новый пароль</span>
             <span class="password-field">
-                <input id="settingsNewPassword" type="password" minlength="8" required autocomplete="new-password">
+                <input id="settingsNewPassword" name="settingsNewPassword" data-no-persist="true" type="password" minlength="8" required autocomplete="new-password">
                 <button type="button" data-settings-password-toggle="settingsNewPassword">Показать</button>
             </span>
         </label>
         <label class="form-group">
             <span>Повторите новый пароль</span>
             <span class="password-field">
-                <input id="settingsNewPasswordConfirm" type="password" minlength="8" required autocomplete="new-password">
+                <input id="settingsNewPasswordConfirm" name="settingsNewPasswordConfirm" data-no-persist="true" type="password" minlength="8" required autocomplete="new-password">
                 <button type="button" data-settings-password-toggle="settingsNewPasswordConfirm">Показать</button>
             </span>
         </label>
@@ -58,11 +58,11 @@
         <button type="button" class="account-delete-close" data-delete-close aria-label="Закрыть">×</button>
         <h3 id="deleteAccountTitle">Удалить аккаунт</h3>
         <p>Для подтверждения удаления введите текущий пароль.</p>
-        <form id="deleteAccountForm" class="settings-account-form">
+        <form id="deleteAccountForm" name="confirm-account-deletion" method="post" data-no-form-persistence="true" class="settings-account-form">
             <label class="form-group">
                 <span>Текущий пароль</span>
                 <span class="password-field">
-                    <input id="deleteAccountPassword" type="password" required autocomplete="current-password">
+                    <input id="deleteAccountPassword" name="deleteAccountPassword" data-no-persist="true" type="password" required autocomplete="current-password">
                     <button type="button" data-settings-password-toggle="deleteAccountPassword">Показать</button>
                 </span>
             </label>

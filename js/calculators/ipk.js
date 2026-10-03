@@ -134,18 +134,23 @@ function createCard(category) {
       <div class="ipk-stats">
         <div><span>Очков нужно:</span><strong data-ipk-target>${formatNumber(category.target)}</strong></div>
         <div><span>Не хватает:</span><strong data-ipk-missing>${formatNumber(category.target)}</strong></div>
-        <div><span>Получу:</span><input class="ipk-result-input" type="number" min="0" value="${manualResult ?? 0}" inputmode="numeric" data-ipk-result data-no-persist="true"></div>
+        <div><span>Получу:</span><input class="ipk-result-input" type="number" min="0" value="0" inputmode="numeric" data-ipk-result data-no-persist="true"></div>
       </div>
       <div class="ipk-rows">
         ${rows.map(row => `
           <div class="ipk-row" data-key="${row.key}" data-action-id="${row.id}" data-option="${row.option ?? ""}" data-points="${row.points}">
             <label>${row.label}</label>
-            <input type="number" min="0" value="${row.value}" inputmode="numeric">
+            <input type="number" min="0" value="" inputmode="numeric">
             <div class="ipk-need">${row.points > 0 ? formatNumber(Math.ceil(category.target / row.points)) : "0"}</div>
           </div>`).join("")}
       </div>
     </div>`;
 
+  // Stored calculator values are data, never HTML attribute markup.
+  card.querySelector("[data-ipk-result]").value = String(manualResult ?? 0);
+  card.querySelectorAll(".ipk-row input").forEach((input, index) => {
+    input.value = String(rows[index].value);
+  });
   card.addEventListener("input", event => {
     if (event.target.matches("[data-ipk-result]")) {
       card.dataset.resultManual = "true";
