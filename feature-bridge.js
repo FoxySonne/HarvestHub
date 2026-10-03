@@ -70,8 +70,9 @@
     // Keep the new common event map reachable from the functional alliance hub.
     const hub=document.querySelector('#page-content .alliance-dashboard-grid');
     if(hub&&!hub.querySelector('[href="#resource-map"]')){
-      const link=document.createElement('a');link.href='#resource-map';link.className='card tool-card';
-      link.textContent='Карта нефть/ДНК/медь';hub.append(link);
+      const card=document.createElement('section');card.className='card alliance-dashboard-card';
+      card.innerHTML='<div class="card-header"><div><h3>Карта нефть/ДНК/медь</h3><p>Точки, владельцы и массовое назначение на карте.</p></div></div><a class="button" href="#resource-map">Открыть</a>';
+      hub.append(card);
     }
   });
 })();

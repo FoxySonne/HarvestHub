@@ -14,7 +14,7 @@
   state.alliances=state.alliances.filter(a=>a&&typeof a.id==='string'&&typeof a.name==='string'&&/^#[0-9a-f]{6}$/i.test(a.color));
   state.expenses=Array.isArray(state.expenses)?state.expenses:[];
   state.settings=state.settings&&typeof state.settings==='object'?state.settings:{};
-  const shapes=new Map(), territories=new Map();
+  const shapes=new Map();
   function element(tag,attributes={}){const node=document.createElementNS(ns,tag);for(const [key,value] of Object.entries(attributes))node.setAttribute(key,value);return node;}
   function status(message){document.querySelector('#map-status').textContent=message;}
   function persist(){try{
@@ -24,19 +24,8 @@
   function record(message){undo.push(JSON.stringify(state));if(undo.length>50)undo.shift();state.history.push({time:new Date().toISOString(),message});if(state.history.length>200)state.history.shift();document.querySelector('#map-undo').disabled=false;}
   function alliance(id){return state.alliances.find(item=>item.id===id);}
   function pointName(node){return (node.kind==='den'?'Логово ':node.kind==='bench'?'Верстак ':'База ')+node.label;}
-  // Ячейка ближайшей точки: самостоятельная векторная область, не изображение.
-  function territory(node){
-    let polygon=[[0,0],[data.width,0],[data.width,data.height],[0,data.height]];
-    for(const other of data.nodes){if(other===node)continue;const nx=other.x-node.x,ny=other.y-node.y;
-      const limit=(other.x**2+other.y**2-node.x**2-node.y**2)/2, next=[];
-      for(let i=0;i<polygon.length;i++){const a=polygon[i],b=polygon[(i+1)%polygon.length];const fa=a[0]*nx+a[1]*ny-limit,fb=b[0]*nx+b[1]*ny-limit;
-        if(fa<=.001)next.push(a);if((fa<0)!==(fb<0)){const t=fa/(fa-fb);next.push([a[0]+t*(b[0]-a[0]),a[1]+t*(b[1]-a[1])]);}}
-      polygon=next;if(!polygon.length)break;
-    }return polygon.map(pair=>pair.join(',')).join(' ');
-  }
-  const regions=element('g',{'class':'map-regions'}), lines=element('g',{'class':'map-lines'}), points=element('g',{'class':'map-points'});
-  svg.append(regions,lines,points);
-  for(const node of data.nodes){const polygon=element('polygon',{points:territory(node),'data-point':node.id,'class':'map-region'});regions.append(polygon);territories.set(node.id,polygon);}
+  const lines=element('g',{'class':'map-lines'}), points=element('g',{'class':'map-points'});
+  svg.append(lines,points);
   // Ровно один прямой отрезок на связь. Контуры объектов закрывают концы линии.
   for(const [from,to] of data.edges){const a=byId.get(from),b=byId.get(to);lines.append(element('line',{x1:a.x,y1:a.y,x2:b.x,y2:b.y,'data-from':from,'data-to':to}));}
   const choice=document.querySelector('#point-choice');
@@ -61,7 +50,12 @@
       const g=shapes.get(node.id);g.style.setProperty('--owner-color',color||'var(--card)');g.classList.toggle('owned',Boolean(owner));g.classList.toggle('selected',node.id===selected);
       g.setAttribute('aria-label',pointName(node)+(owner?' — '+owner.name:''));
       const score=g.querySelector('.point-score');if(score){score.textContent=saved.score??'';g.classList.toggle('has-score',saved.score!==undefined&&saved.score!=='');}
-      const region=territories.get(node.id);region.style.fill=color||'transparent';region.classList.toggle('owned',Boolean(owner));
+    }
+    for(const line of lines.children){
+      const owner=state.points[line.dataset.from]?.owner;
+      const color=owner&&owner===state.points[line.dataset.to]?.owner?alliance(owner)?.color:null;
+      line.style.stroke=color||'';line.style.strokeOpacity=color?'1':'';
+      line.classList.toggle('owned',Boolean(color));
     }
     const paint=document.querySelector('#paint-owner'),previous=paint.value;paint.replaceChildren(new Option('Без владельца',''));
     const list=document.querySelector('#map-alliance-list');list.replaceChildren();
