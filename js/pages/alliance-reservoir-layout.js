@@ -1,4 +1,4 @@
-import { loadAlliancePageContext, fillAllianceCompactHeader, getActiveAllianceId, canEditAlliance } from "../alliance/page-context.js?v=20260725-guest-access-1";
+import { loadAlliancePageContext, fillAllianceCompactHeader, getActiveAllianceId, canEditAlliance } from "../alliance/page-context.js?v=20261115-alliance-delete";
 import { fetchReservoirWeeks, fetchReservoirEntries } from "../alliance/reservoir-api.js?v=20260721-1";
 import { fetchReservoirLayout, saveReservoirLayout, resetReservoirLayout } from "../alliance/reservoir-layout-api.js?v=20260722-1";
 import { fetchAllianceSquadPower } from "../alliance/power-api.js?v=20260718-50";

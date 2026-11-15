@@ -1,0 +1,41 @@
+<section id="allianceStateMap" class="page-section state-map-page">
+  <a class="alliance-back-button secondary-button" href="#alliance" data-page-path="alliance/members.html">← В штаб</a>
+  <h1>Карта штата</h1>
+  <p id="stateMapStatus" role="status">Загружаем карты…</p>
+  <button id="stateMapRetry" class="secondary-button" type="button" hidden>Повторить загрузку</button>
+  <div id="stateMapContent" hidden>
+    <section class="card state-map-card">
+      <div class="state-map-toolbar">
+        <label class="field-label">Карта <select id="stateMapSelect"></select></label>
+        <div class="button-group" aria-label="Масштаб карты">
+          <button type="button" class="secondary-button" data-state-zoom="out" aria-label="Отдалить карту">−</button>
+          <button type="button" class="secondary-button" data-state-zoom="in" aria-label="Приблизить карту">+</button>
+          <button type="button" class="secondary-button" data-state-zoom="fit">Вся карта</button>
+        </div>
+      </div>
+      <div id="stateMapViewport" class="state-map-viewport" data-no-swipe tabindex="0" aria-label="Карта. Стрелки перемещают приближённую карту">
+        <svg id="stateMapSvg" role="group" aria-label="Территории штата"></svg>
+      </div>
+      <p id="stateMapHint">Наведи курсор, выбери территорию клавишей Tab или коснись её, чтобы увидеть сведения.</p>
+      <section id="stateMapInfo" class="state-map-info" aria-label="Сведения о территории" hidden></section>
+      <form id="stateMapOwnerForm" hidden>
+        <label class="field-label">Владелец выбранной территории <select id="stateMapOwner"></select></label>
+        <button type="submit">Сохранить назначение</button>
+      </form>
+    </section>
+    <section class="card state-map-card">
+      <h2>Союзы на карте</h2>
+      <ul id="stateMapSides" class="state-map-sides"></ul>
+      <form id="stateMapSideForm" class="state-map-toolbar" hidden>
+        <label class="field-label">Название союза <input id="stateMapSideName" maxlength="40" required></label>
+        <label class="field-label">Цвет <input id="stateMapSideColor" type="color" value="#35a7a0"></label>
+        <button type="submit">Добавить союз</button>
+      </form>
+      <form id="stateMapColorForm" class="state-map-toolbar" hidden>
+        <label class="field-label">Союз <select id="stateMapColorSide"></select></label>
+        <label class="field-label">Новый цвет <input id="stateMapNewColor" type="color"></label>
+        <button type="submit">Сохранить цвет</button>
+      </form>
+    </section>
+  </div>
+</section>

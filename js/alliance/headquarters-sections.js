@@ -7,6 +7,7 @@
     "alliance/reservoir-activity.html"
   ]);
   window.harvestHubHeadquarters = Object.freeze({
-    isSuspended: path => suspended.has(path)
+    isSuspended: path => suspended.has(path),
+    showPlayerProfileShortcut: false
   });
 })();

@@ -1,0 +1,22 @@
+.state-map-toolbar { display: flex; flex-wrap: wrap; gap: .75rem; align-items: end; }
+.state-map-card { margin-block: .75rem; min-width: 0; }
+.state-map-viewport {
+  height: clamp(280px, 54svh, 720px); position: relative; overflow: hidden;
+  background: var(--bg); border: 1px solid var(--border); border-radius: .75rem;
+  touch-action: none; cursor: grab; user-select: none; margin-block: .75rem;
+}
+.state-map-viewport:active { cursor: grabbing; }
+.state-map-viewport svg { width: 100%; height: 100%; display: block; transform-origin: center; }
+.state-map-viewport path {
+  fill: var(--territory-color, #7890a8); stroke: #172333; stroke-width: 1.2;
+  vector-effect: non-scaling-stroke; cursor: pointer;
+}
+.state-map-viewport path:hover, .state-map-viewport path:focus-visible, .state-map-viewport path.is-selected {
+  stroke: #fff; stroke-width: 3; paint-order: fill stroke;
+}
+.state-map-info { padding: .75rem; border: 1px solid var(--border); border-radius: .5rem; overflow-wrap: anywhere; }
+.state-map-info dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: .25rem .75rem; margin: 0; }
+.state-map-info dd { margin: 0; }
+.state-map-sides { display: flex; flex-wrap: wrap; gap: .5rem 1rem; padding: 0; list-style: none; overflow-wrap: anywhere; }
+.state-map-sides span { display: inline-block; width: .9rem; height: .9rem; margin-inline-end: .35rem; border-radius: 50%; }
+.state-map-page [hidden] { display: none !important; }

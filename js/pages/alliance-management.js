@@ -347,10 +347,11 @@ function bindDeleteAlliance() {
   const cancel = byId("allianceCancelDelete");
   const errorBox = byId("allianceDeleteError");
   if (!dialog || state.context?.membership?.role !== "owner") return;
-  const alliance = state.context.alliance;
-  let busy = false;
+  let alliance, busy = false;
 
   register(byId("allianceOpenDelete"), "click", () => {
+    if (state.context?.membership?.role !== "owner") return;
+    alliance = state.context.alliance;
     byId("allianceDeleteName").textContent = alliance.name;
     input.value = "";
     errorBox.textContent = "";
@@ -363,7 +364,7 @@ function bindDeleteAlliance() {
   register(dialog, "cancel", event => { if (busy) event.preventDefault(); });
   register(byId("allianceDeleteForm"), "submit", async event => {
     event.preventDefault();
-    if (busy || input.value !== alliance.name || getActiveAllianceId() !== alliance.id) return;
+    if (busy || !alliance || input.value !== alliance.name || getActiveAllianceId() !== alliance.id) return;
     busy = confirm.disabled = cancel.disabled = input.disabled = true;
     errorBox.textContent = "";
     try {

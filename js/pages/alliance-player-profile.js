@@ -1,4 +1,4 @@
-import { loadAlliancePageContext, getActiveAllianceId } from "../alliance/page-context.js?v=20260718-1";
+import { loadAlliancePageContext, getActiveAllianceId } from "../alliance/page-context.js?v=20261115-alliance-delete";
 
 const byId = id => document.getElementById(id);
 const pad = value => String(value).padStart(2, "0");

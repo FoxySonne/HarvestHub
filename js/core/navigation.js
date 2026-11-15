@@ -38,6 +38,7 @@
     "vs-statistics": "../pages/alliance-vs-statistics.js?v=20260811-fullscreen-viewport-1",
     "reservoir-activity": "../pages/alliance-reservoir-activity.js",
     "reservoir-layout": "../pages/alliance-reservoir-layout.js",
+    "state-map": "../pages/alliance-state-map.js",
     profile: "../pages/profile.js",
     "advanced-access": "../pages/advanced-access.js",
     settings: "../pages/settings.js",

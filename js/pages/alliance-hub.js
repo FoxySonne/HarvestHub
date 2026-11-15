@@ -40,16 +40,17 @@ function showDashboard() {
   byId("allianceDashboard").hidden = false;
 }
 
-function setDashboardActions({ canEdit = false, canManageRoles = false, hasProfile = false } = {}) {
+function setDashboardActions({ canEdit = false, canManageRoles = false, hasProfile = false, signedMember = false } = {}) {
   document.querySelectorAll(".alliance-dashboard-card").forEach(card => {
     const path = card.querySelector("[data-page-path]")?.dataset.pagePath;
     card.hidden = Boolean(window.harvestHubHeadquarters?.isSuspended(path)) ||
-      (card.hasAttribute("data-alliance-edit-only") && !canEdit);
+      (card.hasAttribute("data-alliance-edit-only") && !canEdit) ||
+      (card.hasAttribute("data-state-map-member") && !signedMember);
   });
   const manageButton = byId("allianceManageButton");
   if (manageButton) manageButton.hidden = !canManageRoles;
   const profileButton = byId("alliancePlayerProfileButton");
-  if (profileButton) profileButton.hidden = !hasProfile;
+  if (profileButton) profileButton.hidden = !hasProfile || window.harvestHubHeadquarters?.showPlayerProfileShortcut === false;
   const ownPowerButton = byId("allianceOwnPowerButton");
   if (ownPowerButton) ownPowerButton.hidden = canEdit || !hasProfile || window.harvestHubHeadquarters?.isSuspended("alliance/power.html");
 }
@@ -93,7 +94,7 @@ async function openDashboard(allianceId) {
     byId("allianceDashboardNickname").textContent = current?.nickname || "Аккаунт не связан";
     byId("allianceDashboardRank").textContent = current?.rank_name || "—";
     byId("allianceDashboardRole").textContent = roleLabel(membership.role, current);
-    setDashboardActions({ canEdit, canManageRoles, hasProfile: Boolean(current) });
+    setDashboardActions({ canEdit, canManageRoles, hasProfile: Boolean(current), signedMember: true });
 
     showDashboard();
     showMessage("");
