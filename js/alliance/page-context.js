@@ -1,4 +1,4 @@
-import { fetchMemberships, fetchParticipants } from "./api.js?v=20260726-role-batch-1";
+import { fetchMemberships, fetchParticipants, fetchAllianceForGuest } from "./api.js?v=20260726-role-batch-1";
 import { ACTIVE_ALLIANCE_STORAGE_KEY, GUEST_ALLIANCE_STORAGE_KEY } from "./config.js";
 
 let contextLoadPromise = null;
@@ -33,6 +33,22 @@ export function setGuestAllianceContext(value) {
 
 export function clearGuestAllianceContext() {
   sessionStorage.removeItem(GUEST_ALLIANCE_STORAGE_KEY);
+}
+
+export async function refreshGuestAllianceContext(client, cached = getGuestAllianceContext()) {
+  if (!cached) return null;
+  if (cached.accessCode) {
+    const result = await fetchAllianceForGuest(client, cached.accessCode);
+    if (result.error) throw result.error;
+    if (result.data?.alliance?.id === cached.alliance.id) {
+      const refreshed = { ...result.data, accessCode: cached.accessCode };
+      setGuestAllianceContext(refreshed);
+      return refreshed;
+    }
+  }
+  clearGuestAllianceContext();
+  if (getActiveAllianceId() === cached.alliance.id) setActiveAllianceId("");
+  return null;
 }
 
 function guestPageContext(session, memberships, guestData) {
@@ -74,7 +90,8 @@ async function loadContext(client, { requireAlliance }) {
   const guestData = getGuestAllianceContext();
 
   if (!membership && guestData?.alliance?.id === allianceId) {
-    return guestPageContext(session, memberships, guestData);
+    const refreshed = await refreshGuestAllianceContext(client, guestData);
+    if (refreshed) return guestPageContext(session, memberships, refreshed);
   }
 
   if (!membership && memberships.length) {
