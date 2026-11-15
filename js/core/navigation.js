@@ -5,27 +5,10 @@
   const MAX_QUICK_LINKS = 5;
   const pagesDatabase = [
     { title: "Главная", path: "home.html", group: "Основное" },
-    { title: "База знаний", path: "knowledge.html", group: "Основное" },
     { title: "Калькулятор", path: "calculator.html", group: "Основное" },
-    { title: "Ивенты", path: "events.html", group: "Основное" },
-    { title: "Список дел", path: "todo.html", group: "Основное" },
-    { title: "События", path: "timeline.html", group: "Основное" },
-    { title: "Советы", path: "tips.html", group: "Основное" },
     { title: "Настройки", path: "settings.html", group: "Основное" },
-    { title: "Союзный штаб", path: "alliance/members.html", group: "Союз" },
-    { title: "Управление союзом", path: "alliance/management.html", group: "Союз" },
-    { title: "Профиль игрока", path: "alliance/player-profile.html", group: "Союз" },
-    { title: "Состав союза", path: "alliance/roster.html", group: "Союз" },
-    { title: "Сила отрядов", path: "alliance/power.html", group: "Союз" },
-    { title: "VS", path: "alliance/vs.html", group: "Союз" },
-    { title: "Статистика VS", path: "alliance/vs-statistics.html", group: "Союз" },
-    { title: "Резервуар: активность", path: "alliance/reservoir-activity.html", group: "Союз" },
-    { title: "Резервуар: расстановка", path: "alliance/reservoir-layout.html", group: "Союз" },
     { title: "Игра по-крупному", path: "calculator/ipk.html", group: "Калькуляторы" },
-    { title: "Турбочерепашка & VS", path: "calculator/turbo-vs.html", group: "Калькуляторы" },
-    { title: "Сезонные ресурсы", path: "calculator/season-resources.html", group: "Калькуляторы" },
-    { title: "Нефть/ДНК/Медь", path: "calculator/oil-dna-copper.html", group: "Калькуляторы" },
-    { title: "Обучение войск", path: "calculator/troop-training.html", group: "Калькуляторы" }
+    { title: "Турбочерепашка & VS", path: "calculator/turbo-vs.html", group: "Калькуляторы" }
   ];
   const pageModulePaths = {
     home: "../pages/home.js",
@@ -90,9 +73,6 @@
     return [
       "calculator/ipk.html",
       "calculator/turbo-vs.html",
-      "calculator/season-resources.html",
-      "calculator/oil-dna-copper.html",
-      "calculator/troop-training.html",
       "calculator.html"
     ].map(getPageByPath).filter(Boolean);
   }
