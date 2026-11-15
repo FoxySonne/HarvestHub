@@ -16,6 +16,10 @@
   let loadedRoute='', pending=0;
   async function show(route, options={}) {
     if(!routes[route]) return false;
+    if(window.harvestHubHeadquarters?.isSuspended(routes[route])) {
+      route='alliance';
+      history.replaceState(null,'','#alliance');
+    }
     const ticket=++pending;
     const ok=await sourceLoad(routes[route],options);
     if(!ok || ticket!==pending) return false;

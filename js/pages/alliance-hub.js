@@ -41,13 +41,17 @@ function showDashboard() {
 }
 
 function setDashboardActions({ canEdit = false, canManageRoles = false, hasProfile = false } = {}) {
-  document.querySelectorAll("[data-alliance-edit-only]").forEach(card => { card.hidden = !canEdit; });
+  document.querySelectorAll(".alliance-dashboard-card").forEach(card => {
+    const path = card.querySelector("[data-page-path]")?.dataset.pagePath;
+    card.hidden = Boolean(window.harvestHubHeadquarters?.isSuspended(path)) ||
+      (card.hasAttribute("data-alliance-edit-only") && !canEdit);
+  });
   const manageButton = byId("allianceManageButton");
   if (manageButton) manageButton.hidden = !canManageRoles;
   const profileButton = byId("alliancePlayerProfileButton");
   if (profileButton) profileButton.hidden = !hasProfile;
   const ownPowerButton = byId("allianceOwnPowerButton");
-  if (ownPowerButton) ownPowerButton.hidden = canEdit || !hasProfile;
+  if (ownPowerButton) ownPowerButton.hidden = canEdit || !hasProfile || window.harvestHubHeadquarters?.isSuspended("alliance/power.html");
 }
 
 function openGuestDashboard(guestData = state.guestData) {

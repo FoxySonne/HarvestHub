@@ -26,7 +26,7 @@
     { title: "Сезонные ресурсы", path: "calculator/season-resources.html", group: "Калькуляторы" },
     { title: "Нефть/ДНК/Медь", path: "calculator/oil-dna-copper.html", group: "Калькуляторы" },
     { title: "Обучение войск", path: "calculator/troop-training.html", group: "Калькуляторы" }
-  ];
+  ].filter(page => !window.harvestHubHeadquarters?.isSuspended(page.path));
   const pageModulePaths = {
     home: "../pages/home.js",
     members: "../pages/alliance-hub.js",
@@ -217,6 +217,7 @@
   }
 
   async function loadPage(pageName, options = {}) {
+    if (window.harvestHubHeadquarters?.isSuspended(pageName)) pageName = "alliance/members.html";
     const previousLeaveGuard = window.harvestHubConfirmPageLeave;
     if (typeof previousLeaveGuard === "function"
         && previousLeaveGuard(pageName) === false) {
