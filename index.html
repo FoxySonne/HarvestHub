@@ -18,7 +18,7 @@
 <script defer src="js/account/advanced-mode-access.js?v=20261004-security-1"></script>
 <script defer src="js/account/advanced-access-store.js?v=20261004-security-1"></script>
 <script defer src="js/core/utc-clock.js?v=20261004-security-1"></script>
-<script defer src="js/core/navigation.js?v=20261004-security-1"></script>
+<script defer src="js/core/navigation.js?v=20261115-simple-navigation"></script>
 <script defer src="js/core/app-loader.js?v=20261004-security-1"></script>
 <script defer src="js/account/account-storage.js?v=20261004-security-1"></script>
 <script defer src="js/account/game-profile-manager.js?v=20261004-security-1"></script>
@@ -44,8 +44,8 @@
 <script type="module" src="js/ui/page-enhancements.js?v=20261004-security-1"></script>
 <script defer src="js/ui/tooltips.js?v=20261004-security-1"></script>
 <script defer src="js/sync/sync-status.js?v=20261004-security-1"></script>
-  <script src="feature-bridge.js?v=20261004-security-1" defer></script>
-  <script src="app.js?v=20261004-security-1" defer></script>
+  <script src="feature-bridge.js?v=20261115-simple-navigation" defer></script>
+  <script src="app.js?v=20261115-simple-navigation" defer></script>
   <script src="map-data.js?v=20261004-security-1" defer></script>
   <script src="maps.js?v=20261004-security-1" defer></script>
   <script src="screens.js?v=20261004-security-1" defer></script>
@@ -77,13 +77,7 @@
       <p class="brand-caption">Dig. Grow. Survive.</p>
       <nav aria-label="Основная навигация" class="main-nav">
         <a href="#home" aria-current="page">Главная</a>
-        <a href="#knowledge">База знаний</a>
         <a href="#calculators">Калькулятор</a>
-        <a href="#alliance">Союзный штаб</a>
-        <a href="#events">Ивенты</a>
-        <a href="#todo">Список дел</a>
-        <a href="#timeline">События</a>
-        <a href="#tips">Советы</a>
         <a href="#settings">Настройки</a>
       </nav>
       <div class="sidebar-bottom"><button type="button" class="desktop-account-launcher secondary-button" data-account-button>Открыть профиль</button>
@@ -95,7 +89,7 @@
       <section class="page-header" aria-label="HarvestHub">
         <a href="#home" class="home-title"><span>Stop fighting.</span><span class="accent">Start farming.</span></a>
         <p>Ваш лучший помощник для Tiles Survive</p>
-        <div class="button-group"><a class="button" href="#knowledge">База знаний</a><a class="button" href="#calculators">Калькулятор</a></div>
+        <div class="button-group"><a class="button" href="#calculators">Калькулятор</a></div>
       </section>
 
       <div class="pages"><section id="functional" class="page" hidden><div id="page-content"></div></section>
@@ -103,17 +97,17 @@
 
         
         
-        <section id="knowledge" class="page"><h1 class="section-title">База знаний</h1><section class="card"><label class="field-label">Поиск по базе знаний<input type="search" disabled placeholder="Тема или название"></label></section><div class="tool-grid"><article class="card"><h2>Начало игры</h2><p class="section-caption">Первые шаги и развитие поселения</p></article><article class="card"><h2>Герои и отряды</h2><p class="section-caption">Подготовка к боям и событиям</p></article><article class="card"><h2>Сезонные события</h2><p class="section-caption">Нефть, ДНК и медь</p></article></div><p class="section-caption">Разделы подготовлены. Статьи будут добавлены позже.</p></section>
+        <section id="knowledge" class="page" hidden><h1 class="section-title">База знаний</h1><section class="card"><label class="field-label">Поиск по базе знаний<input type="search" disabled placeholder="Тема или название"></label></section><div class="tool-grid"><article class="card"><h2>Начало игры</h2><p class="section-caption">Первые шаги и развитие поселения</p></article><article class="card"><h2>Герои и отряды</h2><p class="section-caption">Подготовка к боям и событиям</p></article><article class="card"><h2>Сезонные события</h2><p class="section-caption">Нефть, ДНК и медь</p></article></div><p class="section-caption">Разделы подготовлены. Статьи будут добавлены позже.</p></section>
         
-        <section id="events" class="page"><h1 class="section-title">Ивенты</h1><div class="tool-grid"><article class="card"><h2>Экспедиция славы</h2><p class="section-caption">Расписание ещё не внесено</p></article><article class="card"><h2>Истребление ужаса</h2><p class="section-caption">Расписание ещё не внесено</p></article><a class="card tool-card" href="#resource-map"><span><strong>Сражение за территорию</strong><span class="tool-description">Карта ресурсов в союзном штабе</span></span><span class="chevron">›</span></a></div></section>
-        <section id="todo" class="page"><h1 class="section-title">Список дел</h1><section class="card"><div class="card-heading"><h2>Игровые задачи</h2><button class="button secondary-button" disabled>Добавить</button></div><div class="mini-metrics"><div><span>Сегодня</span><strong>—</strong></div><div><span>Выполнено</span><strong>—</strong></div></div><div class="quiet-empty"><p>Задач пока нет. Сохранение будет подключено позже.</p></div></section></section>
-        <section id="timeline" class="page"><h1 class="section-title">События</h1><section class="card"><div class="card-heading"><h2>Расписание</h2><span class="status-label">UTC</span></div><label class="field-label">Дата<input type="date" disabled></label><div class="quiet-empty"><p>События для выбранной даты пока не добавлены.</p></div></section></section>
-        <section id="tips" class="page"><h1 class="section-title">Советы</h1><article class="card"><h2>Бей крокодила!</h2><p class="section-caption">Совет дня</p></article><section class="card"><h2>Подборки</h2><div class="quiet-empty"><p>Здесь появятся советы по развитию и союзным событиям.</p></div></section></section>
+        <section id="events" class="page" hidden><h1 class="section-title">Ивенты</h1><div class="tool-grid"><article class="card"><h2>Экспедиция славы</h2><p class="section-caption">Расписание ещё не внесено</p></article><article class="card"><h2>Истребление ужаса</h2><p class="section-caption">Расписание ещё не внесено</p></article><a class="card tool-card" href="#resource-map"><span><strong>Сражение за территорию</strong><span class="tool-description">Карта ресурсов в союзном штабе</span></span><span class="chevron">›</span></a></div></section>
+        <section id="todo" class="page" hidden><h1 class="section-title">Список дел</h1><section class="card"><div class="card-heading"><h2>Игровые задачи</h2><button class="button secondary-button" disabled>Добавить</button></div><div class="mini-metrics"><div><span>Сегодня</span><strong>—</strong></div><div><span>Выполнено</span><strong>—</strong></div></div><div class="quiet-empty"><p>Задач пока нет. Сохранение будет подключено позже.</p></div></section></section>
+        <section id="timeline" class="page" hidden><h1 class="section-title">События</h1><section class="card"><div class="card-heading"><h2>Расписание</h2><span class="status-label">UTC</span></div><label class="field-label">Дата<input type="date" disabled></label><div class="quiet-empty"><p>События для выбранной даты пока не добавлены.</p></div></section></section>
+        <section id="tips" class="page" hidden><h1 class="section-title">Советы</h1><article class="card"><h2>Бей крокодила!</h2><p class="section-caption">Совет дня</p></article><section class="card"><h2>Подборки</h2><div class="quiet-empty"><p>Здесь появятся советы по развитию и союзным событиям.</p></div></section></section>
         
         
 
 
-<section id="resource-map" class="page" aria-labelledby="resource-map-heading">
+<section id="resource-map" class="page" hidden aria-labelledby="resource-map-heading">
 <a class="back-link" href="#alliance">← В союзный штаб</a>
 <div class="page-heading"><h1 id="resource-map-heading" class="section-title">Карта нефть/ДНК/медь</h1></div>
 

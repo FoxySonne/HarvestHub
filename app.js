@@ -11,15 +11,6 @@
   const profileButton = document.querySelector("#open-profiles");
   const desktopMenu = matchMedia("(min-width: 56rem)");
   const desktopPanel = matchMedia("(min-width: 80rem)");
-  const pages = [...document.querySelectorAll(".page")];
-  const pageTitles = new Map(pages.map(page => [page.id, page.querySelector("h1")?.textContent || "HarvestHub"]));
-  const tools = new Map([
-    ["ipk", "Игра по-крупному"],
-    ["turbo-vs", "Турбочерепашка & VS"],
-    ["season-resources", "Сезонные ресурсы"],
-    ["territory", "Нефть/ДНК/Медь"],
-    ["troops", "Обучение войск"]
-  ]);
   let openDrawer = null;
   let drawerTrigger = null;
 
@@ -114,32 +105,14 @@
   }
 
   async function showPage(moveFocus = false) {
-    const route=location.hash.slice(1)||"home";
-    document.body.classList.toggle('resource-screen',route==='resource-map');
-    document.body.classList.toggle('reservoir-screen',route==='reservoir');
-    if(window.harvestHubFeatures?.has(route)){
-      closeDrawer(false);
-      const loaded=await window.harvestHubFeatures.show(route);
-      if(loaded && moveFocus){main.focus({preventScroll:true}); window.scrollTo({top:0,behavior:"instant"});}
-      return;
-    }
-    const requested = location.hash.slice(1) || "home";
-    const isTool = tools.has(requested);
-    const id = isTool ? "tool" : pageTitles.has(requested) && requested !== "tool" ? requested : "home";
-    const title = isTool ? tools.get(requested) : pageTitles.get(id);
-    if (isTool) document.querySelector("#tool-heading").textContent = title;
-    pages.forEach(page => page.hidden = page.id !== id);
-    document.querySelectorAll(".main-nav a").forEach(link => {
-      const active = link.hash === "#" + (isTool ? "calculators" : ["reservoir","resource-map","roster","alliance-vs"].includes(id) ? "alliance" : id);
-      if (active) link.setAttribute("aria-current", "page");
-      else link.removeAttribute("aria-current");
-    });
-    document.title = title + " — HarvestHub";
+    const hash = location.hash.slice(1);
+    // An authentication callback hash belongs to the account client, not navigation.
+    const route = !hash || hash.includes("=") ? "home" : hash;
     closeDrawer(false);
-    window.dispatchEvent(new Event("harvesthub:pagechange"));
-    if (moveFocus) {
-      main.focus({preventScroll:true});
-      window.scrollTo({top:0,behavior:"instant"});
+    const loaded = await window.harvestHubFeatures.show(route, { preserveHash: hash.includes("=") });
+    if (loaded && moveFocus) {
+      main.focus({ preventScroll: true });
+      window.scrollTo({ top: 0, behavior: "instant" });
     }
   }
 
