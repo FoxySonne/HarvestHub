@@ -85,3 +85,15 @@ body.resource-screen #resource-map > .compact-toolbar {display:none;}
  #page-content .reservoir-player-pool {display:flex;flex-flow:column;max-height:calc(100dvh - 330px);overflow:auto;}
  #page-content .reservoir-player-chip {flex:none;max-width:none;}
 }
+
+#allianceDeleteDialog {
+  width: min(32rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
+  padding: 1.25rem;
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: .75rem;
+}
+#allianceDeleteDialog::backdrop { background: rgb(0 0 0 / .55); }

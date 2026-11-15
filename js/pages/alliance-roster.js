@@ -5,7 +5,7 @@ import {
 } from "../alliance/api.js?v=20260731-atomic-participant-save-1";
 import { fetchAllianceSquadPower } from "../alliance/power-api.js?v=20260723-roster-power-1";
 import { renderParticipantRows } from "../alliance/view.js?v=20260728-membership-periods-1";
-import { loadAlliancePageContext, fillAllianceCompactHeader, canEditAlliance, getActiveAllianceId } from "../alliance/page-context.js?v=20260725-guest-access-1";
+import { loadAlliancePageContext, fillAllianceCompactHeader, canEditAlliance, getActiveAllianceId } from "../alliance/page-context.js?v=20261115-alliance-delete";
 import { setAllianceTableFullscreen } from "../alliance/fullscreen-table.js?v=20260811-fullscreen-viewport-1";
 
 const byId = id => document.getElementById(id);

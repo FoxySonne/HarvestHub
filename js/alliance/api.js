@@ -65,6 +65,13 @@ export function createAlliance(client, { name, stateNumber }) {
   });
 }
 
+export function deleteAlliance(client, allianceId, confirmationName) {
+  return client.rpc("delete_alliance", {
+    target_alliance_id: allianceId,
+    confirmation_name: confirmationName
+  });
+}
+
 export function updateAllianceDetails(client, { allianceId, name, stateNumber }) {
   return client.rpc("update_alliance_details", {
     target_alliance_id: allianceId,

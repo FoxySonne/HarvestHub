@@ -55,4 +55,22 @@
     </div>
     <div id="alliancePrivilegedAccountsEmpty" class="empty-state alliance-empty-state" hidden>Пользователей с повышенными правами пока нет.</div>
   </section>
+  <section id="allianceDeleteCard" class="card" hidden>
+    <h2>Удаление союза</h2>
+    <button type="button" id="allianceOpenDelete" class="danger-button">Удалить союз</button>
+    <dialog id="allianceDeleteDialog" aria-labelledby="allianceDeleteTitle">
+      <form id="allianceDeleteForm">
+        <h2 id="allianceDeleteTitle">Удалить союз навсегда?</h2>
+        <p>Состав, доступ участников, код приглашения и данные союза будут удалены. Аккаунты и личные профили сохранятся.</p>
+        <label class="field-label">Введи название: <strong id="allianceDeleteName"></strong>
+          <input id="allianceDeleteConfirmation" required autocomplete="off">
+        </label>
+        <p id="allianceDeleteError" role="status"></p>
+        <div class="button-group">
+          <button type="button" id="allianceCancelDelete" class="secondary-button">Отмена</button>
+          <button type="submit" id="allianceConfirmDelete" class="danger-button" disabled>Удалить навсегда</button>
+        </div>
+      </form>
+    </dialog>
+  </section>
 </section>

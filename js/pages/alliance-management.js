@@ -4,16 +4,19 @@ import {
   setAllianceMemberRole,
   transferAllianceR5,
   transferAllianceOwner,
-  updateAllianceDetails
-} from "../alliance/api.js?v=20260726-role-batch-1";
+  updateAllianceDetails,
+  deleteAlliance
+} from "../alliance/api.js?v=20261115-alliance-delete";
 import {
   loadAlliancePageContext,
   invalidateAlliancePageContext,
   fillAllianceCompactHeader,
   canManageAllianceRoles,
   getEffectiveAllianceRole,
-  getActiveAllianceId
-} from "../alliance/page-context.js?v=20260726-role-batch-1";
+  getActiveAllianceId,
+  setActiveAllianceId,
+  clearGuestAllianceContext
+} from "../alliance/page-context.js?v=20261115-alliance-delete";
 
 const byId = id => document.getElementById(id);
 const state = { client: null, context: null, detailsDirty: false, cleanup: [] };
@@ -161,6 +164,7 @@ function render() {
   state.detailsDirty = Boolean(draft);
   setText("allianceManagementInvite", alliance.invite_code || "—");
 
+  setHidden("allianceDeleteCard", state.context.membership?.role !== "owner");
   const canManage = canManageAllianceRoles(state.context);
   ["allianceDetailsCard", "allianceRoleManagementCard", "alliancePrivilegedAccountsCard"].forEach(id => setHidden(id, !canManage));
   if (!canManage) return showMessage("Управление союзом доступно владельцу и связанному Р5.", "info");
@@ -336,11 +340,64 @@ function cleanupPreviousInstance() {
   };
 }
 
+function bindDeleteAlliance() {
+  const dialog = byId("allianceDeleteDialog");
+  const input = byId("allianceDeleteConfirmation");
+  const confirm = byId("allianceConfirmDelete");
+  const cancel = byId("allianceCancelDelete");
+  const errorBox = byId("allianceDeleteError");
+  if (!dialog || state.context?.membership?.role !== "owner") return;
+  let alliance, busy = false;
+
+  register(byId("allianceOpenDelete"), "click", () => {
+    if (state.context?.membership?.role !== "owner") return;
+    alliance = state.context.alliance;
+    byId("allianceDeleteName").textContent = alliance.name;
+    input.value = "";
+    errorBox.textContent = "";
+    confirm.disabled = true;
+    dialog.showModal();
+    input.focus();
+  });
+  register(input, "input", () => { confirm.disabled = input.value !== alliance.name || busy; });
+  register(cancel, "click", () => dialog.close());
+  register(dialog, "cancel", event => { if (busy) event.preventDefault(); });
+  register(byId("allianceDeleteForm"), "submit", async event => {
+    event.preventDefault();
+    if (busy || !alliance || input.value !== alliance.name || getActiveAllianceId() !== alliance.id) return;
+    busy = confirm.disabled = cancel.disabled = input.disabled = true;
+    errorBox.textContent = "";
+    try {
+      const result = await deleteAlliance(state.client, alliance.id, input.value);
+      if (result.error) throw result.error;
+      clearDetailsDraft();
+      if (getActiveAllianceId() === alliance.id) {
+        const key = "harvesthub_state_map:" + alliance.id;
+        localStorage.removeItem(key);
+        setActiveAllianceId("");
+        clearGuestAllianceContext();
+      }
+      invalidateAlliancePageContext();
+      if (dialog.isConnected) {
+        dialog.close();
+        sessionStorage.setItem("harvesthub_choose_alliance_after_delete", "1");
+        await window.loadPage?.("alliance/members.html", { skipCurrentSave: true });
+      }
+    } catch (error) {
+      errorBox.textContent = error.message || "Не удалось удалить союз.";
+    } finally {
+      busy = cancel.disabled = input.disabled = false;
+      confirm.disabled = input.value !== alliance.name;
+    }
+  });
+}
+
 export async function init() {
   cleanupPreviousInstance();
   state.client = window.harvestHubSupabase;
   try { await reload(); } catch (error) { showMessage(error.message, "error"); return; }
 
+  bindDeleteAlliance();
   register(byId("allianceManagementDetailsForm"), "submit", saveDetails);
   register(byId("allianceManagementDetailsForm"), "input", saveDetailsDraft);
   register(byId("allianceManagementCopyInvite"), "click", async () => {

@@ -1,5 +1,5 @@
 import { createAlliance, fetchAllianceForGuest, fetchMemberships, fetchParticipants, joinAllianceByCode } from "../alliance/api.js?v=20260726-permanent-code-1";
-import { clearGuestAllianceContext, getGuestAllianceContext, setActiveAllianceId, setGuestAllianceContext } from "../alliance/page-context.js?v=20260725-guest-access-1";
+import { clearGuestAllianceContext, getGuestAllianceContext, setActiveAllianceId, setGuestAllianceContext, refreshGuestAllianceContext } from "../alliance/page-context.js?v=20261115-alliance-delete";
 
 const byId = id => document.getElementById(id);
 const state = { client: null, session: null, memberships: [], choosingAlliance: false, currentParticipant: null, guestData: null };
@@ -40,14 +40,19 @@ function showDashboard() {
   byId("allianceDashboard").hidden = false;
 }
 
-function setDashboardActions({ canEdit = false, canManageRoles = false, hasProfile = false } = {}) {
-  document.querySelectorAll("[data-alliance-edit-only]").forEach(card => { card.hidden = !canEdit; });
+function setDashboardActions({ canEdit = false, canManageRoles = false, hasProfile = false, signedMember = false } = {}) {
+  document.querySelectorAll(".alliance-dashboard-card").forEach(card => {
+    const path = card.querySelector("[data-page-path]")?.dataset.pagePath;
+    card.hidden = Boolean(window.harvestHubHeadquarters?.isSuspended(path)) ||
+      (card.hasAttribute("data-alliance-edit-only") && !canEdit) ||
+      (card.hasAttribute("data-state-map-member") && !signedMember);
+  });
   const manageButton = byId("allianceManageButton");
   if (manageButton) manageButton.hidden = !canManageRoles;
   const profileButton = byId("alliancePlayerProfileButton");
-  if (profileButton) profileButton.hidden = !hasProfile;
+  if (profileButton) profileButton.hidden = !hasProfile || window.harvestHubHeadquarters?.showPlayerProfileShortcut === false;
   const ownPowerButton = byId("allianceOwnPowerButton");
-  if (ownPowerButton) ownPowerButton.hidden = canEdit || !hasProfile;
+  if (ownPowerButton) ownPowerButton.hidden = canEdit || !hasProfile || window.harvestHubHeadquarters?.isSuspended("alliance/power.html");
 }
 
 function openGuestDashboard(guestData = state.guestData) {
@@ -89,7 +94,7 @@ async function openDashboard(allianceId) {
     byId("allianceDashboardNickname").textContent = current?.nickname || "Аккаунт не связан";
     byId("allianceDashboardRank").textContent = current?.rank_name || "—";
     byId("allianceDashboardRole").textContent = roleLabel(membership.role, current);
-    setDashboardActions({ canEdit, canManageRoles, hasProfile: Boolean(current) });
+    setDashboardActions({ canEdit, canManageRoles, hasProfile: Boolean(current), signedMember: true });
 
     showDashboard();
     showMessage("");
@@ -172,11 +177,11 @@ async function handleJoin(event) {
     if (result.error) return showMessage(getReadableError(result.error), "error");
     if (!result.data?.alliance?.id) return showMessage("Союз с таким кодом не найден.", "error");
 
-    state.guestData = result.data;
-    setGuestAllianceContext(result.data);
+    state.guestData = { ...result.data, accessCode: code.trim().toUpperCase() };
+    setGuestAllianceContext(state.guestData);
     setActiveAllianceId(result.data.alliance.id);
     byId("allianceHubJoinCode").value = "";
-    openGuestDashboard(result.data);
+    openGuestDashboard(state.guestData);
     showMessage("Штаб открыт в гостевом режиме. После входа в аккаунт код подключит союз постоянно.", "success");
   } catch (error) {
     showMessage(getReadableError(error), "error");
@@ -219,8 +224,9 @@ async function applySession(session) {
 
 export async function init() {
   state.client = window.harvestHubSupabase;
-  state.guestData = getGuestAllianceContext();
-  state.choosingAlliance = false;
+  state.guestData = null;
+  state.choosingAlliance = sessionStorage.getItem("harvesthub_choose_alliance_after_delete") === "1";
+  sessionStorage.removeItem("harvesthub_choose_alliance_after_delete");
   if (!state.client) return showMessage("Не удалось подключить Supabase.", "error");
   byId("allianceHubJoinForm")?.addEventListener("submit", handleJoin);
   byId("allianceHubCreateForm")?.addEventListener("submit", handleCreate);
@@ -242,6 +248,7 @@ export async function init() {
   try {
     const sessionResult = await state.client.auth.getSession();
     if (sessionResult.error) return showMessage(getReadableError(sessionResult.error), "error");
+    state.guestData = await refreshGuestAllianceContext(state.client, getGuestAllianceContext());
     await applySession(sessionResult.data.session);
   } catch (error) {
     showMessage(getReadableError(error), "error");

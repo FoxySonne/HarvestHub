@@ -9,13 +9,17 @@
     management:'alliance/management.html', 'player-profile':'alliance/player-profile.html',
     roster:'alliance/roster.html', power:'alliance/power.html', 'alliance-vs':'alliance/vs.html',
     'vs-statistics':'alliance/vs-statistics.html', 'reservoir-activity':'alliance/reservoir-activity.html',
-    reservoir:'alliance/reservoir-layout.html'
+    reservoir:'alliance/reservoir-layout.html', 'state-map':'alliance/state-map.html'
   };
   const reverse=Object.fromEntries(Object.entries(routes).map(([route,path])=>[path,route]));
   const sourceLoad=window.loadPage;
   let loadedRoute='', pending=0;
   async function show(route, options={}) {
     if(!routes[route]) return false;
+    if(window.harvestHubHeadquarters?.isSuspended(routes[route])) {
+      route='alliance';
+      history.replaceState(null,'','#alliance');
+    }
     const ticket=++pending;
     const ok=await sourceLoad(routes[route],options);
     if(!ok || ticket!==pending) return false;
@@ -73,6 +77,8 @@
       const card=document.createElement('section');card.className='card alliance-dashboard-card';
       card.innerHTML='<div class="card-header"><div><h3>Карта нефть/ДНК/медь</h3><p>Точки, владельцы и массовое назначение на карте.</p></div></div><a class="button" href="#resource-map">Открыть</a>';
       hub.append(card);
+      const stateMapCard=hub.querySelector('[data-state-map-member]');
+      if(stateMapCard)hub.append(stateMapCard);
     }
   });
 })();
