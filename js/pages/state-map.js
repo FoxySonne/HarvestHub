@@ -1,4 +1,5 @@
-import {category,today,validDate,replay,summarize,forecast,captureError} from './state-map-rules.js?v=20261119-territory-shapes-4';
+import {category,today,validDate,replay,summarize,forecast,captureError} from './state-map-rules.js?v=20261119-views-5';
+import {projectPoint,projectionBounds} from './state-map-projection.js?v=20261119-views-5';
 const NS='http://www.w3.org/2000/svg',PREFIX='harvesthub_state_map_v2:';
 const PALETTE=['#e66a61','#58a6e7','#63b980','#bd89df','#e6bc4a','#e37bb1','#49bdbb','#df8d44','#8b99ec','#b0bd61','#b57b6c','#a7c8d8'];
 const make=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};
@@ -7,10 +8,10 @@ export async function init(){
  const signal=window.harvestHubPageAbortController?.signal,$=selector=>root.querySelector(selector),on=(n,e,fn,opts={})=>n.addEventListener(e,fn,{...opts,signal});
  document.body.classList.add('state-map-screen');
  const cleanup=()=>{document.body.classList.remove('state-map-screen');$('#sm-panel')?.close();};signal?.addEventListener('abort',cleanup,{once:true});
- if(!document.querySelector('#state-map-css')){const l=make('link');l.id='state-map-css';l.rel='stylesheet';l.href='css/features/state-map.css?v=20261119-territory-shapes-4';document.head.append(l);}
+ if(!document.querySelector('#state-map-css')){const l=make('link');l.id='state-map-css';l.rel='stylesheet';l.href='css/features/state-map.css?v=20261119-views-5';document.head.append(l);}
  const tell=text=>{$('#sm-message').textContent=text;},status=text=>{$('#sm-save-status').textContent=text;};
  async function bounded(operation){let timer,cancel;try{return await Promise.race([operation,new Promise((_,reject)=>{cancel=()=>reject(Error('Загрузка отменена.'));signal?.addEventListener('abort',cancel,{once:true});timer=setTimeout(()=>reject(Error('Сервер не ответил вовремя. Результат операции не подтверждён.')),10000);})]);}finally{clearTimeout(timer);if(cancel)signal?.removeEventListener('abort',cancel);}}
- let asset;try{asset=await bounded(fetch('assets/state-map/large-map.json?v=20261119-territory-shapes-4',{signal}).then(r=>{if(!r.ok)throw Error();return r.json();}));}catch{if(!signal?.aborted){tell('Не удалось загрузить карту. Повторите попытку.');const retry=make('button','Повторить загрузку карты');retry.type='button';on(retry,'click',()=>window.loadPage('state-map.html'));$('#sm-message').append(retry);}return;}if(signal?.aborted)return;
+ let asset;try{asset=await bounded(fetch('assets/state-map/large-map.json?v=20261119-views-5',{signal}).then(r=>{if(!r.ok)throw Error();return r.json();}));}catch{if(!signal?.aborted){tell('Не удалось загрузить карту. Повторите попытку.');const retry=make('button','Повторить загрузку карты');retry.type='button';on(retry,'click',()=>window.loadPage('state-map.html'));$('#sm-message').append(retry);}return;}if(signal?.aborted)return;
  const client=window.harvestHubSupabase,profile=window.getActiveProfile?.(),user=profile?.type==='account'?profile.supabaseUserId:null,key=PREFIX+(user||profile?.id||'guest');
  const blank=()=>({version:2,map:'large',title:'Карта штата',alliances:[],owners:{},planning:false,start:today(),baseOwners:{},actions:[]});
  const byId=new Map(asset.cells.map(c=>[c.id,c]));
@@ -84,15 +85,16 @@ export async function init(){
  on($('#sm-panel-close'),'click',()=>dialog.close());on(dialog,'click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}});
  root.querySelectorAll('[data-panel]').forEach(b=>on(b,'click',()=>open(b.dataset.panel)));on($('#sm-title'),'change',()=>{if(readOnly)return;state.title=$('#sm-title').value.trim()||'Карта штата';persist();});on($('#sm-save'),'click',saveCloud);
  on($('#sm-filter'),'change',render);
- const [originX,originY,extent]=asset.viewBox.split(' ').map(Number);
- let scale=1,px=originX,py=originY;const viewport=$('#sm-viewport'),pointers=new Map();let drag=null,pinch=null,tapped=null;
- function transform(){const size=extent/scale;px=Math.max(originX,Math.min(originX+extent-size,px));py=Math.max(originY,Math.min(originY+extent-size,py));svg.setAttribute('viewBox',`${px} ${py} ${size} ${size}`);labels.style.visibility=scale>=2?'visible':'hidden';}
+ let world={x:48,y:48,width:928,height:928},scale=1,px=48,py=48;const viewport=$('#sm-viewport'),pointers=new Map();let drag=null,pinch=null,tapped=null,projection='top';
+ function transform(){const width=world.width/scale,height=world.height/scale;px=Math.max(world.x,Math.min(world.x+world.width-width,px));py=Math.max(world.y,Math.min(world.y+world.height-height,py));svg.setAttribute('viewBox',`${px} ${py} ${width} ${height}`);labels.style.visibility=scale>=2?'visible':'hidden';}
+ function setProjection(view){projection=view==='game'?'game':'top';world=projectionBounds(asset.cells,projection);for(const c of asset.cells){shapes.get(c.id).setAttribute('points',c.polygon.map(p=>projectPoint(p,projection).join(',')).join(' '));const [x,y]=projectPoint([c.x,c.y],projection);texts.get(c.id).setAttribute('x',x);texts.get(c.id).setAttribute('y',y);}scale=1;px=world.x;py=world.y;root.dataset.mapView=projection;root.querySelectorAll('[data-map-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mapView===projection)));transform();try{localStorage.setItem('harvesthub_state_map_projection',projection);}catch{}}
+ root.querySelectorAll('[data-map-view]').forEach(b=>on(b,'click',()=>setProjection(b.dataset.mapView)));
  const resize=new ResizeObserver(transform);resize.observe(viewport);signal?.addEventListener('abort',()=>resize.disconnect(),{once:true});
- function zoom(next){const old=extent/scale;scale=Math.max(1,Math.min(10,next));const delta=(old-extent/scale)/2;px+=delta;py+=delta;transform();}
+ function zoom(next){const oldWidth=world.width/scale,oldHeight=world.height/scale;scale=Math.max(1,Math.min(10,next));px+=(oldWidth-world.width/scale)/2;py+=(oldHeight-world.height/scale)/2;transform();}
  root.querySelectorAll('[data-zoom]').forEach(b=>on(b,'click',()=>zoom(b.dataset.zoom==='reset'?1:scale*(b.dataset.zoom==='in'?1.5:1/1.5))));
  const distance=()=>{const p=[...pointers.values()];return Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);};
  on(viewport,'pointerdown',e=>{if(e.button!==0)return;tapped=null;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});viewport.setPointerCapture(e.pointerId);if(pointers.size===2){pinch={distance:distance(),scale};if(drag)drag.moved=true;}else drag={id:e.pointerId,x:e.clientX,y:e.clientY,px,py,moved:false};});
- on(viewport,'pointermove',e=>{if(pointers.has(e.pointerId))pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2&&pinch){zoom(pinch.scale*distance()/pinch.distance);return;}if(drag&&drag.id===e.pointerId){const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.hypot(dx,dy)>5)drag.moved=true;const factor=extent/scale/Math.min(viewport.clientWidth,viewport.clientHeight);px=drag.px-dx*factor;py=drag.py-dy*factor;transform();}else{const path=e.target.closest?.('[data-cell]');if(path){$('#sm-tooltip').textContent=info(byId.get(path.dataset.cell));$('#sm-tooltip').hidden=false;}}});
+ on(viewport,'pointermove',e=>{if(pointers.has(e.pointerId))pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2&&pinch){zoom(pinch.scale*distance()/pinch.distance);return;}if(drag&&drag.id===e.pointerId){const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.hypot(dx,dy)>5)drag.moved=true;const factor=Math.max(world.width/viewport.clientWidth,world.height/viewport.clientHeight)/scale;px=drag.px-dx*factor;py=drag.py-dy*factor;transform();}else{const path=e.target.closest?.('[data-cell]');if(path){$('#sm-tooltip').textContent=info(byId.get(path.dataset.cell));$('#sm-tooltip').hidden=false;}}});
  on(viewport,'pointerleave',()=>{$('#sm-tooltip').hidden=true;});
  const release=(e,cancel=false)=>{pointers.delete(e.pointerId);if(!cancel&&drag?.id===e.pointerId&&!drag.moved&&!pinch){const path=document.elementFromPoint(e.clientX,e.clientY)?.closest('[data-cell]');if(path)tapped=path.dataset.cell;}drag=null;if(pointers.size<2)pinch=null;};on(viewport,'pointerup',e=>release(e));on(viewport,'pointercancel',e=>release(e,true));on(viewport,'click',()=>{if(!tapped)return;selected=tapped;tapped=null;render();open('selection');});
  on(viewport,'wheel',e=>{if(!e.ctrlKey)return;e.preventDefault();zoom(scale*(e.deltaY<0?1.15:1/1.15));},{passive:false});on(viewport,'keydown',e=>{const offsets={ArrowLeft:[-40,0],ArrowRight:[40,0],ArrowUp:[0,-40],ArrowDown:[0,40]};if(offsets[e.key]){e.preventDefault();px+=offsets[e.key][0]/scale;py+=offsets[e.key][1]/scale;transform();}if(e.key==='+')zoom(scale*1.5);if(e.key==='-')zoom(scale/1.5);});
@@ -118,5 +120,5 @@ export async function init(){
   finally{cloudLoading=false;}
  }
  on($('#sm-retry-cloud'),'click',loadCloud);
- render();transform();if(!state.alliances.length)tell('Добавьте союзы, затем выберите участок на карте.');void loadCloud();
+ let preferred='top';try{preferred=localStorage.getItem('harvesthub_state_map_projection')||'top';}catch{}setProjection(preferred);render();if(!state.alliances.length)tell('Добавьте союзы, затем выберите участок на карте.');void loadCloud();
 }
