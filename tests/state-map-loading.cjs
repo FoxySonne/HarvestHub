@@ -31,7 +31,7 @@ const server=http.createServer((req,res)=>{const p=path.resolve(root,'.'+new URL
   await page.locator('#sm-retry-cloud').click();
   await page.waitForFunction(()=>!document.querySelector('#sm-save').disabled);
   assert.equal(await page.locator('#sm-title').inputValue(),'Карта аккаунта после повтора');
-  await page.locator('#sm-menu-toggle').click();await page.locator('#sm-site-menu a[href="#calculators"]').click();
+  await page.locator('#sm-menu-toggle').click();await page.locator('#sidebar a[href="#calculators"]').click();
   await page.waitForFunction(()=>window.harvestHubFeatures?.getCurrent()==='calculators');
   assert.equal(await page.locator('#page-content .calculator-directory').isVisible(),true);
   await page.close();
