@@ -1,0 +1,81 @@
+body.state-map-screen{overflow:hidden}
+body.state-map-screen>.topbar,body.state-map-screen #sidebar,body.state-map-screen #utilities,body.state-map-screen footer{display:none!important}
+#state-map-workspace.sm-workspace{position:fixed;inset:0;z-index:40;max-width:none;margin:0;background:var(--bg);overflow:hidden;--sm-overlay:color-mix(in srgb,var(--panel) 95%,transparent)}
+#state-map-workspace .sm-viewport{position:absolute;inset:0;width:100%;height:100%;min-height:0;aspect-ratio:auto;border:0;border-radius:0}
+#state-map-workspace #sm-svg{position:absolute;right:0;top:0;width:calc(100% - 294px);height:100%}
+#state-map-workspace.sm-tools-collapsed #sm-svg{width:100%}
+.sm-float{background:var(--sm-overlay);border:1px solid var(--border);border-radius:14px;box-shadow:0 8px 28px #0003;backdrop-filter:blur(12px)}
+#state-map-workspace .sm-brand{position:absolute;top:16px;left:16px;display:flex;align-items:center;gap:8px;width:260px;padding:6px 8px;z-index:3}
+#state-map-workspace .sm-brand strong{flex:1;font-size:1.05rem}
+#state-map-workspace .sm-brand button{min-width:36px;min-height:36px;padding:4px;background:transparent;color:var(--text);border:0}
+#state-map-workspace .sm-brand button svg{width:24px;height:24px;display:block}
+@media(pointer:coarse){#sm-cells polygon:hover:not([data-selected=true]){stroke:var(--map-outline);stroke-width:.65}}
+#state-map-workspace .sm-controls{position:absolute;top:82px;bottom:80px;left:16px;width:260px;padding:14px;overflow:auto;z-index:2}
+#state-map-workspace.sm-tools-collapsed .sm-controls{display:none}
+#state-map-workspace .sm-controls h2{font-size:.92rem;margin:0}
+#state-map-workspace .sm-controls button{font-size:.85rem}
+#state-map-workspace .sm-search-label{margin-bottom:14px}
+#state-map-workspace .sm-categories{display:grid;gap:4px}
+#state-map-workspace .sm-categories button{display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:left;background:transparent;border:1px solid transparent;color:var(--text)}
+#state-map-workspace .sm-categories button span{font-size:.73rem;color:var(--text-muted)}
+#state-map-workspace .sm-categories button[aria-pressed=true]{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+.sm-sidebar-section,.sm-sidebar-actions{border-top:1px solid var(--border);margin-top:16px;padding-top:12px}
+.sm-sidebar-heading{display:flex;align-items:center;justify-content:space-between}
+#state-map-workspace .sm-sidebar-heading button{border:0;background:transparent;color:var(--text);padding:4px 8px;min-width:36px}
+#state-map-workspace .sm-legend{display:grid;gap:4px;padding:6px 0}
+#state-map-workspace .sm-legend button{width:100%;border:0;background:transparent;text-align:left;padding:8px;color:var(--text)}
+.sm-legend .sm-alliance-count{margin-left:auto;color:var(--text-muted);font-size:.75rem}
+.sm-empty-legend{color:var(--text-muted);font-size:.8rem;padding:8px}
+.sm-sidebar-actions{display:grid;gap:4px}
+.sm-sidebar-actions button{width:100%;background:transparent;border:0;color:var(--text);text-align:left}
+#state-map-workspace .sm-view-switch{position:absolute;right:16px;top:16px;padding:4px;gap:4px;z-index:2}
+#state-map-workspace .sm-view-switch button{flex:none;min-height:36px;padding:6px 12px;font-size:.8rem;border-radius:10px}
+.sm-zoom-controls{position:absolute;right:16px;bottom:24px;display:grid;padding:4px;gap:4px;z-index:2}
+.sm-zoom-controls button{background:transparent;border:0;color:var(--text);min-width:42px;font-size:1.2rem}
+#state-map-workspace .sm-status{position:absolute;left:16px;bottom:16px;max-width:calc(100% - 100px);padding:8px 12px;display:grid;gap:3px;font-size:.69rem;color:var(--text-muted);z-index:2}
+#state-map-workspace .sm-status button{font-size:.75rem;min-height:30px;padding:4px 8px}
+#sm-mode-label{font-size:.64rem}
+#state-map-workspace .sm-notification{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);max-width:min(520px,calc(100% - 32px));padding:10px 14px;font-size:.8rem;color:var(--text);min-height:0;z-index:6}
+#state-map-workspace .sm-notification:empty{display:none}
+#state-map-workspace .sm-site-menu{position:absolute;top:78px;left:16px;width:260px;display:grid;gap:3px;padding:12px;z-index:8;max-height:calc(100dvh - 100px);overflow:auto}
+#state-map-workspace .sm-site-menu a,#state-map-workspace .sm-site-menu button{display:block;text-decoration:none;text-align:left;padding:10px;border:0;border-radius:8px;background:transparent;color:var(--text);font-size:.87rem}
+#state-map-workspace .sm-site-menu a:hover,#state-map-workspace .sm-site-menu button:hover{background:var(--accent-soft)}
+#state-map-workspace #sm-settings-content{display:grid;gap:12px}
+#state-map-workspace .sm-access{margin:0;padding:16px}
+#state-map-workspace .sm-dialog{position:fixed;inset:0;width:min(620px,calc(100vw - 32px));margin:auto;max-height:84dvh;z-index:5;box-shadow:0 14px 40px #0006}
+#state-map-workspace .sm-dialog.sm-context{inset:80px 16px auto auto;width:300px;max-height:calc(100dvh - 175px);padding:18px;background:var(--sm-overlay);backdrop-filter:blur(12px)}
+#state-map-workspace .sm-context>header{top:-18px;gap:8px;padding-top:0}
+#state-map-workspace .sm-context h2{font-size:1rem}
+#state-map-workspace .sm-context #sm-panel-content>p:first-child{white-space:pre-line;font-size:.85rem;margin:0;line-height:1.8}
+#state-map-workspace .sm-context #sm-sheet-toggle{border:0;background:transparent;font-size:1.2rem}
+#state-map-workspace .sm-context.sm-sheet-collapsed #sm-panel-content{display:none}
+#state-map-workspace .sm-context.sm-sheet-collapsed{height:auto}
+#state-map-workspace #sm-tooltip{bottom:auto;top:16px;left:50%;transform:translateX(-50%);max-width:320px}
+@media(max-width:55.99rem){
+ #state-map-workspace #sm-svg{width:100%}
+ #state-map-workspace .sm-brand{inset:max(8px,env(safe-area-inset-top)) 8px auto;width:auto;border-radius:14px}
+ #state-map-workspace .sm-brand #sm-toggle-tools{display:none}
+ #state-map-workspace .sm-brand #sm-account{font-size:1.2rem}
+ #state-map-workspace .sm-controls{display:contents}
+ #state-map-workspace.sm-tools-collapsed .sm-controls{display:contents}
+ #state-map-workspace .sm-search-label,#state-map-workspace .sm-sidebar-section,#state-map-workspace .sm-sidebar-actions{display:none}
+ #state-map-workspace .sm-categories{position:absolute;left:8px;right:8px;top:calc(max(8px,env(safe-area-inset-top)) + 62px);display:flex;gap:3px;z-index:2;padding:5px;background:var(--sm-overlay);border:1px solid var(--border);border-radius:12px}
+ #state-map-workspace .sm-categories button{flex:1;justify-content:center;font-size:.7rem;min-height:36px;padding:4px 5px;white-space:nowrap}
+ #state-map-workspace .sm-categories button span{display:none}
+ #state-map-workspace .sm-categories button[data-category=all]{flex:.6}
+ #state-map-workspace .sm-view-switch{top:auto;right:8px;bottom:calc(16px + env(safe-area-inset-bottom));padding:3px}
+ #state-map-workspace .sm-view-switch button{font-size:.65rem;min-height:32px;padding:4px 7px}
+ #state-map-workspace .sm-zoom-controls{display:none!important}
+ #state-map-workspace .sm-status{left:8px;bottom:calc(16px + env(safe-area-inset-bottom));max-width:42%;padding:6px 8px;font-size:.59rem;pointer-events:none}
+ #state-map-workspace .sm-status:has(button:not([hidden])){pointer-events:auto}
+ #state-map-workspace .sm-site-menu{top:calc(max(8px,env(safe-area-inset-top)) + 58px);left:8px;max-height:calc(100dvh - 100px)}
+ #state-map-workspace .sm-dialog{inset:auto 0 0;width:100%;max-width:none;max-height:82dvh;margin:0;border-radius:20px 20px 0 0;padding:20px 16px;padding-bottom:max(20px,env(safe-area-inset-bottom))}
+ #state-map-workspace .sm-dialog.sm-context{inset:auto 8px calc(65px + env(safe-area-inset-bottom));width:auto;max-height:55dvh;border-radius:18px;padding:16px}
+ #state-map-workspace .sm-context>header{top:-16px}
+ #state-map-workspace .sm-context:not(.sm-context-editing) #sm-panel-content{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px}
+ #state-map-workspace .sm-context:not(.sm-context-editing) #sm-panel-content>p{font-size:.75rem!important}
+ #state-map-workspace .sm-context:not(.sm-context-editing) #sm-panel-content>button{font-size:.75rem}
+ #state-map-workspace .sm-context.sm-sheet-collapsed #sm-panel-content{display:none}
+ #state-map-workspace .sm-notification{top:calc(max(8px,env(safe-area-inset-top)) + 115px);bottom:auto;font-size:.72rem;max-width:calc(100% - 24px);width:max-content}
+ #state-map-workspace #sm-tooltip{display:none}
+}
