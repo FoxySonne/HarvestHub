@@ -11,8 +11,17 @@ body.state-map-screen .app-layout{max-width:120rem;grid-template-columns:13rem m
 .sm .sm-map-tools{display:grid;grid-template-columns:minmax(0,1fr) auto}.sm .sm-map-tools select{inline-size:100%;max-inline-size:100%;width:100%;max-width:100%}.sm .sm-map-tools>div{flex-shrink:0}.sm .sm-map-tools button{width:44px;min-width:44px;flex:0 0 44px}
 @media(max-width:55.99rem){.sm .sm-viewport{height:auto;min-height:0;aspect-ratio:1}.sm .sm-map-tools select{font-size:.75rem;padding:6px}.sm .sm-map-tools>div{gap:4px}.sm-fullscreen .sm-viewport{height:calc(100dvh - 320px);min-height:250px;aspect-ratio:auto}}
 /* The reference is a continuous territory map, not a graph of points. */
-.sm .sm-viewport{background:#080b0f}
-#sm-cells polygon,[data-theme=light] #sm-cells polygon{fill:#ececec;stroke:none;stroke-width:1.25;vector-effect:non-scaling-stroke}
+.sm .sm-viewport{background:var(--bg);--map-outline:#c7d2dc;--map-label:#e6edf2;--map-label-halo:#101820}
+[data-theme=light] .sm .sm-viewport{background:var(--bg);--map-outline:#34494e;--map-label:#20373a;--map-label-halo:#e8f2f2}
+#sm-cells polygon,[data-theme=light] #sm-cells polygon{fill:transparent;stroke:var(--map-outline);stroke-width:1;vector-effect:non-scaling-stroke;pointer-events:all}
+#sm-cells polygon.sm-muted{opacity:.18;pointer-events:none}
 #sm-cells polygon:hover,#sm-cells polygon[data-selected="true"]{stroke:#5d9d41;stroke-width:2}
-#sm-labels text,[data-theme=light] #sm-labels text{fill:#15201a;stroke:#ecececb0;stroke-width:1.5px}
+#sm-labels text,[data-theme=light] #sm-labels text{fill:var(--map-label);stroke:var(--map-label-halo);stroke-width:2px}
+.sm-view-switch{display:flex;gap:8px;padding:10px 14px;border-bottom:1px solid var(--sm-line)}
+.sm-view-switch button{flex:1;max-width:240px;background:var(--sm-bg);border:1px solid var(--sm-line)}
+.sm-view-switch button[aria-pressed=true]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.sm-tabs button,.sm-view-switch button{color:var(--text)}
+.sm-view-switch button[aria-pressed=true]{color:var(--accent)}
+.sm[data-map-view=game] .sm-viewport{height:65dvh}
+@media(max-width:55.99rem){.sm-view-switch{padding:8px}.sm-view-switch button{max-width:none}.sm[data-map-view=game] .sm-viewport{height:auto;aspect-ratio:1.52}}
 @media(min-width:56rem){.sm .sm-viewport{height:88dvh;min-height:550px}.sm-fullscreen .sm-viewport{height:calc(100dvh - 270px);min-height:300px}}
