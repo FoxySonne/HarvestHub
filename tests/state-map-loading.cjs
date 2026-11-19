@@ -18,7 +18,7 @@ const server=http.createServer((req,res)=>{const p=path.resolve(root,'.'+new URL
   });
   await page.goto(base+'/?loading-check=20261119#state-map');
   await page.waitForSelector('#state-map-workspace',{state:'attached'});
-  assert.equal(await page.locator('#functional').isVisible(),true);
+  assert.equal(await page.locator('#state-map-workspace').isVisible(),true);
   await page.waitForFunction(()=>document.querySelectorAll('#sm-cells polygon').length===313);
   await page.waitForFunction(()=>window.harvestHubFeatures?.getCurrent()==='state-map');
   await page.waitForSelector('#sm-retry-cloud',{state:'visible',timeout:14000});
@@ -31,7 +31,7 @@ const server=http.createServer((req,res)=>{const p=path.resolve(root,'.'+new URL
   await page.locator('#sm-retry-cloud').click();
   await page.waitForFunction(()=>!document.querySelector('#sm-save').disabled);
   assert.equal(await page.locator('#sm-title').inputValue(),'Карта аккаунта после повтора');
-  await page.locator('.main-nav a[href="#calculators"]').click();
+  await page.locator('#sm-menu-toggle').click();await page.locator('#sm-site-menu a[href="#calculators"]').click();
   await page.waitForFunction(()=>window.harvestHubFeatures?.getCurrent()==='calculators');
   assert.equal(await page.locator('#page-content .calculator-directory').isVisible(),true);
   await page.close();
@@ -42,7 +42,7 @@ const server=http.createServer((req,res)=>{const p=path.resolve(root,'.'+new URL
   await guest.route('**/assets/state-map/large-map.json*',r=>{if(fail){fail=false;return r.fulfill({status:503,body:'Unavailable'});}return r.continue();});
   await guest.goto(base+'/?loading-check=20261119#state-map');
   const retry=guest.getByRole('button',{name:'Повторить загрузку карты',exact:true});
-  await retry.waitFor();assert.equal(await guest.locator('#functional').isVisible(),true);
+  await retry.waitFor();assert.equal(await guest.locator('#state-map-workspace').isVisible(),true);
   await retry.click();await guest.waitForFunction(()=>document.querySelectorAll('#sm-cells polygon').length===313);
   assert.equal(await guest.locator('#sm-viewport').isVisible(),true);
   await guest.close();console.log('PASS: failed map asset has visible error and working retry on mobile');
