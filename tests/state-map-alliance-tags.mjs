@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {allianceTagError} from '../js/pages/state-map-alliance-tags.js';
+const alliances=[{id:'a',name:'ZOV'},{id:'b',name:'zov'}];
+assert.equal(allianceTagError('ZoV',alliances),'');
+assert.notEqual(allianceTagError('ZOV',alliances),'');
+assert.equal(allianceTagError('zov',alliances,'b'),'');
+assert.notEqual(allianceTagError('ZOV',alliances,'b'),'');
+assert.notEqual(allianceTagError('ABCD',alliances),'');
+assert.equal(allianceTagError('РУС',alliances),'');
+assert.equal(allianceTagError('РуС',alliances),'');
+assert.notEqual(allianceTagError('',alliances),'');
+console.log('PASS case-sensitive creation and rename, exact duplicates, three-letter limit, Cyrillic');

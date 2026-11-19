@@ -40,12 +40,13 @@
     document.body.classList.remove("drawer-open");
     main.inert = false;
     topbar.inert = false;
-    sidebar.inert = !desktopMenu.matches;
+    sidebar.inert = !desktopMenu.matches || document.body.classList.contains('state-map-screen');
     utilities.inert = !desktopPanel.matches;
 
     panelLauncher.inert = false;
     [menuButton, panelButton, panelLauncher, profileButton].forEach(button => button.setAttribute("aria-expanded", "false"));
     if (restoreFocus && trigger?.getClientRects().length) trigger.focus({preventScroll: true});
+    window.dispatchEvent(new CustomEvent('harvesthub:drawerchange',{detail:{open:false}}));
   }
 
   function showDrawer(drawer, trigger) {
@@ -66,24 +67,26 @@
 
     trigger.setAttribute("aria-expanded", "true");
     drawer.querySelector("[data-close-drawer]").focus({preventScroll: true});
+    window.dispatchEvent(new CustomEvent('harvesthub:drawerchange',{detail:{open:true}}));
   }
 
   function applyLayout() {
+    const dockedMenu = desktopMenu.matches && !document.body.classList.contains('state-map-screen');
     const activeElement = document.activeElement;
     const focusInSidebar = sidebar.contains(activeElement);
     const focusInUtilities = utilities.contains(activeElement);
     const hadDrawer = Boolean(openDrawer);
     closeDrawer(false);
-    sidebar.classList.toggle("is-drawer", !desktopMenu.matches);
+    sidebar.classList.toggle("is-drawer", !dockedMenu);
     utilities.classList.toggle("is-drawer", !desktopPanel.matches);
-    sidebar.hidden = !desktopMenu.matches;
+    sidebar.hidden = !dockedMenu;
     utilities.hidden = !desktopPanel.matches;
-    sidebar.inert = !desktopMenu.matches;
+    sidebar.inert = !dockedMenu;
     utilities.inert = !desktopPanel.matches;
     menuButton.hidden = desktopMenu.matches;
     panelButton.hidden = desktopPanel.matches;
     panelLauncher.hidden = !desktopMenu.matches || desktopPanel.matches;
-    sidebar.querySelector("[data-close-drawer]").hidden = desktopMenu.matches;
+    sidebar.querySelector("[data-close-drawer]").hidden = dockedMenu;
     utilities.querySelector("[data-close-drawer]").hidden = desktopPanel.matches;
     if ((focusInSidebar && sidebar.hidden) || (focusInUtilities && utilities.hidden) || hadDrawer) main.focus({preventScroll:true});
   }
@@ -219,6 +222,8 @@
   },{passive:true});
   utilities.addEventListener('touchcancel',()=>utilitySwipe=null,{passive:true});
 
+  window.harvestHubShell={openMenu:trigger=>showDrawer(sidebar,trigger||menuButton),closeDrawer,refreshLayout:applyLayout};
+  window.addEventListener('harvesthub:layoutchange',applyLayout);
   document.documentElement.classList.add("js");
   syncTheme();
   showPage();
