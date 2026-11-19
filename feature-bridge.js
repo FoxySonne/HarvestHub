@@ -1,7 +1,7 @@
 // Page contracts from HarvestHub-test; the responsive frame owns navigation.
 (() => {
   const routes = {
-    home:'home.html', calculators:'calculator.html', settings:'settings.html',
+    home:'home.html', calculators:'calculator.html', settings:'settings.html', 'state-map':'state-map.html',
     profile:'profile.html', 'advanced-access':'advanced-access.html',
     ipk:'calculator/ipk.html', 'turbo-vs':'calculator/turbo-vs.html'
   };

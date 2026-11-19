@@ -7,6 +7,7 @@
     { title: "Главная", path: "home.html", group: "Основное" },
     { title: "Калькулятор", path: "calculator.html", group: "Основное" },
     { title: "Настройки", path: "settings.html", group: "Основное" },
+    { title: "Карта штата", path: "state-map.html", group: "Основное" },
     { title: "Игра по-крупному", path: "calculator/ipk.html", group: "Калькуляторы" },
     { title: "Турбочерепашка & VS", path: "calculator/turbo-vs.html", group: "Калькуляторы" }
   ];
@@ -24,6 +25,7 @@
     profile: "../pages/profile.js",
     "advanced-access": "../pages/advanced-access.js",
     settings: "../pages/settings.js",
+    "state-map": "../pages/state-map.js",
     ipk: "../calculators/ipk.js",
     "turbo-vs": "../calculators/turbo-vs.js",
     "troop-training": "../calculators/troop-training.js",

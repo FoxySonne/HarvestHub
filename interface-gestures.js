@@ -1,6 +1,6 @@
 // The interface scrolls; each map handles its own independent scale.
 (() => {
- const mapSelector='.map-canvas,.interactive-reservoir';
+ const mapSelector='.map-canvas,.interactive-reservoir,.sm-viewport';
  for(const type of ['touchstart','touchmove'])document.addEventListener(type,event=>{
   if(event.touches.length>1&&!event.target.closest(mapSelector)&&event.cancelable)event.preventDefault();
  },{passive:false});
