@@ -13,7 +13,7 @@ body.state-map-screen .app-layout{max-width:120rem;grid-template-columns:13rem m
 /* The reference is a continuous territory map, not a graph of points. */
 .sm .sm-viewport{background:var(--bg);--map-outline:#c7d2dc;--map-label:#e6edf2;--map-label-halo:#101820}
 [data-theme=light] .sm .sm-viewport{background:var(--bg);--map-outline:#34494e;--map-label:#20373a;--map-label-halo:#e8f2f2}
-#sm-cells polygon,[data-theme=light] #sm-cells polygon{fill:transparent;stroke:var(--map-outline);stroke-width:1;vector-effect:non-scaling-stroke;pointer-events:all}
+#sm-cells polygon,[data-theme=light] #sm-cells polygon{fill:transparent;stroke:var(--map-outline);stroke-width:.65;vector-effect:non-scaling-stroke;pointer-events:all}
 #sm-cells polygon.sm-muted{opacity:.18;pointer-events:none}
 #sm-cells polygon:hover,#sm-cells polygon[data-selected="true"]{stroke:#5d9d41;stroke-width:2}
 #sm-labels text,[data-theme=light] #sm-labels text{fill:var(--map-label);stroke:var(--map-label-halo);stroke-width:2px}
