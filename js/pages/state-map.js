@@ -1,5 +1,6 @@
-import {category,today,validDate,replay,summarize,forecast,captureError} from './state-map-rules.js?v=20261119-views-5';
-import {projectPoint,projectionBounds} from './state-map-projection.js?v=20261119-views-5';
+import {category,today,validDate,replay,summarize,forecast,captureError} from './state-map-rules.js?v=20261119-spacing-6';
+import {projectPoint,projectionBounds} from './state-map-projection.js?v=20261119-spacing-6';
+import {insetPolygon} from './state-map-outline.js?v=20261119-spacing-6';
 const NS='http://www.w3.org/2000/svg',PREFIX='harvesthub_state_map_v2:';
 const PALETTE=['#e66a61','#58a6e7','#63b980','#bd89df','#e6bc4a','#e37bb1','#49bdbb','#df8d44','#8b99ec','#b0bd61','#b57b6c','#a7c8d8'];
 const make=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};
@@ -8,10 +9,10 @@ export async function init(){
  const signal=window.harvestHubPageAbortController?.signal,$=selector=>root.querySelector(selector),on=(n,e,fn,opts={})=>n.addEventListener(e,fn,{...opts,signal});
  document.body.classList.add('state-map-screen');
  const cleanup=()=>{document.body.classList.remove('state-map-screen');$('#sm-panel')?.close();};signal?.addEventListener('abort',cleanup,{once:true});
- if(!document.querySelector('#state-map-css')){const l=make('link');l.id='state-map-css';l.rel='stylesheet';l.href='css/features/state-map.css?v=20261119-views-5';document.head.append(l);}
+ if(!document.querySelector('#state-map-css')){const l=make('link');l.id='state-map-css';l.rel='stylesheet';l.href='css/features/state-map.css?v=20261119-spacing-6';document.head.append(l);}
  const tell=text=>{$('#sm-message').textContent=text;},status=text=>{$('#sm-save-status').textContent=text;};
  async function bounded(operation){let timer,cancel;try{return await Promise.race([operation,new Promise((_,reject)=>{cancel=()=>reject(Error('Загрузка отменена.'));signal?.addEventListener('abort',cancel,{once:true});timer=setTimeout(()=>reject(Error('Сервер не ответил вовремя. Результат операции не подтверждён.')),10000);})]);}finally{clearTimeout(timer);if(cancel)signal?.removeEventListener('abort',cancel);}}
- let asset;try{asset=await bounded(fetch('assets/state-map/large-map.json?v=20261119-views-5',{signal}).then(r=>{if(!r.ok)throw Error();return r.json();}));}catch{if(!signal?.aborted){tell('Не удалось загрузить карту. Повторите попытку.');const retry=make('button','Повторить загрузку карты');retry.type='button';on(retry,'click',()=>window.loadPage('state-map.html'));$('#sm-message').append(retry);}return;}if(signal?.aborted)return;
+ let asset;try{asset=await bounded(fetch('assets/state-map/large-map.json?v=20261119-spacing-6',{signal}).then(r=>{if(!r.ok)throw Error();return r.json();}));}catch{if(!signal?.aborted){tell('Не удалось загрузить карту. Повторите попытку.');const retry=make('button','Повторить загрузку карты');retry.type='button';on(retry,'click',()=>window.loadPage('state-map.html'));$('#sm-message').append(retry);}return;}if(signal?.aborted)return;
  const client=window.harvestHubSupabase,profile=window.getActiveProfile?.(),user=profile?.type==='account'?profile.supabaseUserId:null,key=PREFIX+(user||profile?.id||'guest');
  const blank=()=>({version:2,map:'large',title:'Карта штата',alliances:[],owners:{},planning:false,start:today(),baseOwners:{},actions:[]});
  const byId=new Map(asset.cells.map(c=>[c.id,c]));
@@ -86,7 +87,7 @@ export async function init(){
  root.querySelectorAll('[data-panel]').forEach(b=>on(b,'click',()=>open(b.dataset.panel)));on($('#sm-title'),'change',()=>{if(readOnly)return;state.title=$('#sm-title').value.trim()||'Карта штата';persist();});on($('#sm-save'),'click',saveCloud);
  on($('#sm-filter'),'change',render);
  let world={x:48,y:48,width:928,height:928},scale=1,px=48,py=48;const viewport=$('#sm-viewport'),pointers=new Map();let drag=null,pinch=null,tapped=null,projection='top';
- function transform(){const width=world.width/scale,height=world.height/scale;px=Math.max(world.x,Math.min(world.x+world.width-width,px));py=Math.max(world.y,Math.min(world.y+world.height-height,py));svg.setAttribute('viewBox',`${px} ${py} ${width} ${height}`);labels.style.visibility=scale>=2?'visible':'hidden';}
+ function transform(){const width=world.width/scale,height=world.height/scale;px=Math.max(world.x,Math.min(world.x+world.width-width,px));py=Math.max(world.y,Math.min(world.y+world.height-height,py));svg.setAttribute('viewBox',`${px} ${py} ${width} ${height}`);labels.style.visibility=scale>=2?'visible':'hidden';const unitsPerPixel=Math.max(width/Math.max(1,viewport.clientWidth),height/Math.max(1,viewport.clientHeight));for(const c of asset.cells){const projected=c.polygon.map(p=>projectPoint(p,projection));shapes.get(c.id).setAttribute('points',insetPolygon(projected,unitsPerPixel*.8).map(p=>p.join(',')).join(' '));}}
  function setProjection(view){projection=view==='game'?'game':'top';world=projectionBounds(asset.cells,projection);for(const c of asset.cells){shapes.get(c.id).setAttribute('points',c.polygon.map(p=>projectPoint(p,projection).join(',')).join(' '));const [x,y]=projectPoint([c.x,c.y],projection);texts.get(c.id).setAttribute('x',x);texts.get(c.id).setAttribute('y',y);}scale=1;px=world.x;py=world.y;root.dataset.mapView=projection;root.querySelectorAll('[data-map-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mapView===projection)));transform();try{localStorage.setItem('harvesthub_state_map_projection',projection);}catch{}}
  root.querySelectorAll('[data-map-view]').forEach(b=>on(b,'click',()=>setProjection(b.dataset.mapView)));
  const resize=new ResizeObserver(transform);resize.observe(viewport);signal?.addEventListener('abort',()=>resize.disconnect(),{once:true});
