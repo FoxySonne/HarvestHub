@@ -142,16 +142,37 @@
   async function loadBlock(containerId, filePath, signal) {
     const container = document.getElementById(containerId);
     if (!container) return false;
+    if (containerId === "page-content") {
+      // Reveal the page shell before any network/module/account initialization.
+      // A stalled request must never leave the entire functional page hidden.
+      document.querySelectorAll(".pages > .page").forEach(page => { page.hidden = page.id !== "functional"; });
+      container.setAttribute("aria-busy", "true");
+      container.innerHTML = '<p role="status">Загружаем раздел…</p>';
+    }
+    const showLoadError = () => {
+      if (containerId !== "page-content" || signal?.aborted) return;
+      const error = document.createElement("p");
+      error.setAttribute("role", "alert");
+      error.textContent = "Не удалось загрузить раздел. Проверьте подключение и повторите попытку.";
+      const retry = document.createElement("button");
+      retry.type = "button";
+      retry.textContent = "Повторить загрузку";
+      retry.addEventListener("click", () => window.loadPage(filePath.replace(/^pages\//, "")), { signal });
+      container.replaceChildren(error, retry);
+      container.setAttribute("aria-busy", "false");
+    };
 
     let response;
     try {
       response = await fetch(withCacheBust(filePath), { cache: "no-store", signal });
     } catch (error) {
       if (signal?.aborted) return false;
+      showLoadError();
       window.harvestHubNotifications?.error(error, "Не удалось загрузить раздел сайта. Проверьте подключение и попробуйте ещё раз.");
       return false;
     }
     if (!response.ok) {
+      showLoadError();
       console.warn(`Не удалось загрузить ${filePath}:`, response.status);
       window.harvestHubNotifications?.error(
         { message: `HTTP ${response.status}`, status: response.status },
@@ -195,6 +216,7 @@
       renderQuickLinks();
       window.renderHarvestHubClock?.();
     }
+    if (containerId === "page-content") container.setAttribute("aria-busy", "false");
     return !signal?.aborted;
   }
 
