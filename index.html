@@ -18,7 +18,7 @@
 <script defer src="js/account/advanced-mode-access.js?v=20261004-security-1"></script>
 <script defer src="js/account/advanced-access-store.js?v=20261004-security-1"></script>
 <script defer src="js/core/utc-clock.js?v=20261004-security-1"></script>
-<script defer src="js/core/navigation.js?v=20261115-simple-navigation"></script>
+<script defer src="js/core/navigation.js?v=20261119-state-map"></script>
 <script defer src="js/core/app-loader.js?v=20261004-security-1"></script>
 <script defer src="js/account/account-storage.js?v=20261004-security-1"></script>
 <script defer src="js/account/game-profile-manager.js?v=20261004-security-1"></script>
@@ -44,8 +44,8 @@
 <script type="module" src="js/ui/page-enhancements.js?v=20261004-security-1"></script>
 <script defer src="js/ui/tooltips.js?v=20261004-security-1"></script>
 <script defer src="js/sync/sync-status.js?v=20261004-security-1"></script>
-  <script src="feature-bridge.js?v=20261115-simple-navigation" defer></script>
-  <script src="app.js?v=20261115-simple-navigation" defer></script>
+  <script src="feature-bridge.js?v=20261119-state-map" defer></script>
+  <script src="app.js?v=20261119-state-map" defer></script>
   <script src="map-data.js?v=20261004-security-1" defer></script>
   <script src="maps.js?v=20261004-security-1" defer></script>
   <script src="screens.js?v=20261004-security-1" defer></script>
@@ -78,6 +78,7 @@
       <nav aria-label="Основная навигация" class="main-nav">
         <a href="#home" aria-current="page">Главная</a>
         <a href="#calculators">Калькулятор</a>
+        <a href="#state-map">Карта штата</a>
         <a href="#settings">Настройки</a>
       </nav>
       <div class="sidebar-bottom"><button type="button" class="desktop-account-launcher secondary-button" data-account-button>Открыть профиль</button>

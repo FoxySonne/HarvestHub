@@ -1,0 +1,29 @@
+.state-map-workspace {max-width:1500px;margin:auto;--sm-line:#65718a;--sm-empty:#d9dde4}
+.state-map-workspace [hidden]{display:none!important}
+.sm-layout {display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:16px;align-items:start}
+.sm-map-column,.sm-panel {min-width:0}
+.sm-panel {display:grid;gap:12px}
+.sm-toolbar {display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.sm-toolbar label {display:flex;gap:8px;align-items:center}
+.sm-viewport {position:relative;aspect-ratio:1;overflow:hidden;background:#f5f6f8;border:1px solid var(--sm-line);border-radius:12px;touch-action:none;cursor:grab}
+.sm-viewport:active {cursor:grabbing}
+#sm-svg {width:100%;height:100%;display:block;user-select:none}
+#sm-svg path {fill:var(--sm-empty);stroke:#586377;stroke-width:.8;stroke-linejoin:round}
+#sm-svg path[data-selected="true"] {stroke:#111;stroke-width:3}
+#sm-svg path:hover {stroke:#111;stroke-width:2}
+#sm-svg path.sm-muted {opacity:.12;pointer-events:none}
+.state-map-workspace button,.state-map-workspace input,.state-map-workspace select {font:inherit;max-width:100%;min-height:36px}
+.state-map-workspace button {cursor:pointer;padding:7px 12px;border-radius:8px}
+.state-map-workspace label {display:grid;gap:5px;margin:8px 0}
+.state-map-workspace input:not([type="color"]),.state-map-workspace select {padding:6px 8px;min-width:0;width:100%}
+.sm-alliance {display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:7px;align-items:center;margin-top:10px}
+.sm-alliance input[type="color"] {width:36px;padding:0;border:0;background:transparent}
+.sm-alliance span {overflow-wrap:anywhere}
+.sm-help {font-size:.85rem;opacity:.8;line-height:1.5}
+.sm-notice {padding:12px;border:1px solid var(--sm-line);border-radius:8px;font-size:.9rem}
+.sm-warning {color:#dd902b}
+.sm-summary-item {padding:10px 0;border-top:1px solid var(--sm-line);overflow-wrap:anywhere}
+.sm-summary-item p {margin:4px 0}
+#sm-message {min-height:1.6em}
+@media(max-width:1100px){.sm-layout{grid-template-columns:1fr}.sm-panel{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}}
+@media(prefers-reduced-motion:reduce){#sm-svg *{transition:none}}
