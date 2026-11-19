@@ -1,29 +1,14 @@
-<section id="state-map-workspace" class="state-map-workspace" aria-labelledby="state-map-heading">
-  <h1 id="state-map-heading">Карта штата</h1>
-  <p>Распределите бастионы и территории между союзами.</p>
-  <p class="sm-notice">Первая версия карты: распределение сохраняется в этом браузере. Планирование захватов и доступ по коду ещё не подключены.</p>
-  <p id="sm-message" role="status" aria-live="polite">Загрузка карты…</p>
-  <div class="sm-layout">
-    <div class="sm-map-column">
-      <div class="sm-toolbar" aria-label="Управление картой">
-        <button type="button" data-sm-zoom="in" aria-label="Приблизить карту">＋</button>
-        <button type="button" data-sm-zoom="out" aria-label="Отдалить карту">−</button>
-        <button type="button" data-sm-zoom="reset">Вся карта</button>
-        <label>Показать <select id="sm-filter"><option value="all">Все участки</option><option value="bastion">Бастионы</option><option value="territory">Территории</option><option value="trade">Торговые посты</option></select></label>
-      </div>
-      <div id="sm-viewport" class="sm-viewport" data-no-swipe tabindex="0" aria-label="Карта. Масштаб — кнопками плюс и минус, перемещение — перетаскиванием или стрелками.">
-        <svg id="sm-svg" viewBox="0 0 1024 1024" role="img" aria-label="Разметка карты штата"></svg>
-      </div>
-      <p class="sm-help">Наведите на участок, чтобы увидеть данные. Нажмите, чтобы выбрать. При увеличении перетаскивайте карту; на сенсорном экране используйте кнопки масштаба.</p>
-      <article id="sm-selection" class="card" data-no-collapse="true" aria-live="polite"><h2>Выберите участок</h2><p>Здесь появятся его тип, производство и владелец.</p></article>
-    </div>
-    <aside class="sm-panel" aria-label="Распределение карты">
-      <section class="card"><h2>Союзы</h2>
-        <form id="sm-add-alliance"><label>Название союза<input id="sm-alliance-name" maxlength="40" required autocomplete="off"></label><button type="submit">Добавить союз</button></form>
-        <div id="sm-alliances"></div>
-      </section>
-      <section class="card"><h2>Производство</h2><p class="sm-help">Кварц — показатель на одного участника. Медь — общий показатель союза. Одинаковые бонусы одного типа территории не складываются.</p><div id="sm-summary"></div></section>
-      <section class="card"><h2>Файл распределения</h2><button type="button" id="sm-export">Скачать распределение</button><label>Открыть сохранённое распределение<input type="file" id="sm-import" accept="application/json,.json"></label><p class="sm-help">Сама карта уже встроена. Файл нужен только для переноса ваших отметок.</p></section>
-    </aside>
-  </div>
+<section id="state-map-workspace" class="sm" aria-labelledby="sm-heading">
+ <header class="sm-heading"><div><p class="sm-eyebrow">ШТАТ · ТЕРРИТОРИИ · СОЮЗЫ</p><h1 id="sm-heading">Карта штата</h1></div><button id="sm-fullscreen" type="button">На весь экран</button></header>
+ <div class="sm-topline"><label>Название карты<input id="sm-title" maxlength="80" placeholder="Например, штат 124"></label><div><span id="sm-save-status" role="status">Загрузка…</span><button id="sm-save" type="button">Сохранить в аккаунт</button></div></div>
+ <div class="sm-tabs" role="group" aria-label="Управление картой"><button type="button" data-panel="alliances">Союзы</button><button type="button" data-panel="planning">План захватов</button><button type="button" data-panel="summary">Ресурсы и бонусы</button></div>
+ <div id="sm-message" role="status" aria-live="polite"></div>
+ <div class="sm-board-wrap">
+  <div class="sm-map-tools"><label class="sm-sr-only" for="sm-filter">Типы участков</label><select id="sm-filter"><option value="all">Вся карта</option><option value="bastion">Бастионы</option><option value="territory">Территории</option><option value="trade">Торговые посты</option></select><div><button type="button" data-zoom="in" aria-label="Приблизить">＋</button><button type="button" data-zoom="out" aria-label="Отдалить">−</button><button type="button" data-zoom="reset" aria-label="Показать всю карту">⤢</button></div></div>
+  <div id="sm-viewport" class="sm-viewport" data-no-swipe tabindex="0" aria-label="Карта штата. Масштаб: плюс и минус, перемещение: стрелки или перетаскивание."><svg id="sm-svg" viewBox="0 0 1024 1024" aria-label="Карта владений"><g id="sm-links" aria-hidden="true"></g><g id="sm-cells"></g><g id="sm-labels" aria-hidden="true"></g></svg><div id="sm-tooltip" hidden role="tooltip"></div></div>
+  <div class="sm-map-caption"><span>○ Бастионы · □ Территории · ◇ Торговые посты<br>Линия между участками — общая граница</span><span id="sm-mode-label">Свободная раскраска</span></div>
+ </div>
+ <div id="sm-legend" class="sm-legend" aria-label="Легенда союзов"></div>
+ <section class="sm-access" aria-label="Доступ к карте"><h2>Доступ к карте</h2><p>Приглашённые видят только последнюю сохранённую карту и не могут её менять.</p><form id="sm-invite-form"><label>Ввести пригласительный код<input id="sm-invite" inputmode="numeric" pattern="[0-9]{12}" minlength="12" maxlength="12" autocomplete="off" required></label><button type="submit">Вход</button></form><div class="sm-access-actions"><button type="button" id="sm-own-map" hidden>Вернуться к своей карте</button><button type="button" id="sm-give-code">Выдать пригласительный код</button><button type="button" id="sm-rotate-code" hidden>Сменить код</button><output id="sm-code"></output></div><label id="sm-connections-label" hidden>Карты с сохранённым доступом<select id="sm-connections"><option value="">Выберите карту</option></select></label></section>
+ <dialog id="sm-panel" class="sm-dialog"><header><h2 id="sm-panel-heading"></h2><button id="sm-panel-close" type="button" aria-label="Закрыть панель">×</button></header><div id="sm-panel-content"></div></dialog>
 </section>
