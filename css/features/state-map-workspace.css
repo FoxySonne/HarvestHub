@@ -29,6 +29,21 @@ body.state-map-screen #backdrop{z-index:80}
 #state-map-workspace .sm-legend button{width:100%;border:0;background:transparent;text-align:left;padding:8px;color:var(--text)}
 .sm-legend .sm-alliance-count{margin-left:auto;color:var(--text-muted);font-size:.75rem}
 .sm-empty-legend{color:var(--text-muted);font-size:.8rem;padding:8px}
+#state-map-workspace .sm-legend-row{display:grid;grid-template-columns:minmax(0,1fr) 40px 40px;gap:3px;align-items:center}
+#state-map-workspace .sm-legend-row button{min-height:40px;padding:6px;border:1px solid transparent;border-radius:8px}
+#state-map-workspace .sm-legend-row .sm-paint-owner{display:flex;align-items:center;gap:8px;min-width:0}
+#state-map-workspace .sm-paint-owner[aria-pressed=true]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+#state-map-workspace .sm-legend-row .sm-alliance-action{text-align:center;font-size:1.2rem;border-color:var(--border)}
+#state-map-workspace .sm-paint-help{font-size:.72rem;color:var(--accent);margin:6px 0;line-height:1.5}
+#state-map-workspace #sm-paint-stop{width:100%;font-size:.75rem;min-height:36px}
+#state-map-workspace.sm-alliance-collapsed #sm-legend,#state-map-workspace.sm-alliance-collapsed #sm-paint-help{display:none}
+@media(max-width:55.99rem){
+ #state-map-workspace .sm-controls .sm-sidebar-section{display:block;position:absolute;top:calc(max(8px,env(safe-area-inset-top)) + 115px);left:8px;width:218px;max-height:35dvh;overflow:auto;z-index:2;background:var(--sm-overlay);border:1px solid var(--border);border-radius:12px;margin:0;padding:6px}
+ #state-map-workspace .sm-controls .sm-legend{max-height:19dvh;overflow:auto}
+ #state-map-workspace .sm-controls .sm-legend-row button{min-height:44px}
+ #state-map-workspace .sm-controls .sm-legend-row{grid-template-columns:minmax(0,1fr) 44px 44px}
+ #state-map-workspace .sm-notification{top:auto;bottom:calc(112px + env(safe-area-inset-bottom))}
+}
 .sm-sidebar-actions{display:grid;gap:4px}
 .sm-sidebar-actions button{width:100%;background:transparent;border:0;color:var(--text);text-align:left}
 #state-map-workspace .sm-view-switch{position:absolute;right:16px;top:16px;padding:4px;gap:4px;z-index:2}
@@ -90,3 +105,5 @@ body.state-map-screen #backdrop{z-index:80}
  #state-map-workspace .sm-map-actions{position:absolute;bottom:calc(116px + env(safe-area-inset-bottom));right:8px;display:grid;gap:4px;padding:10px;z-index:7;max-width:calc(100% - 16px)}
  #state-map-workspace .sm-map-actions button{display:block;text-align:left;background:transparent;border:0;color:var(--text)}
 }
+
+@media(max-width:55.99rem){#state-map-workspace .sm-notification{top:auto;bottom:calc(112px + env(safe-area-inset-bottom))}}
