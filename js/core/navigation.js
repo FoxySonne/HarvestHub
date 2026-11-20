@@ -223,7 +223,7 @@
   async function loadPage(pageName, options = {}) {
     const previousLeaveGuard = window.harvestHubConfirmPageLeave;
     if (typeof previousLeaveGuard === "function"
-        && previousLeaveGuard(pageName) === false) {
+        && await previousLeaveGuard(pageName) === false) {
       return false;
     }
     window.harvestHubConfirmPageLeave = null;
