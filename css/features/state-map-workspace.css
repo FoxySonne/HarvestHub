@@ -107,3 +107,12 @@ body.state-map-screen #backdrop{z-index:80}
 }
 
 @media(max-width:55.99rem){#state-map-workspace .sm-notification{top:auto;bottom:calc(112px + env(safe-area-inset-bottom))}}
+#state-map-workspace #sm-paint-toggle{width:100%;margin-top:6px;min-height:40px;font-size:.8rem;border:1px solid var(--border);background:transparent;color:var(--text)}
+#state-map-workspace #sm-paint-toggle[aria-pressed=true]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+#state-map-workspace[data-painting=true] #sm-cells polygon{cursor:crosshair}
+#state-map-workspace .sm-confirm{inset:0;margin:auto;width:min(440px,calc(100vw - 32px));height:fit-content;max-height:80dvh;padding:24px;border-radius:18px;z-index:10;background:var(--panel);color:var(--text);border:1px solid var(--border)}
+#state-map-workspace .sm-confirm h2{font-size:1.1rem;margin:0 0 14px}
+#state-map-workspace .sm-confirm p{font-size:.9rem;line-height:1.6;margin:0 0 22px;color:var(--text-muted)}
+#state-map-workspace .sm-confirm-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px}
+#state-map-workspace .sm-confirm-actions button{min-height:44px;flex:1}
+#state-map-workspace #sm-confirm-cancel{background:transparent;color:var(--text);border:1px solid var(--border)}
